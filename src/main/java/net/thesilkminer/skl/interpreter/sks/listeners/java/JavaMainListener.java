@@ -1,6 +1,5 @@
 package net.thesilkminer.skl.interpreter.sks.listeners.java;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 
@@ -20,6 +19,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.tools.FileObject;
 import javax.tools.ForwardingJavaFileManager;
 import javax.tools.JavaCompiler;
@@ -294,6 +294,6 @@ public class JavaMainListener implements IScriptListener {
 			return Optional.of(this.logs);
 		}
 
-		return Optional.absent();
+		return Optional.empty();
 	}
 }

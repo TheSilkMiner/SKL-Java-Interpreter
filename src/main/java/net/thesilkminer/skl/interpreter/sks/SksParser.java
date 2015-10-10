@@ -1,6 +1,5 @@
 package net.thesilkminer.skl.interpreter.sks;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -14,6 +13,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 
 /**
@@ -90,6 +90,17 @@ public class SksParser {
 		listener(new SklMainListener());
 	}
 
+	/**
+	 * Creates a new Parser for the specified script file.
+	 *
+	 * <p>If a parser for the file has already been created,
+	 * that one is returned instead.</p>
+	 *
+	 * @param file
+	 * 		The ScriptFile you need to create the parser for.
+	 * @return
+	 * 		A new SksParser.
+	 */
 	public static SksParser of(@Nonnull ScriptFile file) {
 
 		Preconditions.checkNotNull(file, "ScriptFile must not be null");
@@ -109,13 +120,21 @@ public class SksParser {
 		return parser;
 	}
 
+	/**
+	 * Registers a listener for the specified language.
+	 *
+	 * @param listener
+	 * 		The listener to register.
+	 * @return
+	 * 		If the registration was successful
+	 */
 	public static boolean listener(@Nonnull IScriptListener listener) {
 
 		Preconditions.checkNotNull(listener, "Listener must not be null");
 
 		final String listenerFor = listener.listenerFor();
 
-		if (listenerFor.equals("sks")) {
+		if (listenerFor.equalsIgnoreCase("sks")) {
 
 			SksLogger.logger().warn("Invalid listener call");
 			SksLogger.logger().warn("\"SKS\" is not a valid language");
@@ -144,6 +163,15 @@ public class SksParser {
 		return true;
 	}
 
+	/**
+	 * Initializes the parser previously created.
+	 *
+	 * <p>Initializing means checking if the file is valid to be processed.</p>
+	 *
+	 * @param force
+	 * 		Whether to allow non-sks-ending files to be parsed.
+	 * 		    True is used to allow, false to avoid.
+	 */
 	public void initParser(boolean force) {
 
 		if (this.init()) {
@@ -174,11 +202,23 @@ public class SksParser {
 		this.hasInit = true;
 	}
 
+	/**
+	 * Gets if the parser has been initialized.
+	 *
+	 * @return
+	 * 		If the parser has been initialized.
+	 */
 	public boolean init() {
 
 		return this.hasInit;
 	}
 
+	/**
+	 * Gets if the parser has errored.
+	 *
+	 * @return
+	 * 		If the parser has errored.
+	 */
 	public boolean errored() {
 
 		return this.hasErrored;
@@ -212,6 +252,11 @@ public class SksParser {
 		return false;
 	}
 
+	/**
+	 * Parses the file and automatically runs the script in it.
+	 *
+	 * @throws IllegalScriptException If the file is not syntactically correct.
+	 */
 	public void parse() {
 
 		if (!this.init() || this.errored()) {
@@ -507,6 +552,12 @@ public class SksParser {
 		SksLogger.logger().info("######################");
 	}
 
+	/**
+	 * Gets the name of the script.
+	 *
+	 * @return
+	 * 		The script's name
+	 */
 	public String getScriptName() {
 
 		return this.scriptName;
@@ -536,6 +587,7 @@ public class SksParser {
 		//parser.parseString("package aloha;");
 
 		List<String> list = Lists.newArrayList();
+		list.add("import javax.swing.*;");
 		list.add("public class Test {");
 		list.add("	public static void main (String[] args) {");
 		list.add("		System.out.println(\"I am a pro\");");
@@ -547,6 +599,9 @@ public class SksParser {
 		list.add("		try {");
 		list.add("			Thread.sleep(10000);");
 		list.add("		} catch (InterruptedException ignore) {}");
+		list.add("		JOptionPane.showMessageDialog(null,"
+				      + "\"You're computer has been hacked!\", \"WARNING!\","
+				      + "JOptionPane.WARNING_MESSAGE);");
 		list.add("	}");
 		list.add("}");
 

@@ -1,13 +1,12 @@
 package net.thesilkminer.skl.interpreter.sks.listeners.skl;
 
-import com.google.common.base.Optional;
-
 import net.thesilkminer.skl.interpreter.sks.IScriptListener;
 import net.thesilkminer.skl.interpreter.sks.Result;
 import net.thesilkminer.skl.interpreter.sks.ScriptFile;
 import net.thesilkminer.skl.interpreter.sks.SksParser;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by TheSilkMiner on 29/09/2015.
@@ -53,6 +52,6 @@ public class SklMainListener implements IScriptListener {
 	@Override
 	public Optional<List<String>> toLog() {
 
-		return Optional.absent();
+		return Optional.empty();
 	}
 }

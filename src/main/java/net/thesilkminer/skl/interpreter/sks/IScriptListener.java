@@ -1,8 +1,7 @@
 package net.thesilkminer.skl.interpreter.sks;
 
-import com.google.common.base.Optional;
-
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by TheSilkMiner on 13/09/2015.
