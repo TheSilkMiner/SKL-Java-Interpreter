@@ -71,6 +71,6 @@ shadowJar {
 */
 
 checkstyle {
-	toolVersion = "6.10.1"
+	toolVersion = "6.14.1"
 	configFile = new File(rootDir, "checkstyle.xml")
 }

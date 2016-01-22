@@ -25,15 +25,15 @@ after_success:
   - echo Now building the artifacts
   - ./gradlew build --info
   - echo Deploying artifact
-  - echo ** Insert here artifact deploy **
+  - echo == Insert here artifact deploy ==
 after_failure:
   - echo Build failed
   - echo See the log for errors
   - echo Deploying build log...
-  - echo ** Insert here log deploy **
+  - echo == Insert here log deploy ==
 after_script:
   - echo After script...
-  - echo ** Insert cleanup if needed **
+  - echo == Insert cleanup if needed ==
   - echo Build terminated.
 notifications:
   email:

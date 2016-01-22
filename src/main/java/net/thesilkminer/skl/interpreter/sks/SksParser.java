@@ -4,6 +4,17 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import net.thesilkminer.skl.interpreter.sks.components.decisionals.EndIfDeclaration;
+import net.thesilkminer.skl.interpreter.sks.components.decisionals.IfDeclaration;
+import net.thesilkminer.skl.interpreter.sks.components.declaration.ScriptDeclaration;
+import net.thesilkminer.skl.interpreter.sks.components.language.LanguageDeclaration;
+import net.thesilkminer.skl.interpreter.sks.components.listeners.FallBackListenersDeclaration;
+import net.thesilkminer.skl.interpreter.sks.components.listeners.ListenerDeclaration;
+import net.thesilkminer.skl.interpreter.sks.components.listeners.MultiListenerDeclaration;
+import net.thesilkminer.skl.interpreter.sks.components.listeners.NoListenerDeclaration;
+import net.thesilkminer.skl.interpreter.sks.components.markers.ScriptEndDeclaration;
+import net.thesilkminer.skl.interpreter.sks.components.markers.ScriptStartDeclaration;
+import net.thesilkminer.skl.interpreter.sks.listeners.c.CMainListener;
 import net.thesilkminer.skl.interpreter.sks.listeners.java.JavaMainListener;
 import net.thesilkminer.skl.interpreter.sks.listeners.skl.SklMainListener;
 
@@ -11,9 +22,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 
 /**
@@ -22,7 +36,7 @@ import javax.annotation.Nonnull;
  * <p>This class's scope is parse a specified file and run
  * every script which is found in them.
  */
-public class SksParser {
+public final class SksParser {
 
 	private enum FixedExpressions {
 
@@ -63,6 +77,7 @@ public class SksParser {
 
 	private static Map<ScriptFile, SksParser> map = Maps.newHashMap();
 	private static Map<String, IScriptListener> listeners = Maps.newHashMap();
+	private static List<ILanguageComponent> components = Lists.newArrayList();
 	private boolean hasInit;
 	private boolean hasErrored;
 	private ScriptFile file;
@@ -76,18 +91,68 @@ public class SksParser {
 	private String actualLanguage;
 	private String listenerClass;
 	private String scriptName;
+	private List<String> listenersClasses;
+
+	/* -- 0.2 rendition stuff -- */
+	/**
+	 * Simply needed to pass VarArg argument.
+	 */
+	private boolean wasVarArg;
+	private List<ILanguageComponent> argsBefore;
+	private boolean hasScriptLineBefore;
+	private boolean shallIgnore;
+
+	/* -- 0.3 rendition stuff (I think) -- */
+	/**
+	 * Holds all the data that previously was stored in different variables.
+	 *
+	 * <p>First argument is the identifier, second is the value assigned.</p>
+	 */
+	private Map<String, Object> datas; // TODO
 
 	private static final String USER_VARIABLE = "@USER@";
 
 	private SksParser(ScriptFile file) {
 
 		this.file = file;
+		this.datas = Maps.newLinkedHashMap();
+		this.listenersClasses = Lists.newArrayList();
+		this.argsBefore = Lists.newArrayList();
 	}
 
 	static {
 
 		listener(new JavaMainListener());
 		listener(new SklMainListener());
+		listener(new CMainListener());
+	}
+
+	static {
+
+		component(new LanguageDeclaration());
+		component(new ScriptDeclaration());
+		component(new ListenerDeclaration());
+		component(new MultiListenerDeclaration());
+		component(new FallBackListenersDeclaration());
+		// TODO subsequentlisteners
+		// TODO? addonlisteners
+		component(new NoListenerDeclaration());
+		// TODO multiscript
+		component(new ScriptStartDeclaration());
+		component(new IfDeclaration());
+		// TODO else
+		component(new EndIfDeclaration());
+		component(new ScriptEndDeclaration());
+	}
+
+	private static void component(@Nonnull ILanguageComponent component) {
+
+		components.add(component);
+
+		SksLogger.logger().info("Registered language component:");
+		SksLogger.logger().info("    Name: " + component.getName());
+		SksLogger.logger().info("    Declaration: " + component.getScriptDeclaration());
+		SksLogger.logger().info("    Syntax: " + component.getSyntax());
 	}
 
 	/**
@@ -137,7 +202,7 @@ public class SksParser {
 		if (listenerFor.equalsIgnoreCase("sks")) {
 
 			SksLogger.logger().warn("Invalid listener call");
-			SksLogger.logger().warn("\"SKS\" is not a valid language");
+			SksLogger.logger().warn("\"sks\" is not a valid language");
 
 			return false;
 		}
@@ -160,6 +225,8 @@ public class SksParser {
 
 		listeners.put(listenerFor, listener);
 
+		SksLogger.logger().info("Listener added for language " + listenerFor);
+
 		return true;
 	}
 
@@ -179,7 +246,7 @@ public class SksParser {
 			throw new IllegalStateException("The parser has already been initialized");
 		}
 
-		SksLogger.logger().fine("Initialising Parser");
+		SksLogger.logger().info("Initialising Parser");
 
 		try {
 
@@ -231,7 +298,7 @@ public class SksParser {
 			throw new IllegalStateException("File was null");
 		}
 
-		SksLogger.logger().fine("Checking file");
+		SksLogger.logger().info("Checking file");
 
 		if (!this.file.getFileExtension().equalsIgnoreCase("sks")) {
 
@@ -240,7 +307,8 @@ public class SksParser {
 				SksLogger.logger().error("File specified does not end with .sks");
 				SksLogger.logger().error("Aborting process");
 
-				throw new IllegalStateException();
+				throw new IllegalStateException("File must end with .sks to be "
+						+ "able to be parsed");
 			}
 
 			SksLogger.logger().warn("File specified does not end with .sks");
@@ -281,10 +349,270 @@ public class SksParser {
 			SksLogger.logger().stacktrace(e);
 		}
 
-		this.sendToListener(lines);
+		this.sendToListeners(lines);
 	}
 
 	private boolean parseString(String line) {
+
+		if (components.isEmpty()
+				      || System.getProperty("skl.sks.useLegacyParsing", "false")
+				               .equals("true")) {
+
+			SksLogger.logger().warn("Using legacy parsing");
+			SksLogger.logger().warn("New scripts may not work with it");
+			return this.parseHardcodedString(line);
+		}
+
+		final String format = String.format("<#%s>", EndIfDeclaration.DECLARATION);
+
+		if (!line.equals(format) && this.shallIgnore) {
+
+			return true;
+		}
+
+		if (!(line.startsWith("<#") && line.endsWith(">"))) {
+
+			this.hasScriptLineBefore = true;
+			return false;
+		}
+
+		final String rawLine = line.substring(2, line.length() - 1);
+		final String[] parts = rawLine.split(Pattern.quote(" "));
+		final String cmd = parts[0];
+		final String[] args = new String[parts.length - 1];
+
+		System.arraycopy(parts, 1, args, 0, parts.length - 1);
+
+		SksLogger.logger().info("Found script command");
+		SksLogger.logger().info("  Command: " + cmd);
+
+		final ComponentArguments arguments = ComponentArguments.of();
+		boolean flag = false;
+
+		for (final ILanguageComponent component : components) {
+
+			if (!this.canApply(component, cmd, args)) {
+
+				continue;
+			}
+
+			final Location location = Location.from(this.hasScriptLineBefore,
+								      this.argsBefore);
+
+			if (!component.isLocationValid(location)) {
+
+				try {
+
+					component.throwInvalidLocation();
+				} catch (IllegalScriptException e) {
+
+					throw new IllegalScriptException(
+							String
+							.format("Invalid location for command %s!",
+									cmd),
+							e);
+				}
+			}
+
+			this.tryParseString(component, line, arguments, args);
+
+			this.performChanges(component);
+
+			this.addListenerToListeners();
+
+			flag = true;
+			this.argsBefore.add(component);
+		}
+
+		if (flag) {
+
+			return true;
+		}
+
+		throw new IllegalScriptException("Command not recognized");
+	}
+
+	private boolean canApply(final ILanguageComponent component,
+							  final String command,
+							  final String[] args) {
+
+		if (!command.equals(component.getScriptDeclaration())) {
+
+			return false;
+		}
+
+		final Optional<ComponentArguments> optionalArguments = component.getArguments();
+
+		if (!optionalArguments.isPresent() && args.length != 0) {
+
+			return false;
+		}
+
+		final ComponentArguments arguments = ComponentArguments.of(optionalArguments.get());
+
+		String key = ComponentArguments.INIT;
+		String value = "";
+		final boolean flag = arguments.isVarArg(key);
+
+		for (int i = 0; i < args.length; ++i) {
+
+			if (flag) {
+
+				value += args[i];
+
+				if (i == args.length - 1) {
+
+					arguments.pairValue(ComponentArguments.asVararg(key),
+							            value);
+				}
+
+				continue;
+			}
+
+			if (i % 2 == 0) {
+
+				value = args[i];
+				arguments.pairValue(key, value);
+			} else if (i % 2 == 1) {
+
+				key = args[i];
+			}
+		}
+
+		this.wasVarArg = flag;
+
+		return component.canApply(arguments);
+	}
+
+	private void tryParseString(final ILanguageComponent component,
+								 final String line,
+								 final ComponentArguments arguments,
+								 final String[] args) {
+
+		String key = ComponentArguments.INIT;
+		String value = "";
+		final boolean flag = this.wasVarArg;
+		this.wasVarArg = false;
+
+		for (int i = 0; i < args.length; ++i) {
+
+			if (flag) {
+
+				value += args[i];
+
+				if (i == args.length - 1) {
+
+					arguments.addArgument(ComponentArguments.asVararg(key),
+							            value);
+				}
+
+				continue;
+			}
+
+			if (i % 2 == 0) {
+
+				value = args[i];
+				arguments.addArgument(key, value);
+			} else if (i % 2 == 1) {
+
+				key = args[i];
+			}
+		}
+
+		try {
+
+			if (!component.parse(arguments)) {
+
+				if (!component.parseFallback(line)) {
+
+					throw new IllegalScriptException(
+							"Unable to parse line " + line);
+				}
+			}
+		} catch (ILanguageComponent.UnableToParseException e) {
+
+			throw new IllegalScriptException(e.getLocalizedMessage(), e);
+		}
+	}
+
+	private void performChanges(ILanguageComponent component) {
+
+		if (component.hasErrored()) {
+
+			component.throwError();
+		}
+
+		try {
+
+			Optional<ComponentArguments> neededEditsOptional = component
+					      .getNeededEdits();
+
+			if (!neededEditsOptional.isPresent()) {
+
+				return;
+			}
+
+			Set<Map.Entry<String, String>> edits = neededEditsOptional
+					      .get()
+					      .getArguments()
+					      .entrySet();
+
+			for (Map.Entry<String, String> edit : edits) {
+
+				Field field = this.getClass().getDeclaredField(edit.getKey());
+
+				if (field != null) {
+
+					try {
+
+						field.set(this, edit.getValue());
+					} catch (IllegalArgumentException e) {
+
+						field.set(this, Boolean.valueOf(edit.getValue()));
+					}
+				}
+			}
+
+		} catch (ReflectiveOperationException e) {
+
+			SksLogger.logger().error("Unable to set all data values");
+		}
+	}
+
+	private void addListenerToListeners() {
+
+		if (this.listenerClass == null || this.listenerClass.isEmpty()) {
+
+			return;
+		}
+
+		String[] listeners;
+
+		if (this.listenerClass.contains(";")) {
+
+			listeners = this.listenerClass.split(Pattern.quote(";"));
+		} else {
+
+			listeners = new String[] {this.listenerClass};
+		}
+
+		for (String listener : listeners) {
+
+			if (listener.endsWith(";")) {
+
+				listener = listener.substring(0, listener.length() - 1);
+			} else if (listener.startsWith(";")) {
+
+				listener = listener.substring(1);
+			}
+
+			this.listenersClasses.add(listener);
+		}
+
+		this.listenerClass = "";
+	}
+
+	private boolean parseHardcodedString(String line) {
 
 		if (line.equals(FixedExpressions.SCRIPT_END.getFull())) {
 
@@ -423,7 +751,7 @@ public class SksParser {
 						break;
 					}
 
-					SksLogger.logger().severe("In SKL 1.0, the modifier \""
+					SksLogger.logger().severe("In SKL 0.1, the modifier \""
 							      + modifier + "\" is not allowed as "
 							      + "modifier of a script");
 
@@ -437,6 +765,31 @@ public class SksParser {
 		}
 
 		throw new IllegalScriptException();
+	}
+
+	private void sendToListeners(List<String> lines) {
+
+		SksLogger.logger().info("Sending script to listeners...");
+		int ind = 1;
+
+		if (listenersClasses.isEmpty()) {
+
+			SksLogger.logger().info(
+					      String.format("Sending script to listener #%d...",
+							         ind));
+			this.sendToListener(lines);
+		}
+
+		for (String listenerClass : listenersClasses) {
+
+			SksLogger.logger().info(
+					      String.format("Sending script to listener #%d...",
+							         ind));
+			this.listenerClass = listenerClass;
+			this.sendToListener(lines);
+			this.listenerClass = "";
+			++ind;
+		}
 	}
 
 	private void sendToListener(List<String> lines) {
@@ -464,10 +817,48 @@ public class SksParser {
 
 			} catch (ClassNotFoundException e) {
 
-				throw new IllegalStateException("Listener class not found");
+				if (FallBackListenersDeclaration.wasFallBack(this.listenerClass)) {
+
+					SksLogger.logger().info("Attempting to send script to "
+							       + this.listenerClass);
+					SksLogger.logger().info("Failed: class not found");
+					SksLogger.logger().info("Since it is a fallback listener, "
+							       + "skipping to the next");
+
+					return;
+				}
+
+				try {
+
+					throw new IllegalStateException("Listener class "
+							+ "not found", e);
+				} catch (IllegalStateException exc) {
+
+					throw new IllegalScriptException("Invalid script", exc);
+				}
 			} catch (InstantiationException | IllegalAccessException e) {
 
-				throw new IllegalStateException("Unable to instantiate listener");
+				if (FallBackListenersDeclaration.wasFallBack(this.listenerClass)) {
+
+					SksLogger.logger().info("Attempting to send script to "
+							       + this.listenerClass);
+					SksLogger.logger().info("Failed: cannot initialize class");
+					SksLogger.logger().info("Since it is a fallback listener, "
+							       + "skipping to the next");
+
+					return;
+				}
+
+
+				try {
+
+					throw new IllegalStateException("Unable to "
+							+ "instantiate listener",
+							e);
+				} catch (IllegalStateException exc) {
+
+					throw new IllegalScriptException("Invalid script", exc);
+				}
 			}
 
 			return;
@@ -481,20 +872,25 @@ public class SksParser {
 		Preconditions.checkNotNull(listener, "No listener specified for language "
 				                + this.actualLanguage);
 
-		SksLogger.logger().info("Sending to listener...");
+		SksLogger.logger().info(String.format("Sending to listener %s...",
+				      listener.toString()));
 
 		if (!listener.listenerFor().equalsIgnoreCase(this.actualLanguage)) {
 
-			throw new RuntimeException("The specified listener is not valid");
+			throw new IllegalScriptException("The specified listener is not valid");
 		}
 
 		if (listener.needsInit() && !listener.hasAlreadyInit()) {
 
-			SksLogger.logger().fine("Initialising listener...");
+			SksLogger.logger().info("Initialising listener...");
 			listener.init(this, this.file);
 		}
 
+		SksLogger.logger().info("Sending...");
+
 		listener.runScript(lines);
+
+		SksLogger.logger().info("Checking listener result...");
 
 		Result result = listener.result();
 
@@ -510,6 +906,9 @@ public class SksParser {
 
 				SksLogger.logger().warn("Retry to send the script.");
 			}
+		} else {
+
+			SksLogger.logger().info("Execution went correctly");
 		}
 
 		SksLogger.logger().info("Logging listener info...");
@@ -538,7 +937,7 @@ public class SksParser {
 							         new Exception("Stack trace"));
 				} else if (msg.startsWith("[FINE]")) {
 
-					SksLogger.logger().fine(msg.substring(5));
+					SksLogger.logger().info(msg.substring(5));
 				} else {
 
 					SksLogger.logger().info(msg);
@@ -576,12 +975,28 @@ public class SksParser {
 		parser.parseString("<#listener "
 				      + "\"net.thesilkminer.skl.interpreter.sks."
 				      + "listeners.java.JavaMainListener\">");
+		parser.parseString("<#fallbacklisteners "
+				      + "\"net.thesilkminer.skl.interpreter.sks."
+				      + "listeners.java.JavaMainListener\" "
+				      + "\"net.thesilkminer.skl.interpreter.sks."
+				      + "listeners.ccd.ADS\">");
+		parser.parseString("<#listeners "
+				      + "\"net.thesilkminer.skl.interpreter.sks."
+				      + "listeners.java.JavaMainListener\" "
+				      + "\"net.thesilkminer.skl.interpreter.sks."
+				      + "listeners.ccd.ADSA\">");
+		parser.parseString("<#nolistener>");
+		parser.parseString("<#ifdef \"debugTest=true\" type javaProperty>");
+		parser.parseString("<#script \"Test\" visibility private>");
+		parser.parseString("<#endif>");
 		//parser.parseString("<#listener \"com.example.MyListener\">");
 		//parser.parseString("<#language \"skl\">");
 		//parser.parseString("package aloha;");
-		parser.parseString("<#script \"Test\" declare public>");
+		//parser.parseString("<#script \"Test\" declare public>");
+		parser.parseString("<#script \"Test\" visibility public>");
+		//parser.parseString("<#script \"Test\" visibility private>");
 		//parser.parseString("<#script \"JustBecauseICan\" declare private>");
-		parser.parseString("<#start \"script\">");
+		parser.parseString("<#start script>");
 		parser.parseString("package aloha;");
 		parser.parseString("<#end script>");
 		//parser.parseString("package aloha;");
@@ -602,9 +1017,11 @@ public class SksParser {
 		list.add("		JOptionPane.showMessageDialog(null,"
 				      + "\"You're computer has been hacked!\", \"WARNING!\","
 				      + "JOptionPane.WARNING_MESSAGE);");
+		list.add("      System.out.println(String.format("
+				      + "\"# generated by %s on %d.%d.%d\", \"a\", 1, 2, 3));");
 		list.add("	}");
 		list.add("}");
 
-		parser.sendToListener(list);
+		parser.sendToListeners(list);
 	}
 }

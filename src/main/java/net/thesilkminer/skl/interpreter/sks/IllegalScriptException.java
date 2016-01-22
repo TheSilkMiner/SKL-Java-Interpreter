@@ -1,9 +1,11 @@
 package net.thesilkminer.skl.interpreter.sks;
 
 /**
- * Created by TheSilkMiner on 13/09/2015.
- * Package: net.thesilkminer.skl.interpreter.sks.
- * Project: Java Interpreter.
+ * Represents an exception thrown when the script does not comply to the syntax.
+ *
+ * @author TheSilkMiner
+ *
+ * @since 0.1
  */
 public class IllegalScriptException extends RuntimeException {
 
