@@ -422,6 +422,7 @@ public final class SksParser {
 
 			flag = true;
 			this.argsBefore.add(component);
+			break;
 		}
 
 		if (flag) {
