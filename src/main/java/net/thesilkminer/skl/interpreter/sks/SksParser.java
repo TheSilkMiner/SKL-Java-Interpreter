@@ -75,12 +75,12 @@ public final class SksParser {
 		}
 	}
 
-	private static Map<ScriptFile, SksParser> map = Maps.newHashMap();
+	private static Map<IScriptHolder, SksParser> map = Maps.newHashMap();
 	private static Map<String, IScriptListener> listeners = Maps.newHashMap();
 	private static List<ILanguageComponent> components = Lists.newArrayList();
 	private boolean hasInit;
 	private boolean hasErrored;
-	private ScriptFile file;
+	private IScriptHolder file;
 	private BufferedReader fileReader;
 
 	/* -- Internal stuff -- */
@@ -112,7 +112,7 @@ public final class SksParser {
 
 	private static final String USER_VARIABLE = "@USER@";
 
-	private SksParser(ScriptFile file) {
+	private SksParser(IScriptHolder file) {
 
 		this.file = file;
 		this.datas = Maps.newLinkedHashMap();
@@ -162,13 +162,13 @@ public final class SksParser {
 	 * that one is returned instead.</p>
 	 *
 	 * @param file
-	 * 		The ScriptFile you need to create the parser for.
+	 * 		The IScriptHolder you need to create the parser for.
 	 * @return
 	 * 		A new SksParser.
 	 */
-	public static SksParser of(@Nonnull ScriptFile file) {
+	public static SksParser of(@Nonnull IScriptHolder file) {
 
-		Preconditions.checkNotNull(file, "ScriptFile must not be null");
+		Preconditions.checkNotNull(file, "IScriptHolder must not be null");
 
 		if (map.containsKey(file) && map.get(file) != null) {
 
@@ -248,11 +248,19 @@ public final class SksParser {
 
 		SksLogger.logger().info("Initialising Parser");
 
+		if (!(this.file instanceof ScriptFile)) {
+
+			SksLogger.logger().error("Currently only ScriptFile is"
+					      + "supported as a script holder");
+		}
+
+		ScriptFile scriptFile = (ScriptFile) this.file;
+
 		try {
 
 			this.checkFile(force);
 
-			this.fileReader = new BufferedReader(new FileReader(this.file));
+			this.fileReader = new BufferedReader(new FileReader(scriptFile));
 
 		} catch (Throwable throwable) {
 
@@ -300,7 +308,7 @@ public final class SksParser {
 
 		SksLogger.logger().info("Checking file");
 
-		if (!this.file.getFileExtension().equalsIgnoreCase("sks")) {
+		if (!((ScriptFile) this.file).getFileExtension().equalsIgnoreCase("sks")) {
 
 			if (!force) {
 

@@ -3,10 +3,7 @@ package net.thesilkminer.skl.interpreter.sks.listeners.java;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 
-import net.thesilkminer.skl.interpreter.sks.IScriptListener;
-import net.thesilkminer.skl.interpreter.sks.Result;
-import net.thesilkminer.skl.interpreter.sks.ScriptFile;
-import net.thesilkminer.skl.interpreter.sks.SksParser;
+import net.thesilkminer.skl.interpreter.sks.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -167,7 +164,7 @@ public class JavaMainListener implements IScriptListener {
 	}
 
 	@Override
-	public void init(SksParser parser, ScriptFile scriptFile) {
+	public void init(SksParser parser, IScriptHolder scriptFile) {
 
 		this.logs = Lists.newArrayList();
 		this.className = parser.getScriptName();

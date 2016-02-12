@@ -60,7 +60,7 @@ public interface IScriptListener {
 	 *
 	 * @since 0.1
 	 */
-	void init(SksParser parser, ScriptFile scriptFile);
+	void init(SksParser parser, IScriptHolder scriptFile);
 
 	/**
 	 * Runs the script.

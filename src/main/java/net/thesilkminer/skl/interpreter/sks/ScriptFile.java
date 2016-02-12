@@ -15,7 +15,7 @@ import javax.annotation.Nonnull;
  * @since 1.0
  * @version 1.0
  */
-public class ScriptFile extends File {
+public class ScriptFile extends File implements IScriptHolder {
 
 	private String fileName;
 	private String fileExtension;
