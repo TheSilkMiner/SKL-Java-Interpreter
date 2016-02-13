@@ -1,6 +1,6 @@
 package net.thesilkminer.skl.interpreter;
 
-import net.thesilkminer.skl.interpreter.sks.ui.UiFrame;
+import net.thesilkminer.skl.interpreter.implementation.sks.ui.UiFrame;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
