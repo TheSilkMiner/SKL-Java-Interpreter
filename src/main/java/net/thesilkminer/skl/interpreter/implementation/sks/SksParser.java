@@ -6,20 +6,18 @@ import com.google.common.collect.Maps;
 
 import net.thesilkminer.skl.interpreter.api.sks.holder.IScriptHolder;
 import net.thesilkminer.skl.interpreter.api.sks.language.ComponentArguments;
-import net.thesilkminer.skl.interpreter.api.sks.language.components.ILanguageComponent;
 import net.thesilkminer.skl.interpreter.api.sks.language.IllegalScriptException;
 import net.thesilkminer.skl.interpreter.api.sks.language.Location;
+import net.thesilkminer.skl.interpreter.api.sks.language.components.ILanguageComponent;
 import net.thesilkminer.skl.interpreter.api.sks.listener.IScriptListener;
+import net.thesilkminer.skl.interpreter.api.sks.listener.ISubsequentListener;
 import net.thesilkminer.skl.interpreter.api.sks.listener.Result;
 import net.thesilkminer.skl.interpreter.api.sks.parser.ISksParser;
 import net.thesilkminer.skl.interpreter.implementation.sks.components.decisionals.EndIfDeclaration;
 import net.thesilkminer.skl.interpreter.implementation.sks.components.decisionals.IfDeclaration;
 import net.thesilkminer.skl.interpreter.implementation.sks.components.declaration.ScriptDeclaration;
 import net.thesilkminer.skl.interpreter.implementation.sks.components.language.LanguageDeclaration;
-import net.thesilkminer.skl.interpreter.implementation.sks.components.listeners.FallBackListenersDeclaration;
-import net.thesilkminer.skl.interpreter.implementation.sks.components.listeners.ListenerDeclaration;
-import net.thesilkminer.skl.interpreter.implementation.sks.components.listeners.MultiListenerDeclaration;
-import net.thesilkminer.skl.interpreter.implementation.sks.components.listeners.NoListenerDeclaration;
+import net.thesilkminer.skl.interpreter.implementation.sks.components.listeners.*;
 import net.thesilkminer.skl.interpreter.implementation.sks.components.markers.ScriptEndDeclaration;
 import net.thesilkminer.skl.interpreter.implementation.sks.components.markers.ScriptStartDeclaration;
 import net.thesilkminer.skl.interpreter.implementation.sks.listeners.c.CMainListener;
@@ -113,6 +111,8 @@ public final class SksParser implements ISksParser {
 	private List<ILanguageComponent> argsBefore;
 	private boolean hasScriptLineBefore;
 	private boolean shallIgnore;
+	private ISubsequentListener listenerTmp;
+	private List<ISubsequentListener> previousSsListener;
 
 	/* -- 0.3 rendition stuff (I think) -- */
 	/**
@@ -124,12 +124,14 @@ public final class SksParser implements ISksParser {
 
 	private static final String USER_VARIABLE = "@USER@";
 
-	private SksParser(IScriptHolder file) {
+	private SksParser(final IScriptHolder file) {
 
 		this.file = file;
 		this.datas = Maps.newLinkedHashMap();
 		this.listenersClasses = Lists.newArrayList();
 		this.argsBefore = Lists.newArrayList();
+		this.shallIgnore = false;
+		this.previousSsListener = Lists.newArrayList();
 	}
 
 	static {
@@ -146,7 +148,7 @@ public final class SksParser implements ISksParser {
 		component(new ListenerDeclaration());
 		component(new MultiListenerDeclaration());
 		component(new FallBackListenersDeclaration());
-		// TODO subsequentlisteners
+		component(new SubSequentListenersDeclaration());
 		// TODO? addonlisteners
 		component(new NoListenerDeclaration());
 		// TODO multiscript
@@ -785,10 +787,120 @@ public final class SksParser implements ISksParser {
 					      String.format("Sending script to listener #%d...",
 							         ind));
 			this.listenerClass = listenerClass;
+			final boolean ss = this.listenerClass.startsWith("SS");
+
+			if (ss) {
+
+				this.handleSubsequentListenersBefore();
+			}
+
 			this.sendToListener(lines);
+
+			if (ss) {
+
+				this.handleSubsequentListenersAfter();
+			}
+
 			this.listenerClass = "";
 			++ind;
 		}
+	}
+
+	private void handleSubsequentListenersBefore() {
+
+		ISubsequentListener[] prev = new ISubsequentListener[
+				this.previousSsListener.size()];
+		prev = this.previousSsListener.toArray(prev);
+
+		int beginIndex = 0;
+
+		for (int i = 0; i < this.listenerClass.length(); ++i) {
+
+			if (this.listenerClass.charAt(i) == '#') {
+
+				beginIndex = i;
+			}
+		}
+
+		this.listenerClass = this.listenerClass.substring(beginIndex);
+
+		if (this.listenerClass.startsWith("#")) {
+
+			this.listenerClass = this.listenerClass.substring(1);
+		}
+
+		ISubsequentListener listener;
+
+		try {
+
+			Class<?> listenerClazz = Class.forName(this.listenerClass);
+
+			if (!ISubsequentListener.class.isAssignableFrom(listenerClazz)) {
+
+				throw new IllegalScriptException("Invalid listener");
+			}
+
+			Object classInstance = listenerClazz.newInstance();
+
+			if (!(classInstance instanceof ISubsequentListener)) {
+
+				throw new IllegalScriptException("Invalid listener");
+			}
+
+			listener = (ISubsequentListener) classInstance;
+
+		} catch (ClassNotFoundException e) {
+
+			try {
+
+				throw new IllegalStateException("Listener class "
+						+ "not found", e);
+			} catch (IllegalStateException exc) {
+
+				throw new IllegalScriptException("Invalid script", exc);
+			}
+		} catch (InstantiationException | IllegalAccessException e) {
+
+			try {
+
+				throw new IllegalStateException("Unable to "
+						+ "instantiate listener",
+						e);
+			} catch (IllegalStateException exc) {
+
+				throw new IllegalScriptException("Invalid script", exc);
+			}
+		}
+
+		IScriptListener[] prevSl = new IScriptListener[prev.length];
+
+		for (int i = 0; i < prev.length; ++i) {
+
+			prevSl[i] = prev[i].getListenerForSuccessor(listener.getListener());
+		}
+
+		if (!listener.canApply(prevSl)) {
+
+			throw new IllegalScriptException("Specified chain of listener "
+					+ "can't be applied.");
+		}
+
+		listener.obtainPreviousListenersInformation(prevSl);
+	}
+
+	private void handleSubsequentListenersWhile(final IScriptListener listener) {
+
+		if (!(listener instanceof ISubsequentListener)) {
+
+			return;
+		}
+
+		this.listenerTmp = (ISubsequentListener) listener;
+	}
+
+	private void handleSubsequentListenersAfter() {
+
+		this.previousSsListener.add(this.listenerTmp);
 	}
 
 	private void sendToListener(List<String> lines) {
@@ -812,6 +924,9 @@ public final class SksParser implements ISksParser {
 				}
 
 				IScriptListener realListener = (IScriptListener) classInstance;
+
+				this.handleSubsequentListenersWhile(realListener);
+
 				this.sendToListener(realListener, lines);
 
 			} catch (ClassNotFoundException e) {

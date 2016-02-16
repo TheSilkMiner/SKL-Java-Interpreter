@@ -101,6 +101,16 @@ public interface IScriptListener {
 	 */
 	Optional<List<String>> toLog();
 
+	/*
+	 * The following methods are reported by IntelliJ as:
+	 *
+	 * - Overriders of the methods in java.lang.Object
+	 * - Implemented by java.lang.Object
+	 *
+	 *
+	 * What????
+	 */
+
 	@Override
 	boolean equals(Object object);
 

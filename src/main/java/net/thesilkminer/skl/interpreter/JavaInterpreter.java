@@ -18,6 +18,12 @@ public class JavaInterpreter extends JFrame implements Runnable {
 
 	private boolean running;
 
+	/**
+	 * Main method.
+	 *
+	 * @param args
+	 * 		The passed in arguments
+	 */
 	public static void main(String[] args) {
 
 		JavaInterpreter thiz = new JavaInterpreter();
