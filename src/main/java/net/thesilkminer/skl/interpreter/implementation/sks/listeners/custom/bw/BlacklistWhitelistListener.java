@@ -7,7 +7,7 @@ import net.thesilkminer.skl.interpreter.api.sks.holder.IScriptHolder;
 import net.thesilkminer.skl.interpreter.api.sks.listener.IScriptListener;
 import net.thesilkminer.skl.interpreter.api.sks.listener.ISubsequentListener;
 import net.thesilkminer.skl.interpreter.api.sks.listener.Result;
-import net.thesilkminer.skl.interpreter.implementation.sks.SksParser;
+import net.thesilkminer.skl.interpreter.api.sks.parser.ISksParser;
 
 import java.util.List;
 import java.util.Map;
@@ -66,7 +66,7 @@ public class BlacklistWhitelistListener implements IScriptListener, ISubsequentL
 
 
 	@Override
-	public void init(final SksParser parser, final IScriptHolder scriptFile) {
+	public void init(final ISksParser parser, final IScriptHolder scriptFile) {
 
 		this.whiteListItems = Lists.newArrayList();
 		this.blackListItems = Lists.newArrayList();

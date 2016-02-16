@@ -21,6 +21,8 @@ import net.thesilkminer.skl.interpreter.implementation.sks.components.listeners.
 import net.thesilkminer.skl.interpreter.implementation.sks.components.markers.ScriptEndDeclaration;
 import net.thesilkminer.skl.interpreter.implementation.sks.components.markers.ScriptStartDeclaration;
 import net.thesilkminer.skl.interpreter.implementation.sks.listeners.c.CMainListener;
+import net.thesilkminer.skl.interpreter.implementation.sks.listeners.custom.bw.BlacklistWhitelistListener;
+import net.thesilkminer.skl.interpreter.implementation.sks.listeners.custom.register.listeners.ListenerRegisterListener;
 import net.thesilkminer.skl.interpreter.implementation.sks.listeners.java.JavaMainListener;
 import net.thesilkminer.skl.interpreter.implementation.sks.listeners.skl.SklMainListener;
 
@@ -139,6 +141,8 @@ public final class SksParser implements ISksParser {
 		listener(new JavaMainListener());
 		listener(new SklMainListener());
 		listener(new CMainListener());
+		listener(new BlacklistWhitelistListener());
+		listener(new ListenerRegisterListener());
 	}
 
 	static {
@@ -1065,12 +1069,7 @@ public final class SksParser implements ISksParser {
 		SksLogger.logger().info("######################");
 	}
 
-	/**
-	 * Gets the name of the script.
-	 *
-	 * @return
-	 * 		The script's name
-	 */
+	@Override
 	public String getScriptName() {
 
 		return this.scriptName;

@@ -3,7 +3,7 @@ package net.thesilkminer.skl.interpreter.implementation.sks.listeners.skl;
 import net.thesilkminer.skl.interpreter.api.sks.holder.IScriptHolder;
 import net.thesilkminer.skl.interpreter.api.sks.listener.IScriptListener;
 import net.thesilkminer.skl.interpreter.api.sks.listener.Result;
-import net.thesilkminer.skl.interpreter.implementation.sks.SksParser;
+import net.thesilkminer.skl.interpreter.api.sks.parser.ISksParser;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,7 +34,7 @@ public class SklMainListener implements IScriptListener {
 	}
 
 	@Override
-	public void init(SksParser parser, IScriptHolder scriptFile) {
+	public void init(ISksParser parser, IScriptHolder scriptFile) {
 
 	}
 

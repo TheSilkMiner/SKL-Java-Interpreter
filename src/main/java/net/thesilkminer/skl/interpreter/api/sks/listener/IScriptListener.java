@@ -1,7 +1,7 @@
 package net.thesilkminer.skl.interpreter.api.sks.listener;
 
 import net.thesilkminer.skl.interpreter.api.sks.holder.IScriptHolder;
-import net.thesilkminer.skl.interpreter.implementation.sks.SksParser;
+import net.thesilkminer.skl.interpreter.api.sks.parser.ISksParser;
 
 import java.util.List;
 import java.util.Optional;
@@ -57,13 +57,13 @@ public interface IScriptListener {
 	 * Initializes this listener.
 	 *
 	 * @param parser
-	 * 		The current script parser. See also {@link SksParser}.
+	 * 		The current script parser. See also {@link ISksParser}.
 	 * @param scriptFile
 	 * 		The file that is currently being parsed.
 	 *
 	 * @since 0.1
 	 */
-	void init(SksParser parser, IScriptHolder scriptFile);
+	void init(ISksParser parser, IScriptHolder scriptFile);
 
 	/**
 	 * Runs the script.

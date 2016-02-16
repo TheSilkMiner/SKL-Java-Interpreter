@@ -5,6 +5,7 @@ import net.thesilkminer.skl.interpreter.api.sks.listener.IScriptListener;
 import net.thesilkminer.skl.interpreter.api.sks.logging.ISksLogger;
 import net.thesilkminer.skl.interpreter.api.sks.parser.ISksParser;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import javax.annotation.Nonnull;
 
@@ -99,7 +100,7 @@ public class SksApi {
 	 * @return
 	 * 		If the registration was successful.
 	 */
-	public Boolean getParser(@Nonnull final IScriptListener listener) {
+	public Boolean registerListener(@Nonnull final IScriptListener listener) {
 
 		try {
 
@@ -109,6 +110,30 @@ public class SksApi {
 			Method listenerM = parserClass.getMethod("listener", IScriptListener.class);
 
 			return (Boolean) listenerM.invoke(null, listener);
+		} catch (final ReflectiveOperationException e) {
+
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * Gets a new script holder of the current implementation.
+	 *
+	 * @param file
+	 * 		The file you need to create the holder for.
+	 * @return
+	 * 		The holder instance of the current implementation.
+	 */
+	public IScriptHolder getDefaultScriptHolderForFile(final File file) {
+
+		try {
+
+			Class<?> sksFileClass = Class.forName("net.thesilkminer.skl."
+					      + "interpreter.implementation.sks.ScriptFile");
+
+			Method of = sksFileClass.getMethod("of", File.class);
+
+			return (IScriptHolder) of.invoke(null, file);
 		} catch (final ReflectiveOperationException e) {
 
 			throw new RuntimeException(e);

@@ -6,7 +6,7 @@ import com.google.common.collect.Lists;
 import net.thesilkminer.skl.interpreter.api.sks.holder.IScriptHolder;
 import net.thesilkminer.skl.interpreter.api.sks.listener.IScriptListener;
 import net.thesilkminer.skl.interpreter.api.sks.listener.Result;
-import net.thesilkminer.skl.interpreter.implementation.sks.SksParser;
+import net.thesilkminer.skl.interpreter.api.sks.parser.ISksParser;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -167,7 +167,7 @@ public class JavaMainListener implements IScriptListener {
 	}
 
 	@Override
-	public void init(SksParser parser, IScriptHolder scriptFile) {
+	public void init(ISksParser parser, IScriptHolder scriptFile) {
 
 		this.logs = Lists.newArrayList();
 		this.className = parser.getScriptName();

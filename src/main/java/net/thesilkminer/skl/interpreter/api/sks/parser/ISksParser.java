@@ -43,4 +43,11 @@ public interface ISksParser {
 	 * 		If the file is not syntactically correct.
 	 */
 	void parse();
+
+	/**
+	 * Gets the name of the script.
+	 *
+	 * @return The script's name
+	 */
+	String getScriptName();
 }
