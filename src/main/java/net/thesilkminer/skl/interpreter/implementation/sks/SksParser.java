@@ -17,7 +17,11 @@ import net.thesilkminer.skl.interpreter.implementation.sks.components.decisional
 import net.thesilkminer.skl.interpreter.implementation.sks.components.decisionals.IfDeclaration;
 import net.thesilkminer.skl.interpreter.implementation.sks.components.declaration.ScriptDeclaration;
 import net.thesilkminer.skl.interpreter.implementation.sks.components.language.LanguageDeclaration;
-import net.thesilkminer.skl.interpreter.implementation.sks.components.listeners.*;
+import net.thesilkminer.skl.interpreter.implementation.sks.components.listeners.FallBackListenersDeclaration;
+import net.thesilkminer.skl.interpreter.implementation.sks.components.listeners.ListenerDeclaration;
+import net.thesilkminer.skl.interpreter.implementation.sks.components.listeners.MultiListenerDeclaration;
+import net.thesilkminer.skl.interpreter.implementation.sks.components.listeners.NoListenerDeclaration;
+import net.thesilkminer.skl.interpreter.implementation.sks.components.listeners.SubSequentListenersDeclaration;
 import net.thesilkminer.skl.interpreter.implementation.sks.components.markers.ScriptEndDeclaration;
 import net.thesilkminer.skl.interpreter.implementation.sks.components.markers.ScriptStartDeclaration;
 import net.thesilkminer.skl.interpreter.implementation.sks.listeners.c.CMainListener;
