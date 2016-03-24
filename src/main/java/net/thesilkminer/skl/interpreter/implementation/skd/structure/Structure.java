@@ -5,5 +5,5 @@ package net.thesilkminer.skl.interpreter.implementation.skd.structure;
  * Package: net.thesilkminer.skl.interpreter.skd.structure.
  * Project: Java Interpreter.
  */
-public class DatabaseStructure {
+public class Structure {
 }

@@ -2,16 +2,11 @@ package net.thesilkminer.skl.interpreter.implementation.skd;
 
 import com.google.common.base.Preconditions;
 
-import net.thesilkminer.skl.interpreter.api.skd.IDatabaseHolder;
+import net.thesilkminer.skl.interpreter.api.skd.holder.IDatabaseHolder;
 
 import java.io.File;
 import javax.annotation.Nonnull;
 
-/**
- * Created by TheSilkMiner on 09/10/2015.
- * Package: net.thesilkminer.skl.interpreter.skd.
- * Project: Java Interpreter.
- */
 /**
  * This class is used to represent a database file.
  *

@@ -1,12 +1,8 @@
 package net.thesilkminer.skl.interpreter.implementation.skd.structure;
 
-/**
- * Created by TheSilkMiner on 09/10/2015.
- * Package: net.thesilkminer.skl.interpreter.skd.structure.
- * Project: Java Interpreter.
- */
-
 import com.google.common.base.Preconditions;
+
+import net.thesilkminer.skl.interpreter.api.skd.structure.ISkdProperty;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -16,13 +12,17 @@ import javax.annotation.Nullable;
 /**
  * This class represents a set of properties that are
  * found in a SKD file's tag.
+ *
+ * @author TheSilkMiner
+ *
+ * @since 0.1
  */
-public class SkdProperty {
+public class SkdProperty implements ISkdProperty {
 
 	private String name;
 	private Optional<String> value;
 
-	private SkdProperty(@Nonnull String name,@Nonnull Optional<String> value) {
+	private SkdProperty(@Nonnull final String name, @Nonnull final Optional<String> value) {
 
 		this.name = name;
 		this.value = value;
@@ -38,8 +38,9 @@ public class SkdProperty {
 	 * @return
 	 * 		A new SkdProperty instance.
 	 */
-	public static SkdProperty getProperty(@Nonnull String name,
+	public static SkdProperty getProperty(@Nonnull final String name,
 										  @Nonnull
+										  final
 										  Optional<String>
 											value) {
 
@@ -59,9 +60,10 @@ public class SkdProperty {
 	 * @return
 	 * 		A new SkdProperty instance.
 	 */
-	public static SkdProperty getProperty(@Nonnull String name,
+	public static SkdProperty getProperty(@Nonnull final String name,
 										  @Nullable
-										  String value) {
+										  final String
+											value) {
 
 		Optional<String> opt = Optional.empty();
 
@@ -73,42 +75,25 @@ public class SkdProperty {
 		return SkdProperty.getProperty(name, opt);
 	}
 
-	/**
-	 * Gets the name of the property.
-	 *
-	 * @return
-	 * 		The property's name
-	 */
+	@Override
 	public String getName() {
 
 		return this.name;
 	}
 
-	/**
-	 * Gets the property value. It may be {@link Optional#empty()}
-	 *
-	 * @return
-	 * 		The property's value
-	 */
+	@Override
 	public Optional<String> getValue() {
 
 		return this.value;
 	}
 
-	/**
-	 * Sets the value of the property.
-	 *
-	 * @param value
-	 * 		The new value
-	 */
-	public void setValue(String value) {
+	@Override
+	public void setValue(final String value) {
 
 		this.value = Optional.of(value);
 	}
 
-	/**
-	 * Clears the value of the property.
-	 */
+	@Override
 	public void removeValue() {
 
 		this.value = Optional.empty();
@@ -139,24 +124,6 @@ public class SkdProperty {
 
 	@Override
 	public String toString() {
-
-		String returnable = "SkdProperty{";
-
-		returnable += this.getName();
-		returnable += "=";
-		returnable += "\"" + this.getValue() + "\"";
-
-		returnable += "}";
-
-		return returnable;
-	}
-
-	public String toString(boolean toConcat) {
-
-		if (!toConcat) {
-
-			return this.toString();
-		}
 
 		String str = "";
 

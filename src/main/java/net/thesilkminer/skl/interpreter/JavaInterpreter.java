@@ -24,7 +24,9 @@ public class JavaInterpreter extends JFrame implements Runnable {
 	 * @param args
 	 * 		The passed in arguments
 	 */
-	public static void main(String[] args) {
+	@SuppressWarnings("all")
+	// Yeah. Suppress everything due to spelling (thiz --> this)
+	public static void main(final String[] args) {
 
 		JavaInterpreter thiz = new JavaInterpreter();
 		thiz.run();

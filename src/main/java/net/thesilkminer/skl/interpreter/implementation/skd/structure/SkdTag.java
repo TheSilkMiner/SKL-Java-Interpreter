@@ -1,13 +1,10 @@
 package net.thesilkminer.skl.interpreter.implementation.skd.structure;
 
-/**
- * Created by TheSilkMiner on 09/10/2015.
- * Package: net.thesilkminer.skl.interpreter.skd.structure.
- * Project: Java Interpreter.
- */
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+
+import net.thesilkminer.skl.interpreter.api.skd.structure.ISkdProperty;
+import net.thesilkminer.skl.interpreter.api.skd.structure.ISkdTag;
 
 import java.util.List;
 import java.util.Objects;
@@ -16,16 +13,20 @@ import javax.annotation.Nonnull;
 
 /**
  * This class represents a tag in skd, which is e.g. {@code <tag></tag>}
+ *
+ * @author TheSilkMiner
+ *
+ * @since 0.1
  */
-public class SkdTag {
+public class SkdTag implements ISkdTag {
 
 	private String name;
 	private Optional<String> content;
 	private boolean voidElement;
-	private List<SkdTag> children;
-	private List<SkdProperty> properties;
+	private List<ISkdTag> children;
+	private List<ISkdProperty> properties;
 
-	private SkdTag(String name) {
+	private SkdTag(final String name) {
 
 		Preconditions.checkNotNull(name, "Tag name must not be null");
 		this.name = name;
@@ -42,106 +43,62 @@ public class SkdTag {
 	 * @return
 	 * 		A new tag instance
 	 */
-	public static SkdTag of(@Nonnull String name) {
+	public static SkdTag of(@Nonnull final String name) {
 
 		return new SkdTag(Preconditions.checkNotNull(name));
 	}
 
-	/**
-	 * Gets the tag's name.
-	 *
-	 * @return
-	 * 		The tag's name.
-	 */
+	@Override
 	public String getName() {
 
 		return this.name;
 	}
 
-	/**
-	 * Gets the content of the tag (aka the part between brackets).
-	 *
-	 * @return
-	 * 		The tag's content. It may be {@link Optional#empty()}.
-	 */
+	@Override
 	public Optional<String> getContent() {
 
 		return this.content;
 	}
 
-	/**
-	 * Gets if this is a void element.
-	 *
-	 * @return
-	 * 		If the tag is a void tag.
-	 */
+	@Override
 	public boolean isVoidElement() {
 
 		return this.voidElement;
 	}
 
-	/**
-	 * Gets the list of children tags.
-	 *
-	 * @return
-	 * 		The list of childern tags.
-	 */
-	public List<SkdTag> getChildren() {
+	@Override
+	public List<ISkdTag> getChildren() {
 
 		return this.children;
 	}
 
-	/**
-	 * Gets the properties of this tag.
-	 *
-	 * @return
-	 * 		The tag's properties.
-	 */
-	public List<SkdProperty> getProperties() {
+	@Override
+	public List<ISkdProperty> getProperties() {
 
 		return this.properties;
 	}
 
-	/**
-	 * Adds a child tag to this tag.
-	 *
-	 * <p>Remember that the addition of tags is order-sensitive.</p>
-	 *
-	 * @param tag
-	 * 		The tag to add.
-	 */
-	public void addChildTag(SkdTag tag) {
+	@Override
+	public void addChildTag(final ISkdTag tag) {
 
 		Preconditions.checkState(!this.voidElement,
 				      "The tag is void");
 		this.children.add(tag);
 	}
 
-	/**
-	 * Sets the tag as a child of another tag.
-	 *
-	 * @param parent
-	 * 		The parent of this tag
-	 */
-	public void setAsChild(SkdTag parent) {
+	@Override
+	public void setAsChild(final ISkdTag parent) {
 
-		parent.children.add(this);
+		parent.getChildren().add(this);
 	}
 
-	/**
-	 * Removes a child tag.
-	 *
-	 * @param tag
-	 * 		The tag to remove
-	 */
-	public void removeChildTag(SkdTag tag) {
+	@Override
+	public void removeChildTag(final ISkdTag tag) {
 
 		this.children.remove(tag);
 	}
 
-	/**
-	 * Sets the tag as a void element.
-	 */
+	@Override
 	public void setVoidElement() {
 
 		Preconditions.checkState(!this.content.isPresent(),
@@ -149,13 +106,8 @@ public class SkdTag {
 		this.voidElement = true;
 	}
 
-	/**
-	 * Sets the tag's content.
-	 *
-	 * @param content
-	 * 		A content. It can be {@link Optional#empty()}.
-	 */
-	public void setContent(@Nonnull Optional<String> content) {
+	@Override
+	public void setContent(@Nonnull final Optional<String> content) {
 
 		Preconditions.checkState(!this.voidElement,
 				      "The tag is void");
@@ -163,15 +115,8 @@ public class SkdTag {
 		this.content = content;
 	}
 
-	/**
-	 * Adds a property to the tag.
-	 *
-	 * @param property
-	 * 		The property to add.
-	 * @return
-	 * 		True if the property was added successfully, false if not.
-	 */
-	public boolean addProperty(@Nonnull SkdProperty property) {
+	@Override
+	public boolean addProperty(@Nonnull final ISkdProperty property) {
 
 		if (this.hasProperty(property)) {
 
@@ -182,15 +127,8 @@ public class SkdTag {
 		return true;
 	}
 
-	/**
-	 * Removes a property to the tag.
-	 *
-	 * @param property
-	 * 		The property to remove.
-	 * @return
-	 * 		True if the property was removed successfully, false if not.
-	 */
-	public boolean removeProperty(@Nonnull SkdProperty property) {
+	@Override
+	public boolean removeProperty(@Nonnull ISkdProperty property) {
 
 		if (!this.hasProperty(property)) {
 
@@ -201,21 +139,15 @@ public class SkdTag {
 		return true;
 	}
 
-	/**
-	 * Gets if the tag has the specified property.
-	 *
-	 * @param property
-	 * 		The property to look for.
-	 * @return
-	 * 		True if found, false otherwise.
-	 */
-	public boolean hasProperty(@Nonnull SkdProperty property) {
+	@Override
+	public boolean hasProperty(@Nonnull ISkdProperty property) {
 
 		return this.properties.contains(property);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
+
 		if (this == obj) {
 
 			return true;
@@ -250,65 +182,13 @@ public class SkdTag {
 
 		String builder = "";
 
-		builder += "SkdTag{";
 		builder += "<";
 		builder += this.name;
 		builder += " ";
 
-		for (SkdProperty prop : this.properties) {
+		for (ISkdProperty prop : this.properties) {
 
-			builder += prop.toString(true);
-			builder += " ";
-		}
-
-		builder = builder.substring(0, builder.length() - 1);
-
-		if (this.voidElement) {
-
-			builder += " />";
-			builder += "}";
-
-			return builder;
-		}
-
-		builder += ">";
-
-		if (this.content.isPresent()) {
-
-			builder += this.content.get();
-			builder += " ";
-		}
-
-		for (SkdTag tag : this.children) {
-
-			builder += tag.toString(true);
-		}
-
-		builder += "</";
-		builder += this.name;
-		builder += ">";
-
-		builder += "}";
-
-		return builder;
-	}
-
-	public String toString(boolean toConcat) {
-
-		if (!toConcat) {
-
-			return this.toString();
-		}
-
-		String builder = "";
-
-		builder += "<";
-		builder += this.name;
-		builder += " ";
-
-		for (SkdProperty prop : this.properties) {
-
-			builder += prop.toString(true);
+			builder += prop.toString();
 			builder += " ";
 		}
 
@@ -329,9 +209,9 @@ public class SkdTag {
 			builder += " ";
 		}
 
-		for (SkdTag tag : this.children) {
+		for (ISkdTag tag : this.children) {
 
-			builder += tag.toString(true);
+			builder += tag.toString();
 		}
 
 		builder += "</";
@@ -373,15 +253,19 @@ public class SkdTag {
 
 		childThree.setVoidElement();
 
-		System.out.println(main.toString(false));
+		System.out.println(main.toString());
 
 		main.removeChildTag(childThree);
 
-		System.out.println(main.toString(false));
+		System.out.println(main.toString());
 
 		System.out.println(childOne.removeProperty(propertyTwo));
 		System.out.println(childOne.removeProperty(propertyOne));
 
-		System.out.println(main.toString(false));
+		System.out.println(main.toString());
+
+		main.setContent(Optional.empty());
+
+		System.out.println(main.toString());
 	}
 }
