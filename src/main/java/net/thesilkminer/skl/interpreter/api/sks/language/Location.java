@@ -57,6 +57,19 @@ public class Location {
 		this.args.addAll(Arrays.asList(previousArguments));
 	}
 
+	/**
+	 * Generates a new location instance with the
+	 * specified previous language components.
+	 *
+	 * @param scriptLinesBefore
+	 * 		Holds if there were some script lines before this location.
+	 * @param prev
+	 * 		The previous arguments encountered.
+	 * @return
+	 * 		A new location instance.
+	 *
+	 * @since 0.2
+	 */
 	@SuppressWarnings("WeakerAccess") //API Method
 	public static Location from(final boolean scriptLinesBefore,
 								 @Nullable
@@ -70,6 +83,19 @@ public class Location {
 		return new Location(scriptLinesBefore);
 	}
 
+	/**
+	 * Generates a new location instance with the
+	 * specified list of previous language components.
+	 *
+	 * @param scriptLinesBefore
+	 * 		Holds if there were some script lines before this location.
+	 * @param prev
+	 * 		The list of previous arguments encountered.
+	 * @return
+	 * 		A new location instance.
+	 *
+	 * @since 0.2
+	 */
 	public static Location from(final boolean scriptLinesBefore,
 								 @Nullable
 								 final List<ILanguageComponent>
@@ -84,34 +110,91 @@ public class Location {
 		return from(scriptLinesBefore);
 	}
 
+	/**
+	 * Gets the previous arguments as a list.
+	 *
+	 * @return
+	 * 		The previous arguments as a list.
+	 *
+	 * @since 0.2
+	 */
 	@SuppressWarnings("WeakerAccess") //API Method
 	public List<ILanguageComponent> getPreviousArguments() {
 
 		return args;
 	}
 
+	/**
+	 * Gets if there were some script lines before this location.
+	 *
+	 * @return
+	 * 		If there were some script lines before this location.
+	 *
+	 * @since 0.2
+	 */
 	@SuppressWarnings("unused")
 	public boolean wereThereScriptLinesBefore() {
 
 		return hadScriptLines;
 	}
 
+	/**
+	 * Returns if the specified language component is present in the
+	 * list of previous language components.
+	 *
+	 * @param languageComponent
+	 * 		The language component to check.
+	 * @return
+	 * 		If it was present.
+	 *
+	 * @since 0.2
+	 */
 	public boolean isPresent(final ILanguageComponent languageComponent) {
 
 		return this.getPreviousArguments().contains(languageComponent);
 	}
 
+	/**
+	 * Returns if the specified language component is not present in the
+	 * list of previous language components.
+	 *
+	 * @param component
+	 * 		The language component to check.
+	 * @return
+	 * 		If it wasn't present.
+	 *
+	 * @since 0.2
+	 */
 	@SuppressWarnings("WeakerAccess") //API Method
 	public boolean isNotPresent(final ILanguageComponent component) {
 
 		return !this.isPresent(component);
 	}
 
+	/**
+	 * Gets if this is the first argument of a collection.
+	 *
+	 * @return
+	 * 		If this is the first argument of a collection.
+	 *
+	 * @since 0.2
+	 */
 	public boolean isFirst() {
 
 		return this.getPreviousArguments() == null || this.getPreviousArguments().isEmpty();
 	}
 
+	/**
+	 * Gets if the location is before the declaration of a script.
+	 *
+	 * <p>It is a simple convenience method, to avoid having to
+	 * check {@link #wereThereScriptLinesBefore()}.</p>
+	 *
+	 * @return
+	 * 		If the script declaration hasn't been performed yet.
+	 *
+	 * @since 0.2
+	 */
 	public boolean isBeforeScript() {
 
 		try {
@@ -139,6 +222,14 @@ public class Location {
 		}
 	}
 
+	/**
+	 * Gets if this is the first listener declaration.
+	 *
+	 * @return
+	 * 		If this is the first listener declaration.
+	 *
+	 * @since 0.2
+	 */
 	public boolean noOtherListenersPresent() {
 
 		if (System.getProperty(
