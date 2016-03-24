@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
  */
 public class FallBackListenersDeclaration implements ILanguageComponent {
 
-	private static List<String> allFallBackListeners = Lists.newArrayList();
+	private static final List<String> ALL_FALL_BACK_LISTENERS = Lists.newArrayList();
 	private String listeners;
 
 	@Override
@@ -135,7 +135,7 @@ public class FallBackListenersDeclaration implements ILanguageComponent {
 				listener = listener.substring(1);
 			}
 
-			allFallBackListeners.add(listener);
+			ALL_FALL_BACK_LISTENERS.add(listener);
 		}
 
 		return !this.listeners.isEmpty();
@@ -192,7 +192,7 @@ public class FallBackListenersDeclaration implements ILanguageComponent {
 				listener = listener.substring(1);
 			}
 
-			allFallBackListeners.add(listener);
+			ALL_FALL_BACK_LISTENERS.add(listener);
 		}
 
 		return !this.listeners.isEmpty();
@@ -234,6 +234,6 @@ public class FallBackListenersDeclaration implements ILanguageComponent {
 
 	public static boolean wasFallBack(final String listener) {
 
-		return allFallBackListeners.contains(listener);
+		return ALL_FALL_BACK_LISTENERS.contains(listener);
 	}
 }

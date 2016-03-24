@@ -16,16 +16,20 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
- * Created by TheSilkMiner on 14/01/2016.
- * Package: net.thesilkminer.skl.interpreter.sks.listeners.c.
- * Project: Java Interpreter.
+ * Represents the C listener provided by the interpreter.
+ *
+ * @author TheSilkMiner
+ *
+ * @since 0.2
  */
+// TODO
 public class CMainListener implements IScriptListener {
 
 	private static class CompilerException extends RuntimeException {
 
 		private static class PreProcessorException extends CompilerException {
 
+			@SuppressWarnings("unused")
 			public PreProcessorException() {
 
 				this("The C pre-processor has thrown an error");
@@ -47,6 +51,7 @@ public class CMainListener implements IScriptListener {
 			this("The C compiler has thrown an error");
 		}
 
+		@SuppressWarnings("SameParameterValue") // API Method
 		public CompilerException(final String message) {
 
 			this(message, null);
@@ -222,6 +227,7 @@ public class CMainListener implements IScriptListener {
 		return instr.replace(ppi.toString(), "");
 	}
 
+	@SuppressWarnings({"EmptyMethod", "UnusedParameters"}) //TODO
 	private void processInclude(final String include) {
 
 		// TODO

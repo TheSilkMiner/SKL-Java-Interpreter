@@ -17,9 +17,10 @@ import javax.annotation.Nullable;
  *
  * @since 0.1
  */
+@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "WeakerAccess"})
 public class SkdProperty implements ISkdProperty {
 
-	private String name;
+	private final String name;
 	private Optional<String> value;
 
 	private SkdProperty(@Nonnull final String name, @Nonnull final Optional<String> value) {
@@ -123,6 +124,7 @@ public class SkdProperty implements ISkdProperty {
 	}
 
 	@Override
+	@SuppressWarnings("OptionalGetWithoutIsPresent") // Don't you see the check???
 	public String toString() {
 
 		String str = "";

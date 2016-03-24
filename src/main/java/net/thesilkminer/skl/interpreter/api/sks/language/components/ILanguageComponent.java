@@ -256,6 +256,7 @@ public interface ILanguageComponent {
 		 *
 		 * @since 0.2
 		 */
+		@SuppressWarnings("SameParameterValue")
 		public UnableToParseException(@Nonnull final String message,
 									  @Nullable final Throwable
 											  cause) {

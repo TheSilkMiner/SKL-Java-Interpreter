@@ -38,6 +38,7 @@ public interface IScriptListener {
 	 *
 	 * @since 0.1
 	 */
+	@SuppressWarnings("SameReturnValue")
 	boolean needsInit();
 
 	/**

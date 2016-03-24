@@ -10,13 +10,17 @@ import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
 
 /**
- * Created by TheSilkMiner on 23/01/2016.
- * Package: net.thesilkminer.skl.interpreter.sks.ui.
- * Project: SKL-Java-Interpreter.
+ * Runs the script selected.
+ *
+ * @author TheSilkMiner
+ *
+ * @since 0.2
  */
+@SuppressWarnings("WeakerAccess")
+// Same as in MainMenu
 public class ScriptRunTask extends SwingWorker<Integer, Integer> {
 
-	private JFrame parent;
+	private final JFrame parent;
 
 	public ScriptRunTask(final JFrame parent) {
 

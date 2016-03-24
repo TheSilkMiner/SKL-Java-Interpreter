@@ -11,6 +11,7 @@ import java.net.URL;
  *
  * @since 0.2
  */
+@SuppressWarnings({"SameReturnValue", "unused"})
 public interface IDocTypeProvider {
 
 	/**
@@ -60,5 +61,6 @@ public interface IDocTypeProvider {
 	 * @return
 	 * 		If the specified structure is valid for the provider.
 	 */
+	@SuppressWarnings("UnusedParameters")
 	boolean isStructureValidForProvider(final IStructure structure);
 }

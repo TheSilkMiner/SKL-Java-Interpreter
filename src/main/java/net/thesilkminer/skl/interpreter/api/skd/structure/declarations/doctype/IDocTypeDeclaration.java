@@ -12,6 +12,7 @@ import java.net.URL;
  *
  * @since 0.2
  */
+@SuppressWarnings("unused")
 public interface IDocTypeDeclaration extends IDeclaration {
 
 	/**

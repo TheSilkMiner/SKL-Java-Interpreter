@@ -18,13 +18,14 @@ import javax.annotation.Nonnull;
  *
  * @since 0.1
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class SkdTag implements ISkdTag {
 
-	private String name;
+	private final String name;
 	private Optional<String> content;
 	private boolean voidElement;
-	private List<ISkdTag> children;
-	private List<ISkdProperty> properties;
+	private final List<ISkdTag> children;
+	private final List<ISkdProperty> properties;
 
 	private SkdTag(final String name) {
 
@@ -43,6 +44,7 @@ public class SkdTag implements ISkdTag {
 	 * @return
 	 * 		A new tag instance
 	 */
+	@SuppressWarnings("WeakerAccess") //API method
 	public static SkdTag of(@Nonnull final String name) {
 
 		return new SkdTag(Preconditions.checkNotNull(name));

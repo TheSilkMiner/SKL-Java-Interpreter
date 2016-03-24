@@ -32,6 +32,8 @@ public interface ISubsequentListener {
 	 *
 	 * @since 0.2
 	 */
+	@SuppressWarnings({"EmptyMethod", "UnusedParameters"})
+	//Needed due to API
 	void obtainPreviousListenersInformation(final IScriptListener... previous);
 
 	/**

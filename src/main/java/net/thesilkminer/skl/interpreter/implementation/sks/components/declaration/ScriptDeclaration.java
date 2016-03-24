@@ -28,7 +28,7 @@ public class ScriptDeclaration implements ILanguageComponent {
 		PRIVATE("private"),
 		SCRIPT("script");
 
-		private String qualifier;
+		private final String qualifier;
 
 		Visibility(final String qualifier) {
 
@@ -62,7 +62,7 @@ public class ScriptDeclaration implements ILanguageComponent {
 	private String scriptName;
 	private Visibility visibility;
 	private boolean error;
-	private boolean mustPublic;
+	private final boolean mustPublic;
 
 	public ScriptDeclaration() {
 

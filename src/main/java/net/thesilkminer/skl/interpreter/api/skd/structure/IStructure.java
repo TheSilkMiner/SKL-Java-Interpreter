@@ -9,6 +9,7 @@ package net.thesilkminer.skl.interpreter.api.skd.structure;
  *
  * @since 0.2
  */
+@SuppressWarnings("unused")
 public interface IStructure {
 
 

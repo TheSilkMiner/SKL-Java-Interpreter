@@ -12,6 +12,7 @@ import javax.swing.WindowConstants;
  *
  * @since 0.1
  */
+@SuppressWarnings("WeakerAccess") //??
 public class JavaInterpreter extends JFrame implements Runnable {
 
 	private Thread currentThread;

@@ -2,6 +2,7 @@ package net.thesilkminer.skl.interpreter.implementation.sks.listeners.java;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import net.thesilkminer.skl.interpreter.api.sks.holder.IScriptHolder;
 import net.thesilkminer.skl.interpreter.api.sks.listener.IScriptListener;
@@ -16,7 +17,6 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,17 +29,20 @@ import javax.tools.SimpleJavaFileObject;
 import javax.tools.ToolProvider;
 
 /**
- * Created by TheSilkMiner on 14/09/2015.
- * Package: net.thesilkminer.skl.interpreter.sks.listeners.java.
- * Project: Java Interpreter.
+ * Represents the main Java listener, provided by default from the
+ * SKS parser.
+ *
+ * @author TheSilkMIner
+ *
+ * @since 0.1
  */
 public class JavaMainListener implements IScriptListener {
 
 	private static class SourceObject extends SimpleJavaFileObject {
 
-		private String code;
+		private final String code;
 
-		public SourceObject(String className, String contents) {
+		private SourceObject(final String className, final String contents) {
 
 			super(URI.create(
 					"string:///"
@@ -49,7 +52,7 @@ public class JavaMainListener implements IScriptListener {
 		}
 
 		@Override
-		public CharSequence getCharContent(boolean ignoreEncodingErrors)
+		public CharSequence getCharContent(final boolean ignoreEncodingErrors)
 				throws IOException {
 
 			return this.code;
@@ -58,9 +61,9 @@ public class JavaMainListener implements IScriptListener {
 
 	private static class ClassObject extends SimpleJavaFileObject {
 
-		private ByteArrayOutputStream byteArrayOutputStream;
+		private final ByteArrayOutputStream byteArrayOutputStream;
 
-		public ClassObject(String className) throws URISyntaxException {
+		private ClassObject(final String className) throws URISyntaxException {
 
 			super(new URI(className), Kind.CLASS);
 			this.byteArrayOutputStream = new ByteArrayOutputStream();
@@ -72,7 +75,7 @@ public class JavaMainListener implements IScriptListener {
 			return this.byteArrayOutputStream;
 		}
 
-		public byte[] getByteCode() {
+		private byte[] getByteCode() {
 
 			return this.byteArrayOutputStream.toByteArray();
 		}
@@ -80,29 +83,29 @@ public class JavaMainListener implements IScriptListener {
 
 	private static class DynamicClassLoader extends ClassLoader {
 
-		private Map<String, ClassObject> customClass = new HashMap<>();
+		private final Map<String, ClassObject> customClass = Maps.newHashMap();
 
-		public DynamicClassLoader(ClassLoader parent) {
+		private DynamicClassLoader(final ClassLoader parent) {
 
 			super(parent);
 		}
 
-		public void setClass(ClassObject clazz) {
+		public void setClass(final ClassObject clazz) {
 
 			this.customClass.put(clazz.getName(), clazz);
 		}
 
 		@Override
-		protected Class<?> findClass(String name) throws ClassNotFoundException {
+		protected Class<?> findClass(final String name) throws ClassNotFoundException {
 
-			ClassObject clazz = this.customClass.get(name);
+			final ClassObject clazz = this.customClass.get(name);
 
 			if (clazz == null) {
 
 				return super.findClass(name);
 			}
 
-			byte[] byteCode = clazz.getByteCode();
+			final byte[] byteCode = clazz.getByteCode();
 
 			return this.defineClass(name, byteCode, 0, byteCode.length);
 		}
@@ -111,12 +114,12 @@ public class JavaMainListener implements IScriptListener {
 	private static class ExtendedFileManager
 			      extends ForwardingJavaFileManager<JavaFileManager> {
 
-		private ClassObject clazz;
-		private DynamicClassLoader classLoader;
+		private final ClassObject clazz;
+		private final DynamicClassLoader classLoader;
 
-		protected ExtendedFileManager(JavaFileManager manager,
-									  ClassObject clazz,
-									  DynamicClassLoader
+		private ExtendedFileManager(final JavaFileManager manager,
+									  final ClassObject clazz,
+									  final DynamicClassLoader
 									    classLoader) {
 
 			super(manager);
@@ -128,17 +131,17 @@ public class JavaMainListener implements IScriptListener {
 
 		@Override
 		@SuppressWarnings("all")
-		public JavaFileObject getJavaFileForOutput(Location location,
-												   String className,
-												   JavaFileObject.Kind kind,
-												   FileObject sibling)
+		public JavaFileObject getJavaFileForOutput(final Location location,
+												   final String className,
+												   final JavaFileObject.Kind kind,
+												   final FileObject sibling)
 				throws IOException {
 
 			return this.clazz;
 		}
 
 		@Override
-		public ClassLoader getClassLoader(Location location) {
+		public ClassLoader getClassLoader(final Location location) {
 
 			return this.classLoader;
 		}
@@ -167,7 +170,7 @@ public class JavaMainListener implements IScriptListener {
 	}
 
 	@Override
-	public void init(ISksParser parser, IScriptHolder scriptFile) {
+	public void init(final ISksParser parser, final IScriptHolder scriptFile) {
 
 		this.logs = Lists.newArrayList();
 		this.className = parser.getScriptName();
@@ -175,7 +178,7 @@ public class JavaMainListener implements IScriptListener {
 	}
 
 	@Override
-	public void runScript(List<String> lines) {
+	public void runScript(final List<String> lines) {
 
 		try {
 
@@ -186,7 +189,7 @@ public class JavaMainListener implements IScriptListener {
 			Class.forName("javax.tools.JavaFileObject");
 			Class.forName("javax.tools.SimpleJavaFileObject");
 			Class.forName("javax.tools.ToolProvider");
-		} catch (ClassNotFoundException e) {
+		} catch (final ClassNotFoundException e) {
 
 			this.logs.add("The interpreter was not able to find the compiler class");
 			this.logs.add("Make sure you are using the JDK, not only the JRE");
@@ -195,12 +198,12 @@ public class JavaMainListener implements IScriptListener {
 		}
 
 		String sourceCode = "";
-		for (String line : lines) {
+		for (final String line : lines) {
 
 			sourceCode += line;
 		}
 
-		SourceObject source = new SourceObject(this.className, sourceCode);
+		final SourceObject source = new SourceObject(this.className, sourceCode);
 		ClassObject clazz;
 
 		try {
@@ -219,22 +222,22 @@ public class JavaMainListener implements IScriptListener {
 			return;
 		}
 
-		@SuppressWarnings("all")
-		Iterable<? extends JavaFileObject> compilationUnits = Arrays.asList(source);
+		@SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
+		final Iterable<? extends JavaFileObject> compilationUnits = Arrays.asList(source);
 
-		DynamicClassLoader classLoader;
+		final DynamicClassLoader classLoader;
 		classLoader = new DynamicClassLoader(ClassLoader.getSystemClassLoader());
 
-		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+		final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
-		ExtendedFileManager efm = new ExtendedFileManager(
+		final ExtendedFileManager efm = new ExtendedFileManager(
 				      compiler.getStandardFileManager(null, null, null),
 				      clazz, classLoader);
 
-		JavaCompiler.CompilationTask task = compiler.getTask(
+		final JavaCompiler.CompilationTask task = compiler.getTask(
 				      null, efm, null, null, null, compilationUnits);
 
-		boolean result = task.call();
+		final boolean result = task.call();
 
 		if (!result) {
 
@@ -243,26 +246,26 @@ public class JavaMainListener implements IScriptListener {
 			return;
 		}
 
-		Class<?> compiledClass;
+		final Class<?> compiledClass;
 
 		try {
 
 			compiledClass = classLoader.loadClass(className);
-			Method main = compiledClass.getMethod("main", String[].class);
+			final Method main = compiledClass.getMethod("main", String[].class);
 			main.setAccessible(true);
 			main.invoke(null, (Object[]) new String[1]);
 
-		} catch (ClassNotFoundException e) {
+		} catch (final ClassNotFoundException e) {
 
 			this.logs.add("The interpreter was not able to compile the class");
 			this.logs.add("Error: Class hasn't been found");
 			return;
-		} catch (NoSuchMethodException e) {
+		} catch (final NoSuchMethodException e) {
 
 			this.logs.add("The interpreter was not able to compile the class");
 			this.logs.add("Error: \"main\" method not found");
 			return;
-		} catch (IllegalAccessException | InvocationTargetException e) {
+		} catch (final IllegalAccessException | InvocationTargetException e) {
 
 			this.logs.add("The interpreter was not able to compile the class");
 			this.logs.add("Error: Unable to access \"main\" method");
@@ -274,7 +277,7 @@ public class JavaMainListener implements IScriptListener {
 		try {
 
 			Thread.sleep(1000);
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 
 			this.logs.add("Sleep interrupted. Ah well.");
 		}

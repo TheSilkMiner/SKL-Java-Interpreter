@@ -16,13 +16,14 @@ import java.util.Objects;
  * @since 0.2
  */
 // TODO Javadoc
+@SuppressWarnings("unused")
 public final class ComponentArguments {
 
 	public static final String INIT = "<init>";
 	private static final String VARARG = "@VARARG@ ";
 	private static final ComponentArguments empty = ComponentArguments.of().setImmutable();
 
-	private Map<String, String> arguments = Maps.newLinkedHashMap();
+	private final Map<String, String> arguments = Maps.newLinkedHashMap();
 	private boolean isInvalid;
 	private boolean immutable;
 
@@ -120,6 +121,7 @@ public final class ComponentArguments {
 		this.isInvalid = true;
 	}
 
+	@SuppressWarnings("WeakerAccess") //API Method
 	public boolean has(String key) {
 
 		return this.getArguments().containsKey(key);
@@ -154,6 +156,7 @@ public final class ComponentArguments {
 		return this.pairOrAdd(key, val, false);
 	}
 
+	@SuppressWarnings({"WeakerAccess", "SameParameterValue"}) // API Method
 	public ComponentArguments pairOrAdd(final String key,
 										final String val,
 										final boolean va) {
@@ -168,12 +171,15 @@ public final class ComponentArguments {
 		return this;
 	}
 
+	@SuppressWarnings("UnusedReturnValue")
 	public ComponentArguments pairValue(final String key,
 										final String val) {
 
 		return this.pairValue(key, val, false);
 	}
 
+	@SuppressWarnings({"UnusedReturnValue", "SameParameterValue", "WeakerAccess"})
+	//API Method
 	public ComponentArguments pairValue(final String key,
 										final String value,
 										final boolean var) {

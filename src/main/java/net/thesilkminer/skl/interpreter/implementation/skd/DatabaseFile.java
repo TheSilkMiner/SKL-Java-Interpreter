@@ -16,10 +16,11 @@ import javax.annotation.Nonnull;
  * @since 1.0
  * @version 1.0
  */
+@SuppressWarnings("unused")
 public class DatabaseFile extends File implements IDatabaseHolder {
 
-	private String fileName;
-	private String fileExtension;
+	private final String fileName;
+	private final String fileExtension;
 
 	/**
 	 * Creates a new <code>DatabaseFile</code> instance from a parent pathname string

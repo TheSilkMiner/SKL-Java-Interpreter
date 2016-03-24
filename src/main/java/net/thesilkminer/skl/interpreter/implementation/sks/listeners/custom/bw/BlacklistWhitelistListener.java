@@ -164,6 +164,7 @@ public class BlacklistWhitelistListener implements IScriptListener, ISubsequentL
 	 *
 	 * @since 0.2
 	 */
+	@SuppressWarnings("unused")
 	public List<String> getWhiteListItems() {
 
 		return this.whiteListItems;
@@ -177,6 +178,7 @@ public class BlacklistWhitelistListener implements IScriptListener, ISubsequentL
 	 *
 	 * @since 0.2
 	 */
+	@SuppressWarnings("unused")
 	public List<String> getBlackListItems() {
 
 		return this.blackListItems;

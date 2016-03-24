@@ -21,6 +21,8 @@ import javax.swing.border.EmptyBorder;
  *
  * @since 0.2
  */
+@SuppressWarnings("WeakerAccess")
+// Nope. We want implementations to be able to access this class.
 public class MainMenu extends JPanel {
 
 	/**

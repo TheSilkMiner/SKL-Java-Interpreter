@@ -17,6 +17,7 @@ public interface ISkdProperty {
 	 * @return
 	 * 		The property's name
 	 */
+	@SuppressWarnings("unused")
 	String getName();
 
 	/**
@@ -25,6 +26,7 @@ public interface ISkdProperty {
 	 * @return
 	 * 		The property's value
 	 */
+	@SuppressWarnings("unused")
 	Optional<String> getValue();
 
 	/**
@@ -33,10 +35,12 @@ public interface ISkdProperty {
 	 * @param value
 	 * 		The new value
 	 */
+	@SuppressWarnings("unused")
 	void setValue(final String value);
 
 	/**
 	 * Clears the value of the property.
 	 */
+	@SuppressWarnings("unused")
 	void removeValue();
 }

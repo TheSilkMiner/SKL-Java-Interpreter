@@ -197,6 +197,7 @@ public class ListenerRegisterListener implements IScriptListener {
 	 * @return
 	 * 		If the operation was successful.
 	 */
+	@SuppressWarnings("unused") //API method
 	public static boolean addListeners(final File script) {
 
 		final IScriptHolder holder = SksApi.get().getDefaultScriptHolderForFile(script);

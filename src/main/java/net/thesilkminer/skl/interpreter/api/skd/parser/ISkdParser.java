@@ -7,6 +7,7 @@ package net.thesilkminer.skl.interpreter.api.skd.parser;
  *
  * @since 0.2
  */
+@SuppressWarnings("unused")
 public interface ISkdParser {
 
 

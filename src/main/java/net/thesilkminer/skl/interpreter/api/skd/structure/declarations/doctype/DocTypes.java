@@ -63,6 +63,7 @@ public final class DocTypes {
 	 * @return
 	 * 		If the provider has been added successfully.
 	 */
+	@SuppressWarnings("UnusedReturnValue") //API method
 	public boolean addProvider(final IDocTypeProvider provider) {
 
 		return this.validate(provider) && this.providers.add(provider);

@@ -19,6 +19,7 @@ public interface ISkdTag {
 	 * @return
 	 * 		The tag's name.
 	 */
+	@SuppressWarnings("unused")
 	String getName();
 
 	/**
@@ -27,6 +28,7 @@ public interface ISkdTag {
 	 * @return
 	 * 		The tag's content. It may be {@link Optional#empty()}.
 	 */
+	@SuppressWarnings("unused")
 	Optional<String> getContent();
 
 	/**
@@ -35,6 +37,7 @@ public interface ISkdTag {
 	 * @return
 	 * 		If the tag is a void tag.
 	 */
+	@SuppressWarnings("unused")
 	boolean isVoidElement();
 
 	/**
@@ -51,6 +54,7 @@ public interface ISkdTag {
 	 * @return
 	 * 		The tag's properties.
 	 */
+	@SuppressWarnings("unused")
 	List<ISkdProperty> getProperties();
 
 	/**
@@ -61,6 +65,7 @@ public interface ISkdTag {
 	 * @param tag
 	 * 		The tag to add.
 	 */
+	@SuppressWarnings("unused")
 	void addChildTag(final ISkdTag tag);
 
 	/**
@@ -73,6 +78,7 @@ public interface ISkdTag {
 	 * @param parent
 	 * 		The parent of this tag
 	 */
+	@SuppressWarnings("unused")
 	void setAsChild(final ISkdTag parent);
 
 	/**
@@ -81,11 +87,13 @@ public interface ISkdTag {
 	 * @param tag
 	 * 		The tag to remove
 	 */
+	@SuppressWarnings("unused")
 	void removeChildTag(final ISkdTag tag);
 
 	/**
 	 * Sets the tag as a void element.
 	 */
+	@SuppressWarnings("unused")
 	void setVoidElement();
 
 	/**
@@ -94,6 +102,8 @@ public interface ISkdTag {
 	 * @param content
 	 * 		A content. It can be {@link Optional#empty()}.
 	 */
+	@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "unused"})
+	//Such a short name!!!
 	void setContent(@Nonnull final Optional<String> content);
 
 	/**
@@ -104,6 +114,7 @@ public interface ISkdTag {
 	 * @return
 	 * 		True if the property was added successfully, false if not.
 	 */
+	@SuppressWarnings("unused")
 	boolean addProperty(@Nonnull final ISkdProperty property);
 
 	/**
@@ -114,6 +125,7 @@ public interface ISkdTag {
 	 * @return
 	 * 		True if the property was removed successfully, false if not.
 	 */
+	@SuppressWarnings("unused")
 	boolean removeProperty(@Nonnull final ISkdProperty property);
 
 	/**
@@ -124,5 +136,6 @@ public interface ISkdTag {
 	 * @return
 	 * 		True if found, false otherwise.
 	 */
+	@SuppressWarnings("unused")
 	boolean hasProperty(@Nonnull final ISkdProperty property);
 }

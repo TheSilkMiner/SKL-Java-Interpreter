@@ -228,6 +228,7 @@ public class IfDeclaration implements ILanguageComponent {
 		}
 	}
 
+	@SuppressWarnings("SameReturnValue") //TODO
 	private boolean testSpecifiedCondition() {
 
 		net.thesilkminer.skl.interpreter.implementation.sks.SksLogger

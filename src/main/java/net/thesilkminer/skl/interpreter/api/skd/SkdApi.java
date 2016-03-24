@@ -23,6 +23,7 @@ public class SkdApi {
 	 *
 	 * @since 0.2
 	 */
+	@SuppressWarnings("unused")
 	public static SkdApi get() {
 
 		return SINGLETON;

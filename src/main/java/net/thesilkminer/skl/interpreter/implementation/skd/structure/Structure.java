@@ -5,5 +5,6 @@ package net.thesilkminer.skl.interpreter.implementation.skd.structure;
  * Package: net.thesilkminer.skl.interpreter.skd.structure.
  * Project: Java Interpreter.
  */
+@SuppressWarnings("all") //TODO
 public class Structure {
 }

@@ -26,6 +26,7 @@ import java.util.Optional;
  *
  * @since 0.2
  */
+@SuppressWarnings("unused")
 public class DocType implements IDocTypeDeclaration {
 
 	private String docType;

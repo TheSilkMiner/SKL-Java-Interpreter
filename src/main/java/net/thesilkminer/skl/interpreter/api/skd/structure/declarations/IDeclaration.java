@@ -9,6 +9,7 @@ package net.thesilkminer.skl.interpreter.api.skd.structure.declarations;
  *
  * @since 0.2
  */
+@SuppressWarnings("unused")
 public interface IDeclaration {
 
 	/**
@@ -19,6 +20,7 @@ public interface IDeclaration {
 	 *
 	 * @since 0.2
 	 */
+	@SuppressWarnings("SameReturnValue")
 	String getDeclarationName();
 
 	/**

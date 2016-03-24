@@ -85,9 +85,9 @@ public class SksLogger implements ISksLogger {
 		public void flush() {}
 	}
 
-	private static SksLogger singleton = new SksLogger();
+	private static final SksLogger SINGLETON = new SksLogger();
 
-	private Logger logger = Logger.getLogger("SKS Parser");
+	private final Logger logger = Logger.getLogger("SKS Parser");
 
 	private SksLogger() {
 
@@ -105,7 +105,7 @@ public class SksLogger implements ISksLogger {
 	 */
 	public static SksLogger logger() {
 
-		return singleton;
+		return SINGLETON;
 	}
 
 	private void log(Level level, String msg) {

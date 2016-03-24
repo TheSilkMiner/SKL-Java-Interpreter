@@ -19,8 +19,8 @@ import javax.annotation.Nonnull;
  */
 public class ScriptFile extends File implements IScriptHolder {
 
-	private String fileName;
-	private String fileExtension;
+	private final String fileName;
+	private final String fileExtension;
 
 	/**
 	 * Creates a new <code>ScriptFile</code> instance from a parent pathname string
@@ -101,6 +101,7 @@ public class ScriptFile extends File implements IScriptHolder {
 	 * @return
 	 * 		The file's name
 	 */
+	@SuppressWarnings("unused")
 	public String getFileName() {
 
 		return fileName;

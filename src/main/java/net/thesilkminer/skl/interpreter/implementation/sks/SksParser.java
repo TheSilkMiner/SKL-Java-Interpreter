@@ -64,11 +64,11 @@ public final class SksParser implements ISksParser {
 		SCRIPT_END("<#end script>", null, "<#end script>"),
 		;
 
-		private String before;
-		private String after;
-		private String full;
+		private final String before;
+		private final String after;
+		private final String full;
 
-		FixedExpressions(String before, String after, String full) {
+		FixedExpressions(final String before, final String after, final String full) {
 
 			this.before = before;
 			this.after = after;
@@ -91,12 +91,12 @@ public final class SksParser implements ISksParser {
 		}
 	}
 
-	private static Map<IScriptHolder, SksParser> map = Maps.newHashMap();
-	private static Map<String, IScriptListener> listeners = Maps.newHashMap();
-	private static List<ILanguageComponent> components = Lists.newArrayList();
+	private static final Map<IScriptHolder, SksParser> MAP = Maps.newHashMap();
+	private static final Map<String, IScriptListener> LISTENERS = Maps.newHashMap();
+	private static final List<ILanguageComponent> COMPONENTS = Lists.newArrayList();
 	private boolean hasInit;
 	private boolean hasErrored;
-	private IScriptHolder file;
+	private final IScriptHolder file;
 	private BufferedReader fileReader;
 
 	/* -- Internal stuff -- */
@@ -107,18 +107,18 @@ public final class SksParser implements ISksParser {
 	private String actualLanguage;
 	private String listenerClass;
 	private String scriptName;
-	private List<String> listenersClasses;
+	private final List<String> listenersClasses;
 
 	/* -- 0.2 rendition stuff -- */
 	/**
 	 * Simply needed to pass VarArg argument.
 	 */
 	private boolean wasVarArg;
-	private List<ILanguageComponent> argsBefore;
+	private final List<ILanguageComponent> argsBefore;
 	private boolean hasScriptLineBefore;
-	private boolean shallIgnore;
+	@SuppressWarnings("CanBeFinal") private boolean shallIgnore; //Edited with reflection
 	private ISubsequentListener listenerTmp;
-	private List<ISubsequentListener> previousSsListener;
+	private final List<ISubsequentListener> previousSsListener;
 
 	/* -- 0.3 rendition stuff (I think) -- */
 	/**
@@ -126,7 +126,8 @@ public final class SksParser implements ISksParser {
 	 *
 	 * <p>First argument is the identifier, second is the value assigned.</p>
 	 */
-	private Map<String, Object> datas; // TODO
+	@SuppressWarnings({"FieldCanBeLocal", "unused"}) // For 0.3 (I guess)
+	private final Map<String, Object> datas; // TODO
 
 	private static final String USER_VARIABLE = "@USER@";
 
@@ -169,7 +170,7 @@ public final class SksParser implements ISksParser {
 
 	private static void component(@Nonnull ILanguageComponent component) {
 
-		components.add(component);
+		COMPONENTS.add(component);
 
 		SksLogger.logger().info("Registered language component:");
 		SksLogger.logger().info("    Name: " + component.getName());
@@ -192,18 +193,18 @@ public final class SksParser implements ISksParser {
 
 		Preconditions.checkNotNull(file, "IScriptHolder must not be null");
 
-		if (map.containsKey(file) && map.get(file) != null) {
+		if (MAP.containsKey(file) && MAP.get(file) != null) {
 
-			return map.get(file);
+			return MAP.get(file);
 		}
 
-		if (map.containsKey(file)) {
+		if (MAP.containsKey(file)) {
 
-			map.remove(file);
+			MAP.remove(file);
 		}
 
 		final SksParser parser = new SksParser(file);
-		map.put(file, parser);
+		MAP.put(file, parser);
 		return parser;
 	}
 
@@ -215,6 +216,7 @@ public final class SksParser implements ISksParser {
 	 * @return
 	 * 		If the registration was successful
 	 */
+	@SuppressWarnings({"UnusedReturnValue", "WeakerAccess"}) //API Method
 	public static boolean listener(@Nonnull IScriptListener listener) {
 
 		Preconditions.checkNotNull(listener, "Listener must not be null");
@@ -229,7 +231,7 @@ public final class SksParser implements ISksParser {
 			return false;
 		}
 
-		if (listeners.containsKey(listenerFor)) {
+		if (LISTENERS.containsKey(listenerFor)) {
 
 			SksLogger.logger().warn("A listener for " + listenerFor
 					      + " is already available.");
@@ -238,14 +240,14 @@ public final class SksParser implements ISksParser {
 			return false;
 		}
 
-		if (listeners.get(listenerFor) != null
-				          && listeners.get(listenerFor).equals(listener)) {
+		if (LISTENERS.get(listenerFor) != null
+				          && LISTENERS.get(listenerFor).equals(listener)) {
 
 			SksLogger.logger().warn("Listener already registered.");
 			return false;
 		}
 
-		listeners.put(listenerFor, listener);
+		LISTENERS.put(listenerFor, listener);
 
 		SksLogger.logger().info("Listener added for language " + listenerFor);
 
@@ -268,6 +270,8 @@ public final class SksParser implements ISksParser {
 					      + "supported as a script holder");
 		}
 
+		@SuppressWarnings("ConstantConditions")
+		// Already checked. See above
 		ScriptFile scriptFile = (ScriptFile) this.file;
 
 		try {
@@ -303,7 +307,8 @@ public final class SksParser implements ISksParser {
 		return this.hasErrored;
 	}
 
-	private boolean checkFile(boolean force) {
+	//private boolean checkFile(boolean force) {
+	private void checkFile(final boolean force) {
 
 		if (this.file == null) {
 
@@ -326,10 +331,10 @@ public final class SksParser implements ISksParser {
 			SksLogger.logger().warn("File specified does not end with .sks");
 			SksLogger.logger().warn("Forced to accept it...");
 
-			return true;
+			//return true;
 		}
 
-		return false;
+		//return false;
 	}
 
 	@Override
@@ -362,7 +367,7 @@ public final class SksParser implements ISksParser {
 
 	private boolean parseString(String line) {
 
-		if (components.isEmpty()
+		if (COMPONENTS.isEmpty()
 				      || System.getProperty("skl.sks.useLegacyParsing", "false")
 				               .equals("true")) {
 
@@ -397,7 +402,7 @@ public final class SksParser implements ISksParser {
 		final ComponentArguments arguments = ComponentArguments.of();
 		boolean flag = false;
 
-		for (final ILanguageComponent component : components) {
+		for (final ILanguageComponent component : COMPONENTS) {
 
 			if (!this.canApply(component, cmd, args)) {
 
@@ -986,7 +991,7 @@ public final class SksParser implements ISksParser {
 			return;
 		}
 
-		this.sendToListener(listeners.get(this.actualLanguage), lines);
+		this.sendToListener(LISTENERS.get(this.actualLanguage), lines);
 	}
 
 	private void sendToListener(IScriptListener listener, List<String> lines) {

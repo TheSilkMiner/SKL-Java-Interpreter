@@ -18,8 +18,8 @@ import javax.annotation.Nullable;
  */
 public class Location {
 
-	private List<ILanguageComponent> args;
-	private boolean hadScriptLines;
+	private final List<ILanguageComponent> args;
+	private final boolean hadScriptLines;
 
 	private Location(final boolean hadScriptLines) {
 
@@ -57,6 +57,7 @@ public class Location {
 		this.args.addAll(Arrays.asList(previousArguments));
 	}
 
+	@SuppressWarnings("WeakerAccess") //API Method
 	public static Location from(final boolean scriptLinesBefore,
 								 @Nullable
 								 final ILanguageComponent... prev) {
@@ -83,11 +84,13 @@ public class Location {
 		return from(scriptLinesBefore);
 	}
 
+	@SuppressWarnings("WeakerAccess") //API Method
 	public List<ILanguageComponent> getPreviousArguments() {
 
 		return args;
 	}
 
+	@SuppressWarnings("unused")
 	public boolean wereThereScriptLinesBefore() {
 
 		return hadScriptLines;
@@ -98,6 +101,7 @@ public class Location {
 		return this.getPreviousArguments().contains(languageComponent);
 	}
 
+	@SuppressWarnings("WeakerAccess") //API Method
 	public boolean isNotPresent(final ILanguageComponent component) {
 
 		return !this.isPresent(component);

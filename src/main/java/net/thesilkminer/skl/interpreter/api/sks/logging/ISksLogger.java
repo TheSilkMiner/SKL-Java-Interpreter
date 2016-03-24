@@ -2,6 +2,7 @@ package net.thesilkminer.skl.interpreter.api.sks.logging;
 
 import javax.annotation.Nonnull;
 
+@SuppressWarnings("unused")
 public interface ISksLogger {
 
 	/**
