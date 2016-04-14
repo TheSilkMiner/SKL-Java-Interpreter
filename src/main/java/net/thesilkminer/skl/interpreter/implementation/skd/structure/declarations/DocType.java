@@ -31,6 +31,26 @@ public class DocType implements IDocTypeDeclaration {
 
 	private String docType;
 
+	private DocType(final String docType) {
+
+		this.setDocType(docType);
+	}
+
+	/**
+	 * Gets a new doctype declaration.
+	 *
+	 * @param docType
+	 * 		The doctype.
+	 * @return
+	 * 		A new declaration instance.
+	 *
+	 * @since 0.2
+	 */
+	public static IDocTypeDeclaration of(final String docType) {
+
+		return new DocType(docType);
+	}
+
 	@Override
 	public String getDocType() {
 

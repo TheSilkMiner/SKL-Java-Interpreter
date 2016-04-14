@@ -1,9 +1,11 @@
 package net.thesilkminer.skl.interpreter.api.skd.structure.declarations.doctype;
 
+import net.thesilkminer.skl.interpreter.api.skd.structure.ISkdTag;
 import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.IDeclaration;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 /**
  * Represents the DocType declaration of an SKD database.
@@ -63,5 +65,19 @@ public interface IDocTypeDeclaration extends IDeclaration {
 	default URL getStyleSheet() throws MalformedURLException {
 
 		return new URL(this.getDocType());
+	}
+
+	/**
+	 * Applies the current doctype declaration and style sheet
+	 * to the provided list of tags.
+	 *
+	 * @param tags
+	 * 		The list of tags it should apply the style sheet to.
+	 *
+	 * @since 0.2
+	 */
+	default void apply(final List<ISkdTag> tags) {
+
+		//TODO Implement for 0.3
 	}
 }

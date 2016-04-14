@@ -24,9 +24,41 @@ public class DatabaseVersion implements IDatabaseVersionDeclaration {
 
 	private String version;
 
-	public DatabaseVersion() {
+	private DatabaseVersion() {
 
 		//this.version = SkdApi.get().parser().CURRENT_VERSION;
+	}
+
+	/**
+	 * Gets a new version declaration instance with the current version
+	 * as the default version.
+	 *
+	 * @return
+	 * 		A new instance.
+	 *
+	 * @since 0.2
+	 */
+	public static IDatabaseVersionDeclaration get() {
+
+		return new DatabaseVersion();
+	}
+
+	/**
+	 * Gets a new version declaration instance with the specified version
+	 * as the default version.
+	 *
+	 * @param version
+	 * 		The version.
+	 * @return
+	 * 		A new instance.
+	 *
+	 * @since 0.2
+	 */
+	public static IDatabaseVersionDeclaration get(final String version) {
+
+		final IDatabaseVersionDeclaration d = DatabaseVersion.get();
+		d.version(version);
+		return d;
 	}
 
 	@Override
