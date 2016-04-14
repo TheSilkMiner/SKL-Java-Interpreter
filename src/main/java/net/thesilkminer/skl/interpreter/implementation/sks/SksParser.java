@@ -448,7 +448,7 @@ public final class SksParser implements ISksParser {
 
 	private boolean canApply(final ILanguageComponent component,
 							  final String command,
-							  final String[] args) {
+							  final String... args) {
 
 		if (!command.equals(component.getScriptDeclaration())) {
 
@@ -501,7 +501,7 @@ public final class SksParser implements ISksParser {
 	private void tryParseString(final ILanguageComponent component,
 								 final String line,
 								 final ComponentArguments arguments,
-								 final String[] args) {
+								 final String... args) {
 
 		String key = ComponentArguments.INIT;
 		String value = "";
@@ -1090,7 +1090,7 @@ public final class SksParser implements ISksParser {
 	 * @param args
 	 * 		Args
 	 */
-	public static void main(String[] args) {
+	public static void main(String... args) {
 
 		SksParser parser = SksParser.of(ScriptFile.of(new File("user.dir", "Test.sks")));
 		parser.parseString("<#language \"java\">");

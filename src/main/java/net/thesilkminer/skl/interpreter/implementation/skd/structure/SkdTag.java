@@ -229,7 +229,7 @@ public class SkdTag implements ISkdTag {
 	 * @param args
 	 * 		args
 	 */
-	public static void main(String[] args) {
+	public static void main(String... args) {
 
 		final SkdProperty propertyOne = SkdProperty.getProperty("test", "example");
 		final SkdProperty propertyTwo = SkdProperty.getProperty("name", Optional.of("me"));
