@@ -130,11 +130,10 @@ public class JavaMainListener implements IScriptListener {
 		}
 
 		@Override
-		@SuppressWarnings("all")
 		public JavaFileObject getJavaFileForOutput(final Location location,
-												   final String className,
-												   final JavaFileObject.Kind kind,
-												   final FileObject sibling)
+						                    final String className,
+					                        final JavaFileObject.Kind kind,
+						                    final FileObject sibling)
 				throws IOException {
 
 			return this.clazz;

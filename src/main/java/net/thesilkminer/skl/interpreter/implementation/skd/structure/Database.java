@@ -21,8 +21,8 @@ public class Database implements IDatabase {
 	private IStructure struct;
 
 	private Database(final IDocTypeDeclaration docType,
-					 final IDatabaseVersionDeclaration version,
-					 final IStructure struct) {
+				     final IDatabaseVersionDeclaration version,
+				     final IStructure struct) {
 
 		// Structure must be loaded before otherwise a NPE is thrown.
 		this.structure(struct);
@@ -46,8 +46,8 @@ public class Database implements IDatabase {
 	 * @since 0.2
 	 */
 	public static IDatabase newDatabase(final IDocTypeDeclaration docType,
-							final IDatabaseVersionDeclaration version,
-							final IStructure struct) {
+						      final IDatabaseVersionDeclaration version,
+						      final IStructure struct) {
 
 		return new Database(docType, version, struct);
 	}
@@ -62,7 +62,7 @@ public class Database implements IDatabase {
 	public boolean docType(final IDocTypeDeclaration declaration) {
 
 		Preconditions.checkNotNull(declaration,
-				"You cannot create a database without a doctype declaration");
+				      "You cannot create a database without a doctype declaration");
 
 		if (!declaration.validate()) {
 
@@ -77,6 +77,7 @@ public class Database implements IDatabase {
 		try {
 
 			this.apply(declaration);
+			this.docType = declaration;
 			return true;
 		} catch (final RuntimeException e) {
 
