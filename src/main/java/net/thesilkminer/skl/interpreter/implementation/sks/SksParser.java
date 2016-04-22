@@ -268,10 +268,9 @@ public final class SksParser implements ISksParser {
 
 			SksLogger.logger().error("Currently only ScriptFile is"
 					      + "supported as a script holder");
+			return;
 		}
 
-		@SuppressWarnings("ConstantConditions")
-		// Already checked. See above
 		ScriptFile scriptFile = (ScriptFile) this.file;
 
 		try {

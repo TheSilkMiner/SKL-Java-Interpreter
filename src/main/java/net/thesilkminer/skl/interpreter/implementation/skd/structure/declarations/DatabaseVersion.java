@@ -2,13 +2,15 @@ package net.thesilkminer.skl.interpreter.implementation.skd.structure.declaratio
 
 import com.google.common.base.Preconditions;
 
+import net.thesilkminer.skl.interpreter.api.skd.parser.ISkdParser;
+import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.IDeclaration;
 import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.version.IDatabaseVersionDeclaration;
 
 /**
  * Represents the version declaration of an SKD database.
  *
  * <p>Generally the version declaration is
- * {@code <!SKD version="&gt;version&lt;">}. See
+ * {@code <!SKD version=&gt;version&lt;>}. See
  * {@link DatabaseVersion#getDeclarationSyntax()} for more
  * information.</p>
  *
@@ -26,7 +28,7 @@ public class DatabaseVersion implements IDatabaseVersionDeclaration {
 
 	private DatabaseVersion() {
 
-		//this.version = SkdApi.get().parser().CURRENT_VERSION;
+		this.version = ISkdParser.CURRENT_VERSION;
 	}
 
 	/**
@@ -61,6 +63,19 @@ public class DatabaseVersion implements IDatabaseVersionDeclaration {
 		return d;
 	}
 
+	/**
+	 * Gets a dummy instance of this declaration for use within parsers.
+	 *
+	 * @return
+	 * 		A dummy instance of this declaration for use within parsers.
+	 *
+	 * @since 0.2
+	 */
+	public static IDeclaration dummy() {
+
+		return get();
+	}
+
 	@Override
 	public String version() {
 
@@ -84,6 +99,6 @@ public class DatabaseVersion implements IDatabaseVersionDeclaration {
 	@Override
 	public String getDeclarationSyntax() {
 
-		return String.format("%s version=\"<version>\"", this.getDeclarationName());
+		return String.format("%s version <version>", this.getDeclarationName());
 	}
 }

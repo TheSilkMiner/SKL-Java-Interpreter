@@ -1,0 +1,22 @@
+<!DOCTYPE skd http://thesilkminer.net/sks/skd/default.skd>
+<SKD version 0.2>
+
+<main>
+	<child>
+		<tag>
+			Content test
+		</tag>
+		<tag>
+			Content test
+			#2
+		</tag>
+	</child>
+	<other>
+		<properties test1="yes" test2="bella">
+			<aVoidTag />
+			<aVoidTagWithProps prop="prop" />
+		</properties>
+		<aVoidTag />
+	</other>
+</main>
+<voidMain />

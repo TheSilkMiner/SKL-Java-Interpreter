@@ -1,5 +1,6 @@
 package net.thesilkminer.skl.interpreter.implementation.skd.structure.declarations;
 
+import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.IDeclaration;
 import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.doctype.DocTypes;
 import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.doctype.IDocTypeDeclaration;
 import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.doctype.IDocTypeProvider;
@@ -49,6 +50,19 @@ public class DocType implements IDocTypeDeclaration {
 	public static IDocTypeDeclaration of(final String docType) {
 
 		return new DocType(docType);
+	}
+
+	/**
+	 * Gets a dummy instance of this declaration for use within parsers.
+	 *
+	 * @return
+	 * 		A dummy instance of this declaration for use within parsers.
+	 *
+	 * @since 0.2
+	 */
+	public static IDeclaration dummy() {
+
+		return new DocType("http://abc.def.net");
 	}
 
 	@Override

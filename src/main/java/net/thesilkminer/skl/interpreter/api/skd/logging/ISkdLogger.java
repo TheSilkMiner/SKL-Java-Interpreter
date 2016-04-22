@@ -2,7 +2,13 @@ package net.thesilkminer.skl.interpreter.api.skd.logging;
 
 import javax.annotation.Nonnull;
 
-@SuppressWarnings("unused")
+/**
+ * Represents the logger of the database.
+ *
+ * @author TheSilkMiner
+ *
+ * @since 0.2
+ */
 public interface ISkdLogger {
 
 	/**
@@ -11,7 +17,7 @@ public interface ISkdLogger {
 	 * @param msg
 	 * 		The message to log.
 	 *
-	 * @since 0.1
+	 * @since 0.2
 	 */
 	void info(final String msg);
 
@@ -21,7 +27,7 @@ public interface ISkdLogger {
 	 * @param msg
 	 * 		The message to log.
 	 *
-	 * @since 0.1
+	 * @since 0.2
 	 */
 	void warn(final String msg);
 
@@ -31,7 +37,7 @@ public interface ISkdLogger {
 	 * @param msg
 	 * 		The message to log.
 	 *
-	 * @since 0.1
+	 * @since 0.2
 	 */
 	void error(final String msg);
 
@@ -41,9 +47,12 @@ public interface ISkdLogger {
 	 * @param msg
 	 * 		The message to log.
 	 *
-	 * @since 0.1
+	 * @since 0.2
 	 */
-	void severe(final String msg);
+	default void severe(final String msg) {
+
+		this.error(msg);
+	}
 
 	/**
 	 * Logs a fine message.
@@ -51,7 +60,7 @@ public interface ISkdLogger {
 	 * @param msg
 	 * 		The message to log.
 	 *
-	 * @since 0.1
+	 * @since 0.2
 	 */
 	void fine(final String msg);
 
@@ -63,7 +72,7 @@ public interface ISkdLogger {
 	 * @param throwable
 	 * 		The exception.
 	 *
-	 * @since 0.1
+	 * @since 0.2
 	 */
 	void stacktrace(@Nonnull final String msg, final Throwable throwable);
 
@@ -73,7 +82,7 @@ public interface ISkdLogger {
 	 * @param throwable
 	 * 		The exception.
 	 *
-	 * @since 0.1
+	 * @since 0.2
 	 */
 	void stacktrace(final Throwable throwable);
 }

@@ -41,7 +41,26 @@ public interface IStructure {
 	 */
 	void mainTags(final List<ISkdTag> tags);
 
+	/**
+	 * Gets if the specified declaration can be applied to the
+	 * structure.
+	 *
+	 * @param declaration
+	 * 		The declaration.
+	 * @return
+	 * 		If the declaration can be applied.
+	 *
+	 * @since 0.2
+	 */
 	boolean canApply(final IDocTypeDeclaration declaration);
 
+	/**
+	 * Applies the specified declaration.
+	 *
+	 * @param declaration
+	 * 		The declaration to apply.
+	 *
+	 * @since 0.2
+	 */
 	void apply(final IDocTypeDeclaration declaration);
 }

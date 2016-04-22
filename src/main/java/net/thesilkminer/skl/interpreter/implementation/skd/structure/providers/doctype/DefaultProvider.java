@@ -17,10 +17,12 @@ import java.net.URL;
 @SuppressWarnings("unused")
 public class DefaultProvider implements IDocTypeProvider {
 
+	/*
 	public DefaultProvider() {
 
 		DocTypes.get().addProvider(this);
 	}
+	*/
 
 	@Override
 	public String name() {
@@ -48,6 +50,7 @@ public class DefaultProvider implements IDocTypeProvider {
 
 	@Override
 	public boolean isStructureValidForProvider(final IStructure structure) {
-		return false;
+
+		return true; //TODO
 	}
 }

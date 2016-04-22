@@ -27,10 +27,11 @@ public final class DocTypes {
 			Class<?> clazz = Class.forName("net.thesilkminer.skl.interpreter."
 					      + "implementation.skd.structure.providers.doctype."
 					      + "DefaultProvider");
-			clazz.getConstructor().newInstance();
+			this.providers.add((IDocTypeProvider) clazz.getConstructor().newInstance());
 		} catch (final ReflectiveOperationException e) {
 
 			System.err.println("Implementation unavailable");
+			e.printStackTrace();
 		}
 	}
 

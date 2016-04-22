@@ -66,4 +66,18 @@ public class Structure implements IStructure {
 
 		declaration.apply(this.mainTags());
 	}
+
+	@Override
+	public String toString() {
+
+		String toString = "";
+
+		for (final ISkdTag tag : this.mainTags()) {
+
+			toString += tag.toString();
+			toString += "\n";
+		}
+
+		return toString;
+	}
 }

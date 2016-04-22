@@ -120,4 +120,14 @@ public class Database implements IDatabase {
 
 		this.struct = structure;
 	}
+
+	@Override
+	public String toString() {
+
+		return this.docType().toString()
+				+ "\n"
+				+ this.version().toString()
+				+ "\n"
+				+ this.structure().toString();
+	}
 }
