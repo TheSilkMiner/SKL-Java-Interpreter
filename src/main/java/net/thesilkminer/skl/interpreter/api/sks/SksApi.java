@@ -62,9 +62,9 @@ public class SksApi {
 			ISksLogger result = (ISksLogger) logger.invoke(null);
 			loggerCache = result;
 			return result;
-		} catch (final ReflectiveOperationException e) {
+		} catch (final ReflectiveOperationException ex) {
 
-			throw new RuntimeException(e);
+			throw new RuntimeException(ex);
 		}
 	}
 
@@ -86,9 +86,9 @@ public class SksApi {
 			Method of = parserClass.getDeclaredMethod("of", IScriptHolder.class);
 
 			return (ISksParser) of.invoke(null, holder);
-		} catch (final ReflectiveOperationException e) {
+		} catch (final ReflectiveOperationException ex) {
 
-			throw new RuntimeException(e);
+			throw new RuntimeException(ex);
 		}
 	}
 
@@ -110,9 +110,9 @@ public class SksApi {
 			Method listenerM = parserClass.getMethod("listener", IScriptListener.class);
 
 			return (Boolean) listenerM.invoke(null, listener);
-		} catch (final ReflectiveOperationException e) {
+		} catch (final ReflectiveOperationException ex) {
 
-			throw new RuntimeException(e);
+			throw new RuntimeException(ex);
 		}
 	}
 
@@ -134,9 +134,9 @@ public class SksApi {
 			Method of = sksFileClass.getMethod("of", File.class);
 
 			return (IScriptHolder) of.invoke(null, file);
-		} catch (final ReflectiveOperationException e) {
+		} catch (final ReflectiveOperationException ex) {
 
-			throw new RuntimeException(e);
+			throw new RuntimeException(ex);
 		}
 	}
 }

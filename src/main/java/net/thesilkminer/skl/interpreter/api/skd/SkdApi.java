@@ -65,16 +65,16 @@ public class SkdApi {
 		try {
 
 			final Class<?> loggerClass = Class.forName("net.thesilkminer.skl."
-					+ "interpreter.implementation.skd.SkdLogger");
+					      + "interpreter.implementation.skd.SkdLogger");
 
 			final Method get = loggerClass.getDeclaredMethod("get");
 
 			ISkdLogger result = (ISkdLogger) get.invoke(null);
 			this.logger = result;
 			return result;
-		} catch (final ReflectiveOperationException e) {
+		} catch (final ReflectiveOperationException ex) {
 
-			throw new RuntimeException(e);
+			throw new RuntimeException(ex);
 		}
 	}
 
@@ -93,15 +93,15 @@ public class SkdApi {
 		try {
 
 			final Class<?> parserClass = Class.forName("net.thesilkminer.skl."
-					+ "interpreter.implementation.skd.SkdParser");
+					      + "interpreter.implementation.skd.SkdParser");
 
 			final Method of = parserClass.getDeclaredMethod("of",
 					                      IDatabaseHolder.class);
 
 			return (ISkdParser) of.invoke(null, holder);
-		} catch (final ReflectiveOperationException e) {
+		} catch (final ReflectiveOperationException ex) {
 
-			throw new RuntimeException(e);
+			throw new RuntimeException(ex);
 		}
 	}
 
@@ -120,14 +120,14 @@ public class SkdApi {
 		try {
 
 			final Class<?> skdFileClass = Class.forName("net.thesilkminer.skl."
-					+ "interpreter.implementation.skd.DatabaseFile");
+					      + "interpreter.implementation.skd.DatabaseFile");
 
 			final Method of = skdFileClass.getMethod("of", File.class);
 
 			return (IDatabaseHolder) of.invoke(null, file);
-		} catch (final ReflectiveOperationException e) {
+		} catch (final ReflectiveOperationException ex) {
 
-			throw new RuntimeException(e);
+			throw new RuntimeException(ex);
 		}
 	}
 
@@ -152,17 +152,18 @@ public class SkdApi {
 		try {
 
 			final Class<?> databaseClass = Class.forName("net.thesilkminer.skl."
-					+ "interpreter.implementation.skd.structure.Database");
+					      + "interpreter.implementation.skd.structure."
+					      + "Database");
 
 			final Method newDatabase = databaseClass.getMethod("newDatabase",
-					IDocTypeDeclaration.class,
-					IDatabaseVersionDeclaration.class,
-					IStructure.class);
+					      IDocTypeDeclaration.class,
+					      IDatabaseVersionDeclaration.class,
+					      IStructure.class);
 
 			return (IDatabase) newDatabase.invoke(null, docType, version, struct);
-		} catch (final ReflectiveOperationException e) {
+		} catch (final ReflectiveOperationException ex) {
 
-			throw new RuntimeException(e);
+			throw new RuntimeException(ex);
 		}
 	}
 
@@ -181,25 +182,35 @@ public class SkdApi {
 		try {
 
 			final Class<?> docTypeClass = Class.forName("net.thesilkminer.skl."
-					+ "interpreter.implementation.skd.structure.declarations."
-					+ "DocType");
+					      + "interpreter.implementation.skd.structure"
+					      + ".declarations.DocType");
 
 			final Method of = docTypeClass.getMethod("of", String.class);
 
 			return (IDocTypeDeclaration) of.invoke(null, docType);
-		} catch (final ReflectiveOperationException e) {
+		} catch (final ReflectiveOperationException ex) {
 
-			throw new RuntimeException(e);
+			throw new RuntimeException(ex);
 		}
 	}
 
+	/**
+	 * Gets a new IDatabaseVersionDeclaration.
+	 *
+	 * @param version
+	 * 		The version.
+	 * @return
+	 * 		A new declaration instance.
+	 *
+	 * @since 0.2
+	 */
 	public IDatabaseVersionDeclaration version(@Nullable final String version) {
 
 		try {
 
 			final Class<?> declarationClass = Class.forName("net.thesilkminer.skl."
-					+ "interpreter.implementation.skd.structure.declarations."
-					+ "DatabaseVersion");
+					      + "interpreter.implementation.skd.structure"
+					      + ".declarations.DatabaseVersion");
 
 			final Method get;
 
@@ -208,12 +219,12 @@ public class SkdApi {
 				get = declarationClass.getMethod("get");
 				return (IDatabaseVersionDeclaration) get.invoke(null);
 			}
+
 			get = declarationClass.getMethod("get", String.class);
-
 			return (IDatabaseVersionDeclaration) get.invoke(null, version);
-		} catch (final ReflectiveOperationException e) {
+		} catch (final ReflectiveOperationException ex) {
 
-			throw new RuntimeException(e);
+			throw new RuntimeException(ex);
 		}
 	}
 
@@ -233,15 +244,16 @@ public class SkdApi {
 		try {
 
 			final Class<?> skdFileClass = Class.forName("net.thesilkminer.skl."
-					+ "interpreter.implementation.skd.structure.Structure");
+					      + "interpreter.implementation.skd.structure."
+					      + "Structure");
 
 			final Method newInstance = skdFileClass.getMethod("newInstance",
-					Optional.class);
+					      Optional.class);
 
 			return (IStructure) newInstance.invoke(null, tags);
-		} catch (final ReflectiveOperationException e) {
+		} catch (final ReflectiveOperationException ex) {
 
-			throw new RuntimeException(e);
+			throw new RuntimeException(ex);
 		}
 	}
 
@@ -260,14 +272,15 @@ public class SkdApi {
 		try {
 
 			final Class<?> tagClass = Class.forName("net.thesilkminer.skl."
-					+ "interpreter.implementation.skd.structure.SkdTag");
+					      + "interpreter.implementation.skd.structure."
+					      + "SkdTag");
 
 			final Method of = tagClass.getDeclaredMethod("of", String.class);
 
 			return (ISkdTag) of.invoke(null, name);
-		} catch (final ReflectiveOperationException e) {
+		} catch (final ReflectiveOperationException ex) {
 
-			throw new RuntimeException(e);
+			throw new RuntimeException(ex);
 		}
 	}
 
@@ -288,19 +301,20 @@ public class SkdApi {
 		try {
 
 			final Class<?> propertyClass = Class.forName("net.thesilkminer.skl."
-					+ "interpreter.implementation.skd.structure.SkdProperty");
+					      + "interpreter.implementation.skd.structure."
+					      + "SkdProperty");
 
 			final Class<?> valueClass = value instanceof String
-					? String.class : Optional.class;
+					      ? String.class : Optional.class;
 
 			final Method getProperty = propertyClass.getDeclaredMethod("getProperty",
-					String.class, valueClass);
+					      String.class, valueClass);
 
 			return (ISkdProperty) getProperty.invoke(null, name,
-					valueClass.cast(value));
-		} catch (final ReflectiveOperationException e) {
+					      valueClass.cast(value));
+		} catch (final ReflectiveOperationException ex) {
 
-			throw new RuntimeException(e);
+			throw new RuntimeException(ex);
 		}
 	}
 }

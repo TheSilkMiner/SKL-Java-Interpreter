@@ -153,17 +153,17 @@ public class ListenerRegisterListener implements IScriptListener {
 
 			IScriptListener instance = (IScriptListener) newInstance;
 			staticRegOk = SksApi.get().registerListener(instance);
-		} catch (final ReflectiveOperationException e) {
+		} catch (final ReflectiveOperationException ex) {
 
-			SksApi.get().getLogger().stacktrace("Script error!", e);
+			SksApi.get().getLogger().stacktrace("Script error!", ex);
 
 			try {
 
 				// Not exactly its purpose, but who cares, right?
 				throw new ILanguageComponent.WrongSyntaxException(new Dummy());
-			} catch (final ILanguageComponent.WrongSyntaxException ex) {
+			} catch (final ILanguageComponent.WrongSyntaxException exception) {
 
-				throw new IllegalScriptException(ex);
+				throw new IllegalScriptException(exception);
 			}
 		}
 	}

@@ -356,9 +356,9 @@ public final class SksParser implements ISksParser {
 					lines.add(string);
 				}
 			}
-		} catch (IOException e) {
+		} catch (IOException ex) {
 
-			SksLogger.logger().stacktrace(e);
+			SksLogger.logger().stacktrace(ex);
 		}
 
 		this.sendToListeners(lines);
@@ -416,13 +416,13 @@ public final class SksParser implements ISksParser {
 				try {
 
 					component.throwInvalidLocation();
-				} catch (IllegalScriptException e) {
+				} catch (IllegalScriptException ex) {
 
 					throw new IllegalScriptException(
 							String
 							.format("Invalid location for command %s!",
 									cmd),
-							e);
+							ex);
 				}
 			}
 
@@ -542,9 +542,9 @@ public final class SksParser implements ISksParser {
 							"Unable to parse line " + line);
 				}
 			}
-		} catch (ILanguageComponent.UnableToParseException e) {
+		} catch (ILanguageComponent.UnableToParseException ex) {
 
-			throw new IllegalScriptException(e.getLocalizedMessage(), e);
+			throw new IllegalScriptException(ex.getLocalizedMessage(), ex);
 		}
 	}
 
@@ -579,14 +579,14 @@ public final class SksParser implements ISksParser {
 					try {
 
 						field.set(this, edit.getValue());
-					} catch (IllegalArgumentException e) {
+					} catch (IllegalArgumentException ex) {
 
 						field.set(this, Boolean.valueOf(edit.getValue()));
 					}
 				}
 			}
 
-		} catch (ReflectiveOperationException e) {
+		} catch (ReflectiveOperationException ex) {
 
 			SksLogger.logger().error("Unable to set all data values");
 		}
@@ -861,23 +861,23 @@ public final class SksParser implements ISksParser {
 
 			listener = (ISubsequentListener) classInstance;
 
-		} catch (ClassNotFoundException e) {
+		} catch (ClassNotFoundException ex) {
 
 			try {
 
 				throw new IllegalStateException("Listener class "
-						+ "not found", e);
+						+ "not found", ex);
 			} catch (IllegalStateException exc) {
 
 				throw new IllegalScriptException("Invalid script", exc);
 			}
-		} catch (InstantiationException | IllegalAccessException e) {
+		} catch (InstantiationException | IllegalAccessException ex) {
 
 			try {
 
 				throw new IllegalStateException("Unable to "
 						+ "instantiate listener",
-						e);
+						ex);
 			} catch (IllegalStateException exc) {
 
 				throw new IllegalScriptException("Invalid script", exc);
@@ -941,7 +941,7 @@ public final class SksParser implements ISksParser {
 
 				this.sendToListener(realListener, lines);
 
-			} catch (ClassNotFoundException e) {
+			} catch (ClassNotFoundException ex) {
 
 				if (FallBackListenersDeclaration.wasFallBack(this.listenerClass)) {
 
@@ -957,12 +957,12 @@ public final class SksParser implements ISksParser {
 				try {
 
 					throw new IllegalStateException("Listener class "
-							+ "not found", e);
+							+ "not found", ex);
 				} catch (IllegalStateException exc) {
 
 					throw new IllegalScriptException("Invalid script", exc);
 				}
-			} catch (InstantiationException | IllegalAccessException e) {
+			} catch (InstantiationException | IllegalAccessException ex) {
 
 				if (FallBackListenersDeclaration.wasFallBack(this.listenerClass)) {
 
@@ -980,7 +980,7 @@ public final class SksParser implements ISksParser {
 
 					throw new IllegalStateException("Unable to "
 							+ "instantiate listener",
-							e);
+							ex);
 				} catch (IllegalStateException exc) {
 
 					throw new IllegalScriptException("Invalid script", exc);

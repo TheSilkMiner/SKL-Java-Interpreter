@@ -1,12 +1,16 @@
 language: java
 jdk:
   - oraclejdk8
-sudo: false
+  - openjdk8
+sudo: required
+dist: trusty
 before_install:
   - echo Setting up workspace...
   - echo Before install...
   - chmod +x gradlew
   - ls -a -l -h --color
+  - echo Downloading Gradle
+  - ./gradlew
   - echo Gradle 2.7 rc2 running on Linux environment.
   - ./gradlew -version
 install:

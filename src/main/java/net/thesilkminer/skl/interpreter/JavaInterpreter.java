@@ -57,9 +57,9 @@ public class JavaInterpreter extends JFrame implements Runnable {
 
 			this.warn();
 			this.constructComponent();
-		} catch (Throwable t) {
+		} catch (Throwable thr) {
 
-			System.err.println(t.getMessage());
+			System.err.println(thr.getMessage());
 			// Display crash window
 		}
 	}

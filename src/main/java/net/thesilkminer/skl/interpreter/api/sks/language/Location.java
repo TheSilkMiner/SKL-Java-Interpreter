@@ -215,9 +215,9 @@ public class Location {
 			ILanguageComponent end = ILanguageComponent.class.cast(endObj);
 
 			return this.isNotPresent(start) && this.isNotPresent(end);
-		} catch (final ReflectiveOperationException e) {
+		} catch (final ReflectiveOperationException ex) {
 			SksApi.get().getLogger().info("Error while calling location method");
-			SksApi.get().getLogger().stacktrace(e);
+			SksApi.get().getLogger().stacktrace(ex);
 			return false;
 		}
 	}

@@ -337,7 +337,7 @@ public final class ComponentArguments {
 		try {
 
 			this.pairValue(key, val, va);
-		} catch (final RuntimeException e) {
+		} catch (final RuntimeException ex) {
 
 			this.addArgument(key, val, va);
 		}

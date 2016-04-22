@@ -28,7 +28,7 @@ public class SkdLogger implements ISkdLogger {
 		private class LogFormatter extends Formatter {
 
 			private final DateFormat dateFormat =
-					new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+					      new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
 
 			@Override
 			public String format(final LogRecord record) {
@@ -41,7 +41,7 @@ public class SkdLogger implements ISkdLogger {
 				final String sourceClassName = record.getSourceClassName();
 
 				builder.append(sourceClassName.substring(sourceClassName
-						.lastIndexOf('.') + 1));
+						      .lastIndexOf('.') + 1));
 				builder.append("] [");
 				builder.append(record.getLevel());
 				builder.append("] ");

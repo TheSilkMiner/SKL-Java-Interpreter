@@ -45,9 +45,9 @@ public class SkdParser implements ISkdParser {
 
 	// Mainly done due to avoid hacks and direct registrations.
 	private static final List<Class<? extends IDeclaration>> DECLARATIONS =
-			Lists.newArrayList();
+			      Lists.newArrayList();
 	private static final Map<Class<? extends IDeclaration>, IDeclaration> DEF_OBJ =
-			Maps.newHashMap();
+			      Maps.newHashMap();
 
 	private final IDatabaseHolder databaseFile;
 	private final Map<Integer, ISkdTag> lastTagOnLevel;
@@ -116,7 +116,7 @@ public class SkdParser implements ISkdParser {
 					             final IDeclaration defaultImplementation) {
 
 		if (DECLARATIONS.contains(declaration)
-				|| DEF_OBJ.containsValue(defaultImplementation)) {
+				      || DEF_OBJ.containsValue(defaultImplementation)) {
 
 			throw new RuntimeException("Declaration registered twice");
 		}
@@ -138,7 +138,7 @@ public class SkdParser implements ISkdParser {
 		if (!(this.databaseFile instanceof DatabaseFile)) {
 
 			SkdApi.get().logger().error("Supplied file must be an instance of "
-					+ "DatabaseFile to be parsed");
+					      + "DatabaseFile to be parsed");
 			return;
 		}
 
@@ -148,9 +148,9 @@ public class SkdParser implements ISkdParser {
 
 			this.reader = new BufferedReader(
 					new FileReader((DatabaseFile) this.databaseFile));
-		} catch (final Throwable t) {
+		} catch (final Throwable thr) {
 
-			SkdApi.get().logger().stacktrace(t);
+			SkdApi.get().logger().stacktrace(thr);
 			this.error = true;
 		}
 
@@ -178,7 +178,7 @@ public class SkdParser implements ISkdParser {
 		SkdApi.get().logger().info("Checking file");
 
 		if (!((DatabaseFile) this.databaseFile).getFileExtension()
-				.equalsIgnoreCase("skd")) {
+				      .equalsIgnoreCase("skd")) {
 
 			if (!force) {
 
@@ -220,9 +220,9 @@ public class SkdParser implements ISkdParser {
 					throw new IllegalDatabaseSyntaxException();
 				}
 			}
-		} catch (final IOException e) {
+		} catch (final IOException ex) {
 
-			SkdApi.get().logger().stacktrace(e);
+			SkdApi.get().logger().stacktrace(ex);
 		}
 
 		if (!this.mainTags.isEmpty()) {
@@ -285,8 +285,8 @@ public class SkdParser implements ISkdParser {
 		}
 
 		if (!ln.startsWith("<")
-				&& indentationLevel != 0
-				&& this.lastTagOnLevel.get(indentationLevel - 1) == null) {
+				      && indentationLevel != 0
+				      && this.lastTagOnLevel.get(indentationLevel - 1) == null) {
 
 			throw new IllegalDatabaseSyntaxException(); // Incorrect content indentation
 		}
@@ -346,7 +346,7 @@ public class SkdParser implements ISkdParser {
 
 		final boolean emptyTag = strippedLine.endsWith("/>");
 		final String line = strippedLine.substring(1,
-				strippedLine.length() - (emptyTag ? 2 : 1));
+				      strippedLine.length() - (emptyTag ? 2 : 1));
 
 		if (this.checkForDeclarations(line, currentIndentation)) {
 
@@ -442,7 +442,7 @@ public class SkdParser implements ISkdParser {
 			}
 
 			final String syntaxRaw = mapObject.getDeclarationSyntax()
-					.replaceAll("<([A-Za-z0-9_])+>", "%s");
+					      .replaceAll("<([A-Za-z0-9_])+>", "%s");
 
 			final String[] wordsLine = strippedLine.split(" ");
 			final String[] wordsSyntax = syntaxRaw.split(" ");
@@ -496,7 +496,7 @@ public class SkdParser implements ISkdParser {
 				SkdApi.get().logger().warn("Invalid doctype declaration.");
 				SkdApi.get().logger().warn("Accepting it anyway.");
 				SkdApi.get().logger().warn("Warning! This may change in "
-						+ "the future");
+						      + "the future. Please fix the declaration!");
 			}
 
 			if (this.docType != null) {
@@ -511,11 +511,11 @@ public class SkdParser implements ISkdParser {
 		}
 
 		if (line.startsWith(DEF_OBJ.get(IDatabaseVersionDeclaration.class)
-				.getDeclarationName())) {
+				      .getDeclarationName())) {
 
 			final String split = line.split(" ")[2];
 			final IDatabaseVersionDeclaration version = SkdApi.get().version(
-					CURRENT_VERSION.equals(split) ? null : split
+					       CURRENT_VERSION.equals(split) ? null : split
 			);
 
 			if (this.version != null) {
@@ -551,7 +551,7 @@ public class SkdParser implements ISkdParser {
 	public static void main(final String... args) {
 
 		final java.io.File exampleFile = new java.io.File(SkdParser.class.getResource(
-				"/assets/skd_interpreter/examples/DatabaseExample.skd"
+				      "/assets/skd_interpreter/examples/DatabaseExample.skd"
 			).getFile()
 		);
 		final IDatabaseHolder db = SkdApi.get().databaseHolder(exampleFile);

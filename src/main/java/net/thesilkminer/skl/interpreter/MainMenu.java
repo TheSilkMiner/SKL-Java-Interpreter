@@ -38,7 +38,7 @@ public class MainMenu extends JPanel {
 		try {
 
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (final ReflectiveOperationException | UnsupportedLookAndFeelException e) {
+		} catch (final ReflectiveOperationException | UnsupportedLookAndFeelException ex) {
 
 			System.err.println("An error has occured while setting the Look And Feel");
 		}

@@ -222,7 +222,7 @@ public class IfDeclaration implements ILanguageComponent {
 		try {
 
 			return System.getProperty(array[0]).equals(array[1]);
-		} catch (NullPointerException e) {
+		} catch (NullPointerException ex) {
 
 			return false;
 		}
@@ -283,24 +283,25 @@ public class IfDeclaration implements ILanguageComponent {
 			}
 
 			return bool;
-		} catch (ClassNotFoundException e) {
+		} catch (ClassNotFoundException ex) {
 
-			throw new IllegalScriptException("Specified class is invalid.", e);
-		} catch (NoSuchMethodException e) {
+			throw new IllegalScriptException("Specified class is invalid.", ex);
+		} catch (NoSuchMethodException ex) {
 
-			throw new IllegalScriptException("Invalid method specified.", e);
-		} catch (InstantiationException | IllegalAccessException e) {
+			throw new IllegalScriptException("Invalid method specified.", ex);
+		} catch (InstantiationException | IllegalAccessException ex) {
 
-			throw new IllegalScriptException("Unable to access method.", e);
-		} catch (InvocationTargetException e) {
+			throw new IllegalScriptException("Unable to access method.", ex);
+		} catch (InvocationTargetException ex) {
 
-			throw new IllegalScriptException("Method has thrown an exception", e);
-		} catch (ClassCastException e) {
+			throw new IllegalScriptException("Method has thrown an exception", ex);
+		} catch (ClassCastException ex) {
 
-			throw new IllegalScriptException("Method should return a boolean value", e);
-		} catch (IllegalStateException e) {
+			throw new IllegalScriptException("Method should return a boolean value",
+					                         ex);
+		} catch (IllegalStateException ex) {
 
-			throw new IllegalScriptException(e.getMessage(), e);
+			throw new IllegalScriptException(ex.getMessage(), ex);
 		}
 	}
 
@@ -343,21 +344,21 @@ public class IfDeclaration implements ILanguageComponent {
 			}
 
 			return bool;
-		} catch (ClassNotFoundException e) {
+		} catch (ClassNotFoundException ex) {
 
-			throw new IllegalScriptException("Specified class is invalid.", e);
-		} catch (NoSuchFieldException e) {
+			throw new IllegalScriptException("Specified class is invalid.", ex);
+		} catch (NoSuchFieldException ex) {
 
-			throw new IllegalScriptException("Invalid field specified.", e);
-		} catch (InstantiationException | IllegalAccessException e) {
+			throw new IllegalScriptException("Invalid field specified.", ex);
+		} catch (InstantiationException | IllegalAccessException ex) {
 
-			throw new IllegalScriptException("Unable to access field.", e);
-		} catch (ClassCastException e) {
+			throw new IllegalScriptException("Unable to access field.", ex);
+		} catch (ClassCastException ex) {
 
-			throw new IllegalScriptException("Field should be a boolean value", e);
-		} catch (IllegalStateException e) {
+			throw new IllegalScriptException("Field should be a boolean value", ex);
+		} catch (IllegalStateException ex) {
 
-			throw new IllegalScriptException(e.getMessage(), e);
+			throw new IllegalScriptException(ex.getMessage(), ex);
 		}
 	}
 }

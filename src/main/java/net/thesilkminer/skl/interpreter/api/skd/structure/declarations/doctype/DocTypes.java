@@ -2,6 +2,8 @@ package net.thesilkminer.skl.interpreter.api.skd.structure.declarations.doctype;
 
 import com.google.common.collect.Lists;
 
+import net.thesilkminer.skl.interpreter.api.skd.SkdApi;
+
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Optional;
@@ -28,10 +30,11 @@ public final class DocTypes {
 					      + "implementation.skd.structure.providers.doctype."
 					      + "DefaultProvider");
 			this.providers.add((IDocTypeProvider) clazz.getConstructor().newInstance());
-		} catch (final ReflectiveOperationException e) {
+		} catch (final ReflectiveOperationException ex) {
 
-			System.err.println("Implementation unavailable");
-			e.printStackTrace();
+			//System.err.println("Implementation unavailable"); Redirect to SkdLogger
+			SkdApi.get().logger().severe("Implementation unavailable");
+			ex.printStackTrace();
 		}
 	}
 
@@ -115,9 +118,9 @@ public final class DocTypes {
 
 					return Optional.of(provider);
 				}
-			} catch (final MalformedURLException e) {
+			} catch (final MalformedURLException ex) {
 
-				e.printStackTrace();
+				ex.printStackTrace();
 			}
 		}
 

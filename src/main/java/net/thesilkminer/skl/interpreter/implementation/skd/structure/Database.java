@@ -79,7 +79,7 @@ public class Database implements IDatabase {
 			this.apply(declaration);
 			this.docType = declaration;
 			return true;
-		} catch (final RuntimeException e) {
+		} catch (final RuntimeException ex) {
 
 			return false;
 		}

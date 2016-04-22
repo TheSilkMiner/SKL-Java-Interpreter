@@ -1,7 +1,6 @@
 package net.thesilkminer.skl.interpreter.implementation.skd.structure.providers.doctype;
 
 import net.thesilkminer.skl.interpreter.api.skd.structure.IStructure;
-import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.doctype.DocTypes;
 import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.doctype.IDocTypeProvider;
 
 import java.net.MalformedURLException;
@@ -42,9 +41,9 @@ public class DefaultProvider implements IDocTypeProvider {
 		try {
 
 			return new URL("http://thesilkminer.net/sks/skd/default.skd");
-		} catch (final MalformedURLException e) {
+		} catch (final MalformedURLException ex) {
 
-			throw new RuntimeException("This should never happen", e);
+			throw new RuntimeException("This should never happen", ex);
 		}
 	}
 

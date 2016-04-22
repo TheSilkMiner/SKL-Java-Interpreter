@@ -73,10 +73,10 @@ public class CMainListener implements IScriptListener {
 			try {
 
 				return valueOf(instr.toUpperCase(java.util.Locale.ENGLISH));
-			} catch (final IllegalArgumentException e) {
+			} catch (final IllegalArgumentException ex) {
 
 				throw new CompilerException.PreProcessorException(
-						"Unrecognized pre-processor command", e);
+						"Unrecognized pre-processor command", ex);
 			}
 		}
 
@@ -160,21 +160,21 @@ public class CMainListener implements IScriptListener {
 			this.checkJava(javaLines);
 
 			this.javaListener.runScript(javaLines);
-		} catch (final CompilerException e) {
+		} catch (final CompilerException ex) {
 
 			// Simply an exception packaging
 
 			try {
 
-				throw new WrongSyntaxException(e);
-			} catch (final WrongSyntaxException ex) {
+				throw new WrongSyntaxException(ex);
+			} catch (final WrongSyntaxException exc) {
 
 				try {
 
-					throw new IllegalStateException(ex);
-				} catch (final IllegalStateException exc) {
+					throw new IllegalStateException(exc);
+				} catch (final IllegalStateException exception) {
 
-					throw new IllegalScriptException(exc);
+					throw new IllegalScriptException(exception);
 				}
 			}
 		}
@@ -216,9 +216,9 @@ public class CMainListener implements IScriptListener {
 			}
 
 			return "";
-		} catch (final CompilerException.PreProcessorException e) {
+		} catch (final CompilerException.PreProcessorException ex) {
 
-			throw new CompilerException(e.getMessage(), e);
+			throw new CompilerException(ex.getMessage(), ex);
 		}
 	}
 

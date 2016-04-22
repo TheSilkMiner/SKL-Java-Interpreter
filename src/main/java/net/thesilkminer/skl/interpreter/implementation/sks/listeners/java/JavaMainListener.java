@@ -188,7 +188,7 @@ public class JavaMainListener implements IScriptListener {
 			Class.forName("javax.tools.JavaFileObject");
 			Class.forName("javax.tools.SimpleJavaFileObject");
 			Class.forName("javax.tools.ToolProvider");
-		} catch (final ClassNotFoundException e) {
+		} catch (final ClassNotFoundException ex) {
 
 			this.logs.add("The interpreter was not able to find the compiler class");
 			this.logs.add("Make sure you are using the JDK, not only the JRE");
@@ -208,10 +208,10 @@ public class JavaMainListener implements IScriptListener {
 		try {
 
 			clazz = new ClassObject(this.className);
-		} catch (URISyntaxException e) {
+		} catch (URISyntaxException ex) {
 
 			clazz = null;
-			Throwables.propagate(e);
+			Throwables.propagate(ex);
 		}
 
 		if (clazz == null) {
@@ -254,17 +254,17 @@ public class JavaMainListener implements IScriptListener {
 			main.setAccessible(true);
 			main.invoke(null, (Object[]) new String[1]);
 
-		} catch (final ClassNotFoundException e) {
+		} catch (final ClassNotFoundException ex) {
 
 			this.logs.add("The interpreter was not able to compile the class");
 			this.logs.add("Error: Class hasn't been found");
 			return;
-		} catch (final NoSuchMethodException e) {
+		} catch (final NoSuchMethodException ex) {
 
 			this.logs.add("The interpreter was not able to compile the class");
 			this.logs.add("Error: \"main\" method not found");
 			return;
-		} catch (final IllegalAccessException | InvocationTargetException e) {
+		} catch (final IllegalAccessException | InvocationTargetException ex) {
 
 			this.logs.add("The interpreter was not able to compile the class");
 			this.logs.add("Error: Unable to access \"main\" method");
@@ -276,7 +276,7 @@ public class JavaMainListener implements IScriptListener {
 		try {
 
 			Thread.sleep(1000);
-		} catch (final InterruptedException e) {
+		} catch (final InterruptedException ex) {
 
 			this.logs.add("Sleep interrupted. Ah well.");
 		}
