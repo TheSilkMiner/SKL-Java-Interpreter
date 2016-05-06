@@ -205,15 +205,38 @@ public class SkdTag implements ISkdTag {
 
 		builder += ">";
 
-		if (this.content.isPresent()) {
+		for (final ISkdTag tag : this.children) {
 
-			builder += this.content.get();
-			builder += " ";
+			final String[] lines = tag.toString().split("\\n");
+
+			for (final String line : lines) {
+				builder += "\n\t";
+				builder += line;
+			}
 		}
 
-		for (ISkdTag tag : this.children) {
+		if (!this.children.isEmpty()) {
 
-			builder += tag.toString();
+			builder += "\n";
+		}
+
+		if (this.content.isPresent()) {
+
+			final String[] lines = this.content.get().split("\\n");
+			boolean first = true;
+
+			for (final String line : lines) {
+
+				builder += "\n\t";
+				builder += line;
+			}
+
+			builder += "\n";
+		}
+
+		if (this.children.isEmpty() && !this.content.isPresent()) {
+
+			builder += "\n";
 		}
 
 		builder += "</";
@@ -269,5 +292,43 @@ public class SkdTag implements ISkdTag {
 		main.setContent(Optional.empty());
 
 		System.out.println(main.toString());
+
+		System.out.println("============= DATABASE CONSTRUCTION ATTEMPT =============");
+
+		final SkdTag dbMain = SkdTag.of("main");
+
+		final SkdTag dbChild = SkdTag.of("child");
+		dbChild.setAsChild(dbMain);
+
+		final SkdTag dbTag1 = SkdTag.of("tag");
+		dbTag1.setContent(Optional.of("Content test"));
+		dbTag1.setAsChild(dbChild);
+
+		final SkdTag dbTag2 = SkdTag.of("tag");
+		dbTag2.setContent(Optional.of("Content test\n#2"));
+		dbTag2.setAsChild(dbChild);
+
+		final SkdTag dbOther = SkdTag.of("other");
+		dbOther.setAsChild(dbMain);
+
+		final SkdTag dbProperties = SkdTag.of("properties");
+		dbProperties.addProperty(SkdProperty.getProperty("test1", "yes"));
+		dbProperties.addProperty(SkdProperty.getProperty("test2", Optional.of("bella")));
+		dbProperties.setAsChild(dbOther);
+
+		final SkdTag dbAVoidTag1 = SkdTag.of("aVoidTag");
+		dbAVoidTag1.setVoidElement();
+		dbAVoidTag1.setAsChild(dbProperties);
+
+		final SkdTag dbAVoidTagWithProps = SkdTag.of("aVoidTagWithProps");
+		dbAVoidTagWithProps.setVoidElement();
+		dbAVoidTagWithProps.addProperty(SkdProperty.getProperty("prop", "prop"));
+		dbAVoidTagWithProps.setAsChild(dbProperties);
+
+		final SkdTag dbAVoidTag2 = SkdTag.of("aVoidTag");
+		dbAVoidTag2.setVoidElement();
+		dbAVoidTag2.setAsChild(dbOther);
+
+		System.out.println(dbMain);
 	}
 }

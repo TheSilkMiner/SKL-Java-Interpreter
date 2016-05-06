@@ -101,4 +101,13 @@ public class DatabaseVersion implements IDatabaseVersionDeclaration {
 
 		return String.format("%s version <version>", this.getDeclarationName());
 	}
+
+	@Override
+	public String toString() {
+
+		return "<"
+				+ this.getDeclarationSyntax().replace("<version>",
+						this.version())
+				+ ">";
+	}
 }

@@ -105,4 +105,13 @@ public class DocType implements IDocTypeDeclaration {
 
 		return String.format("%s skd <stylesheet>", this.getDeclarationName());
 	}
+
+	@Override
+	public String toString() {
+
+		return "<"
+ 				+ this.getDeclarationSyntax().replace("<stylesheet>",
+						this.getDocType())
+				+ ">";
+	}
 }

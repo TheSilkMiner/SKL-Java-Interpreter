@@ -246,16 +246,26 @@ public class SkdParser implements ISkdParser {
 
 			final ISkdTag tag = this.lastTagOnLevel.get(indentationLevel - 1);
 			final Optional<String> content = tag.getContent();
-			final String newContent;
+			String newContent;
 
 			if (content.isPresent()) {
 
 				newContent = content.get()
 						+ "\n"
-						+ line.substring(indentationLevel - 1);
+						+ line.substring(indentationLevel);
 			} else {
 
-				newContent = line.substring(indentationLevel - 1);
+				newContent = line.substring(indentationLevel);
+			}
+
+			while (newContent.startsWith("\t")) {
+
+				newContent = newContent.substring(1);
+			}
+
+			if (newContent.isEmpty()) {
+
+				return true;
 			}
 
 			tag.setContent(Optional.of(newContent));
