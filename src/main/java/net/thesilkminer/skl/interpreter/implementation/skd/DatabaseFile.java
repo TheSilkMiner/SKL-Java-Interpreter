@@ -5,6 +5,7 @@ import com.google.common.base.Preconditions;
 import net.thesilkminer.skl.interpreter.api.skd.holder.IDatabaseHolder;
 
 import java.io.File;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 
 /**
@@ -16,7 +17,7 @@ import javax.annotation.Nonnull;
  * @since 1.0
  * @version 1.0
  */
-@SuppressWarnings("unused")
+@SuppressWarnings("WeakerAccess")
 public class DatabaseFile extends File implements IDatabaseHolder {
 
 	private final String fileName;
@@ -123,5 +124,17 @@ public class DatabaseFile extends File implements IDatabaseHolder {
 	public String getFileExtension() {
 
 		return fileExtension;
+	}
+
+	@Override
+	public boolean writable() {
+
+		return true;
+	}
+
+	@Override
+	public Optional<String> name() {
+
+		return Optional.of(this.getFileName());
 	}
 }

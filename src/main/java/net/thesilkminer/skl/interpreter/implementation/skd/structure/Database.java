@@ -127,7 +127,7 @@ public class Database implements IDatabase {
 		return this.docType().toString()
 				+ "\n"
 				+ this.version().toString()
-				+ "\n"
+				+ "\n\n"
 				+ this.structure().toString();
 	}
 }

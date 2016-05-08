@@ -21,8 +21,11 @@ import net.thesilkminer.skl.interpreter.implementation.skd.structure.declaration
 import net.thesilkminer.skl.interpreter.implementation.skd.structure.declarations.DocType;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -210,17 +213,17 @@ public class SkdParser implements ISkdParser {
 		}
 
 		try {
-
-			String line;
-
-			while ((line = this.reader.readLine()) != null) {
-
+			this.reader.lines().forEach(line -> {
 				if (!this.parse(line)) {
-
 					throw new IllegalDatabaseSyntaxException();
 				}
+			});
+		} catch (final Exception ex) {
+
+			if (ex instanceof IllegalDatabaseSyntaxException) {
+
+				throw ex;
 			}
-		} catch (final IOException ex) {
 
 			SkdApi.get().logger().stacktrace(ex);
 		}
@@ -539,15 +542,42 @@ public class SkdParser implements ISkdParser {
 	}
 
 	@Override
-	public boolean write(final IDatabase database) {
+	public boolean write(final IDatabase database, final IDatabaseHolder holder) {
+
 		// TODO
-		return false;
+		Preconditions.checkArgument(holder.writable(), "IDatabaseHolder must be writable");
+		Preconditions.checkArgument(holder instanceof DatabaseFile,
+				"Only DatabaseFile is supported");
+
+		final DatabaseFile file = (DatabaseFile) holder;
+
+		try {
+
+			this.write(database, file);
+			return true;
+		} catch (final IOException ex) {
+
+			return false;
+		}
+	}
+
+	private void write(final IDatabase database, final DatabaseFile file) throws IOException {
+
+		final PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+		out.println(database.toString());
+		out.close();
 	}
 
 	@Override
-	public String databaseName() {
+	public Optional<String> getDatabaseName() {
 
-		return ((DatabaseFile) this.databaseFile).getFileName();
+		return this.databaseHolder().name();
+	}
+
+	@Override
+	public IDatabaseHolder databaseHolder() {
+
+		return this.databaseFile;
 	}
 
 	/**
@@ -572,5 +602,33 @@ public class SkdParser implements ISkdParser {
 		final IDatabase database = parser.read();
 
 		System.out.println(database.toString());
+
+		final java.io.File outputFile = new java.io.File(System.getProperty("user.dir"),
+						"temp.skd");
+		try {
+
+			if (!outputFile.createNewFile()) {
+
+				throw new java.io.IOException();
+			}
+		} catch (final java.io.IOException ex) {
+
+			ex.printStackTrace();
+		}
+
+		System.out.println(parser.write(database, SkdApi.get().databaseHolder(outputFile)));
+
+		try (final BufferedReader reader = new BufferedReader(new FileReader(outputFile))) {
+
+			reader.lines().forEach(System.out::println);
+
+			if (!outputFile.delete()) {
+
+				outputFile.deleteOnExit();
+			}
+		} catch (final IOException ex) {
+
+			SkdApi.get().logger().stacktrace(ex);
+		}
 	}
 }
