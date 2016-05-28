@@ -544,7 +544,6 @@ public class SkdParser implements ISkdParser {
 	@Override
 	public boolean write(final IDatabase database, final IDatabaseHolder holder) {
 
-		// TODO
 		Preconditions.checkArgument(holder.writable(), "IDatabaseHolder must be writable");
 		Preconditions.checkArgument(holder instanceof DatabaseFile,
 				"Only DatabaseFile is supported");
@@ -563,6 +562,9 @@ public class SkdParser implements ISkdParser {
 
 	private void write(final IDatabase database, final DatabaseFile file) throws IOException {
 
+		// Yeah, well.
+		// Just a toString() call.
+		// LOL
 		final PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file)));
 		out.println(database.toString());
 		out.close();
