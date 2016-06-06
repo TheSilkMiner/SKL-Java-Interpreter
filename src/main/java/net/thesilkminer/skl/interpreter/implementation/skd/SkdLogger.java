@@ -147,6 +147,7 @@ public class SkdLogger implements ISkdLogger {
 	@Override
 	public void stacktrace(final Throwable throwable) {
 
+		this.error(throwable.getClass().getName());
 		this.stacktrace(throwable.getLocalizedMessage(), throwable);
 	}
 }

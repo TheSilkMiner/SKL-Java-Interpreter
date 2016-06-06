@@ -10,9 +10,14 @@
 			Content test
 			#2
 		</tag>
+		<child>
+			<evenMoreNested>
+				<nestedAsHell />
+			</evenMoreNested>
+		</child>
 	</child>
 	<other>
-		<properties test1="yes" test2="bella">
+		<properties test1="yes" test2="bella" test3="no spaces!!!">
 			<aVoidTag />
 			<aVoidTagWithProps prop="prop" />
 		</properties>

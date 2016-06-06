@@ -218,13 +218,9 @@ public class SkdParser implements ISkdParser {
 					throw new IllegalDatabaseSyntaxException();
 				}
 			});
+		} catch (final IllegalDatabaseSyntaxException ex) {
+			throw ex;
 		} catch (final Exception ex) {
-
-			if (ex instanceof IllegalDatabaseSyntaxException) {
-
-				throw ex;
-			}
-
 			SkdApi.get().logger().stacktrace(ex);
 		}
 
@@ -366,18 +362,45 @@ public class SkdParser implements ISkdParser {
 			return true;
 		}
 
-		String[] parts = line.split(" ");
+		final List<String> parts = Lists.newArrayList();
+		boolean inQuotes = false;
+		String word = "";
 
-		if (parts[0].isEmpty()) {
-
-			throw new IllegalDatabaseSyntaxException();
+		for (final char character : line.toCharArray()) {
+			if (inQuotes) {
+				if (character == '"') {
+					inQuotes = false;
+				}
+				word += character;
+				continue;
+			}
+			if (character == '"') {
+				inQuotes = true;
+				word += character;
+				continue;
+			}
+			if (character == ' ') {
+				parts.add(word);
+				word = "";
+				continue;
+			}
+			word += character;
 		}
 
-		final ISkdTag tag = SkdApi.get().tag(parts[0]);
+		for (final char c : word.toCharArray()) {
+			if (c != ' ') {
+				parts.add(word);
+				break;
+			}
+		}
+
+		System.out.println(parts);
+
+		final ISkdTag tag = SkdApi.get().tag(parts.get(0));
 
 		for (final String part : parts) {
 
-			if (part.equals(parts[0])) {
+			if (part.equals(parts.get(0))) {
 
 				// Tag name
 				continue;

@@ -157,6 +157,7 @@ public class SksLogger implements ISksLogger {
 	@Override
 	public void stacktrace(Throwable throwable) {
 
+		this.error(throwable.getClass().getName());
 		this.error(throwable.getLocalizedMessage());
 		final StackTraceElement[] elements = throwable.getStackTrace();
 		for (final StackTraceElement element : elements) {
