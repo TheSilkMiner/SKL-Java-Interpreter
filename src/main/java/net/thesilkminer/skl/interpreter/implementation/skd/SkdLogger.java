@@ -66,10 +66,8 @@ public class SkdLogger implements ISkdLogger {
 				final String message = this.getFormatter().format(record);
 
 				if (record.getLevel().intValue() >= Level.WARNING.intValue()) {
-
 					System.err.write(message.getBytes());
 				} else {
-
 					System.out.write(message.getBytes());
 				}
 			} catch (final Exception exception) {

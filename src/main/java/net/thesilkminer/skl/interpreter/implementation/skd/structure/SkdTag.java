@@ -18,20 +18,20 @@ import javax.annotation.Nonnull;
  *
  * @since 0.1
  */
-@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class SkdTag implements ISkdTag {
 
 	private final String name;
-	private Optional<String> content;
+	private String content;
 	private boolean voidElement;
 	private final List<ISkdTag> children;
 	private final List<ISkdProperty> properties;
+	private boolean closed;
 
 	private SkdTag(final String name) {
 
 		Preconditions.checkNotNull(name, "Tag name must not be null");
 		this.name = name;
-		this.content = Optional.empty();
+		this.content = null;
 		this.children = Lists.newArrayList();
 		this.properties = Lists.newArrayList();
 	}
@@ -44,7 +44,6 @@ public class SkdTag implements ISkdTag {
 	 * @return
 	 * 		A new tag instance
 	 */
-	@SuppressWarnings("WeakerAccess") //API method
 	public static SkdTag of(@Nonnull final String name) {
 
 		return new SkdTag(Preconditions.checkNotNull(name));
@@ -59,7 +58,7 @@ public class SkdTag implements ISkdTag {
 	@Override
 	public Optional<String> getContent() {
 
-		return this.content;
+		return Optional.ofNullable(this.content);
 	}
 
 	@Override
@@ -82,7 +81,7 @@ public class SkdTag implements ISkdTag {
 
 	@Override
 	public void addChildTag(final ISkdTag tag) {
-
+		Preconditions.checkState(!this.closed(), "Tag closed");
 		Preconditions.checkState(!this.voidElement,
 				      "The tag is void");
 		this.children.add(tag);
@@ -96,25 +95,31 @@ public class SkdTag implements ISkdTag {
 
 	@Override
 	public void removeChildTag(final ISkdTag tag) {
-
+		Preconditions.checkState(!this.closed(), "Tag closed");
 		this.children.remove(tag);
 	}
 
 	@Override
 	public void setVoidElement() {
-
-		Preconditions.checkState(!this.content.isPresent(),
+		Preconditions.checkState(!this.closed(), "Tag closed");
+		Preconditions.checkState(this.content == null,
 				      "The tag has already some content");
 		this.voidElement = true;
 	}
 
 	@Override
-	public void setContent(@Nonnull final Optional<String> content) {
-
-		Preconditions.checkState(!this.voidElement,
-				      "The tag is void");
-		Preconditions.checkNotNull(content);
+	public void setContent(@Nonnull final String content) {
+		Preconditions.checkState(!this.closed(), "Tag closed");
+		Preconditions.checkState(!this.voidElement, "The tag is void");
+		Preconditions.checkNotNull(content, "Use removeContent() to remove the content");
 		this.content = content;
+	}
+
+	@Override
+	public void removeContent() {
+		Preconditions.checkState(!this.closed(), "Tag closed");
+		Preconditions.checkState(!this.voidElement, "The tag is void");
+		this.content = null;
 	}
 
 	@Override
@@ -145,6 +150,16 @@ public class SkdTag implements ISkdTag {
 	public boolean hasProperty(@Nonnull ISkdProperty property) {
 
 		return this.properties.contains(property);
+	}
+
+	@Override
+	public void close() {
+		this.closed = true;
+	}
+
+	@Override
+	public boolean closed() {
+		return this.closed;
 	}
 
 	@Override
@@ -220,10 +235,9 @@ public class SkdTag implements ISkdTag {
 			builder += "\n";
 		}
 
-		if (this.content.isPresent()) {
+		if (this.content != null) {
 
-			final String[] lines = this.content.get().split("\\n");
-			boolean first = true;
+			final String[] lines = this.content.split("\\n");
 
 			for (final String line : lines) {
 
@@ -234,7 +248,7 @@ public class SkdTag implements ISkdTag {
 			builder += "\n";
 		}
 
-		if (this.children.isEmpty() && !this.content.isPresent()) {
+		if (this.children.isEmpty() && this.content == null) {
 
 			builder += "\n";
 		}
@@ -274,7 +288,8 @@ public class SkdTag implements ISkdTag {
 		childThree.setAsChild(main);
 		main.addChildTag(childOne);
 
-		main.setContent(Optional.of("Test content"));
+		//main.setContent(Optional.of("Test content"));
+		main.setContent("Test content");
 
 		childThree.setVoidElement();
 
@@ -289,7 +304,8 @@ public class SkdTag implements ISkdTag {
 
 		System.out.println(main.toString());
 
-		main.setContent(Optional.empty());
+		//main.setContent(Optional.empty());
+		main.removeContent();
 
 		System.out.println(main.toString());
 
@@ -301,11 +317,13 @@ public class SkdTag implements ISkdTag {
 		dbChild.setAsChild(dbMain);
 
 		final SkdTag dbTag1 = SkdTag.of("tag");
-		dbTag1.setContent(Optional.of("Content test"));
+		//dbTag1.setContent(Optional.of("Content test"));
+		dbTag1.setContent("Content test");
 		dbTag1.setAsChild(dbChild);
 
 		final SkdTag dbTag2 = SkdTag.of("tag");
-		dbTag2.setContent(Optional.of("Content test\n#2"));
+		//dbTag2.setContent(Optional.of("Content test\n#2"));
+		dbTag2.setContent("Content test\n#2");
 		dbTag2.setAsChild(dbChild);
 
 		final SkdTag dbOther = SkdTag.of("other");

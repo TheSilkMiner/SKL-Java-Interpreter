@@ -1,21 +1,24 @@
 package net.thesilkminer.skl.interpreter.api.skd;
 
-import net.thesilkminer.skl.interpreter.api.skd.holder.IDatabaseHolder;
+/*import net.thesilkminer.skl.interpreter.api.skd.holder.IDatabaseHolder;
 import net.thesilkminer.skl.interpreter.api.skd.logging.ISkdLogger;
-import net.thesilkminer.skl.interpreter.api.skd.parser.ISkdParser;
-import net.thesilkminer.skl.interpreter.api.skd.structure.IDatabase;
+import net.thesilkminer.skl.interpreter.api.skd.parser.ISkdParser;*/
+import net.thesilkminer.skl.interpreter.api.skd.service.ISkdService;
+import net.thesilkminer.skl.interpreter.api.skd.service.ServiceManager;
+/*import net.thesilkminer.skl.interpreter.api.skd.structure.IDatabase;
 import net.thesilkminer.skl.interpreter.api.skd.structure.ISkdProperty;
 import net.thesilkminer.skl.interpreter.api.skd.structure.ISkdTag;
 import net.thesilkminer.skl.interpreter.api.skd.structure.IStructure;
 import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.doctype.IDocTypeDeclaration;
-import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.version.IDatabaseVersionDeclaration;
+import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.version.IDatabaseVersionDeclaration;*/
 
-import java.io.File;
+/*import java.io.File;
 import java.lang.reflect.Method;
-import java.util.List;
+import java.util.List;*/
+
 import java.util.Optional;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+/*import javax.annotation.Nullable;*/
 
 /**
  * Represents the access point of the SKD Api.
@@ -30,9 +33,21 @@ public class SkdApi {
 
 	private static final SkdApi SINGLETON = new SkdApi();
 
-	private ISkdLogger logger;
+	/*private ISkdLogger logger;*/
 
-	private SkdApi() { }
+	private SkdApi() {
+		try {
+			final Class<?> def = Class
+					.forName("net.thesilkminer.skl.interpreter."
+							+ "implementation.skd.service."
+							+ "DefaultService");
+			final ServiceManager manager = ServiceManager.get();
+			final ISkdService service = ISkdService.class.cast(def.newInstance());
+			manager.provide(SkdApi.class, service);
+		} catch (final ReflectiveOperationException ignored) {
+			// We don't really care
+		}
+	}
 
 	/**
 	 * Gets the singleton instance of the API.
@@ -48,6 +63,39 @@ public class SkdApi {
 	}
 
 	/**
+	 * Gets a service providing the API.
+	 *
+	 * @return
+	 *      The currently registered.
+	 *
+	 * @throws RuntimeException If there is no available service.
+	 *
+	 * @since 0.2.1
+	 */
+	@Nonnull
+	public ISkdService api() {
+		final Optional<ISkdService> service = this.serviceManager().get(SkdApi.class);
+		if (!service.isPresent()) {
+			throw new RuntimeException("No available service found");
+		}
+		return service.get();
+	}
+
+	/**
+	 * Gets the service manager.
+	 *
+	 * @return
+	 *      The service manager
+	 *
+	 * @since 0.2.1
+	 */
+	@Nonnull
+	@SuppressWarnings("WeakerAccess")
+	public ServiceManager serviceManager() {
+		return ServiceManager.get();
+	}
+
+	/**
 	 * Gets the logger instance of the current implementation.
 	 *
 	 * @return
@@ -55,6 +103,7 @@ public class SkdApi {
 	 *
 	 * @since 0.2
 	 */
+	/*
 	public ISkdLogger logger() {
 
 		if (this.logger != null) {
@@ -77,7 +126,7 @@ public class SkdApi {
 			throw new RuntimeException(ex);
 		}
 	}
-
+	*/
 	/**
 	 * Gets the parser instance of the current implementation.
 	 *
@@ -88,6 +137,7 @@ public class SkdApi {
 	 *
 	 * @since 0.2
 	 */
+	/*
 	public ISkdParser parser(@Nonnull final IDatabaseHolder holder) {
 
 		try {
@@ -104,7 +154,7 @@ public class SkdApi {
 			throw new RuntimeException(ex);
 		}
 	}
-
+	*/
 	/**
 	 * Gets a new database holder of the current implementation.
 	 *
@@ -115,6 +165,7 @@ public class SkdApi {
 	 *
 	 * @since 0.2
 	 */
+	/*
 	public IDatabaseHolder databaseHolder(final File file) {
 
 		try {
@@ -130,7 +181,7 @@ public class SkdApi {
 			throw new RuntimeException(ex);
 		}
 	}
-
+	/*
 	/**
 	 * Gets a new IDatabase instance from the specified declarations.
 	 *
@@ -145,6 +196,7 @@ public class SkdApi {
 	 *
 	 * @since 0.2
 	 */
+	/*
 	public IDatabase database(final IDocTypeDeclaration docType,
 							  final IDatabaseVersionDeclaration version,
 							  final IStructure struct) {
@@ -166,7 +218,7 @@ public class SkdApi {
 			throw new RuntimeException(ex);
 		}
 	}
-
+	*/
 	/**
 	 * Gets a new IDocTypeDeclaration.
 	 *
@@ -177,6 +229,7 @@ public class SkdApi {
 	 *
 	 * @since 0.2
 	 */
+	/*
 	public IDocTypeDeclaration docType(final String docType) {
 
 		try {
@@ -193,7 +246,7 @@ public class SkdApi {
 			throw new RuntimeException(ex);
 		}
 	}
-
+	*/
 	/**
 	 * Gets a new IDatabaseVersionDeclaration.
 	 *
@@ -204,6 +257,7 @@ public class SkdApi {
 	 *
 	 * @since 0.2
 	 */
+	/*
 	public IDatabaseVersionDeclaration version(@Nullable final String version) {
 
 		try {
@@ -227,7 +281,7 @@ public class SkdApi {
 			throw new RuntimeException(ex);
 		}
 	}
-
+	*/
 	/**
 	 * Gets a new structure of the current implementation.
 	 *
@@ -238,6 +292,7 @@ public class SkdApi {
 	 *
 	 * @since 0.2
 	 */
+	/*
 	@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 	public IStructure structure(final Optional<List<ISkdTag>> tags) {
 
@@ -256,7 +311,7 @@ public class SkdApi {
 			throw new RuntimeException(ex);
 		}
 	}
-
+	*/
 	/**
 	 * Gets a new instance of an SKD tag.
 	 *
@@ -267,6 +322,7 @@ public class SkdApi {
 	 *
 	 * @since 0.2
 	 */
+	/*
 	public ISkdTag tag(final String name) {
 
 		try {
@@ -283,7 +339,7 @@ public class SkdApi {
 			throw new RuntimeException(ex);
 		}
 	}
-
+	*/
 	/**
 	 * Gets a new property from the specified values.
 	 *
@@ -296,6 +352,7 @@ public class SkdApi {
 	 *
 	 * @since 0.2
 	 */
+	/*
 	public ISkdProperty property(final String name, final Object value) {
 
 		try {
@@ -317,4 +374,5 @@ public class SkdApi {
 			throw new RuntimeException(ex);
 		}
 	}
+	*/
 }

@@ -9,7 +9,7 @@ import java.util.Optional;
  *
  * @since 0.2
  */
-public interface ISkdProperty {
+public interface ISkdProperty extends IAcceptable<ISkdProperty> {
 
 	/**
 	 * Gets the name of the property.

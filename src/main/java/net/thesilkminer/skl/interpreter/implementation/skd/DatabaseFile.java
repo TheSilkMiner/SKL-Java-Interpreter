@@ -1,10 +1,11 @@
 package net.thesilkminer.skl.interpreter.implementation.skd;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
 
 import net.thesilkminer.skl.interpreter.api.skd.holder.IDatabaseHolder;
 
-import java.io.File;
+import java.io.*;
 import java.util.Optional;
 import javax.annotation.Nonnull;
 
@@ -132,9 +133,39 @@ public class DatabaseFile extends File implements IDatabaseHolder {
 		return true;
 	}
 
+	@Nonnull
 	@Override
 	public Optional<String> name() {
 
 		return Optional.of(this.getFileName());
+	}
+
+	@Override
+	public boolean canBeAcceptedByDefault() {
+		return this.getFileExtension().equalsIgnoreCase("skd");
+	}
+
+	@Nonnull
+	@Override
+	public BufferedReader readerStream() {
+		try {
+			return new BufferedReader(new FileReader(this));
+		} catch (final FileNotFoundException exception) {
+			Throwables.propagate(exception);
+			throw new RuntimeException(); //Dead code, but ok
+		}
+	}
+
+	@Nonnull
+	@Override
+	public Optional<BufferedWriter> writerStream() {
+		final BufferedWriter out;
+		try {
+			out = new BufferedWriter(new FileWriter(this));
+		} catch (final IOException exception) {
+			Throwables.propagate(exception);
+			throw new RuntimeException(); //Dead code, but ok
+		}
+		return Optional.of(out);
 	}
 }

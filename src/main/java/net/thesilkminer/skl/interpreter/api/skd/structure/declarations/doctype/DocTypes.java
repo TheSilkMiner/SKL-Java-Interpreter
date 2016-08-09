@@ -32,8 +32,7 @@ public final class DocTypes {
 			this.providers.add((IDocTypeProvider) clazz.getConstructor().newInstance());
 		} catch (final ReflectiveOperationException ex) {
 
-			//System.err.println("Implementation unavailable"); Redirect to SkdLogger
-			SkdApi.get().logger().severe("Implementation unavailable");
+			SkdApi.get().api().logger().severe("Implementation unavailable");
 			ex.printStackTrace();
 		}
 	}

@@ -4,6 +4,7 @@
 # Gradle
 .gradle/
 build/
+classes/
 run/
 bin/
 
@@ -13,6 +14,7 @@ bin/
 .settings/
 
 # IntelliJ IDEA
+.idea/
 *.iml
 *.iws
 *.ipr

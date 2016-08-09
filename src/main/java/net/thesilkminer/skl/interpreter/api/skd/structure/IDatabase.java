@@ -10,7 +10,7 @@ import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.version.I
  *
  * @since 0.2
  */
-public interface IDatabase {
+public interface IDatabase extends IAcceptable<IDatabase> {
 
 	/**
 	 * Gets the current doctype declaration.

@@ -73,7 +73,7 @@ public class SkdParser implements ISkdParser {
 		this.error = false;
 		this.reader = null;
 
-		this.struct = SkdApi.get().structure(Optional.empty());
+		this.struct = SkdApi.get().api().structure(Lists.newArrayList());
 		this.mainTags = Lists.newArrayList();
 		this.docType = null;
 		this.version = null;
@@ -136,11 +136,11 @@ public class SkdParser implements ISkdParser {
 			throw new IllegalStateException("Parser has already been initialized");
 		}
 
-		SkdApi.get().logger().info("Initializing database parser");
+		SkdApi.get().api().logger().info("Initializing database parser");
 
 		if (!(this.databaseFile instanceof DatabaseFile)) {
 
-			SkdApi.get().logger().error("Supplied file must be an instance of "
+			SkdApi.get().api().logger().error("Supplied file must be an instance of "
 					      + "DatabaseFile to be parsed");
 			return;
 		}
@@ -153,7 +153,7 @@ public class SkdParser implements ISkdParser {
 					new FileReader((DatabaseFile) this.databaseFile));
 		} catch (final Throwable thr) {
 
-			SkdApi.get().logger().stacktrace(thr);
+			SkdApi.get().api().logger().stacktrace(thr);
 			this.error = true;
 		}
 
@@ -178,23 +178,23 @@ public class SkdParser implements ISkdParser {
 			throw new IllegalStateException("File was null");
 		}
 
-		SkdApi.get().logger().info("Checking file");
+		SkdApi.get().api().logger().info("Checking file");
 
 		if (!((DatabaseFile) this.databaseFile).getFileExtension()
 				      .equalsIgnoreCase("skd")) {
 
 			if (!force) {
 
-				SkdApi.get().logger()
+				SkdApi.get().api().logger()
 						.error("File specified does not end with .skd");
-				SkdApi.get().logger().error("Aborting process");
+				SkdApi.get().api().logger().error("Aborting process");
 
 				throw new IllegalStateException("File must end with .skd to be "
 						+ "able to be parsed");
 			}
 
-			SkdApi.get().logger().warn("File specified does not end with .skd");
-			SkdApi.get().logger().warn("Forced to accept it...");
+			SkdApi.get().api().logger().warn("File specified does not end with .skd");
+			SkdApi.get().api().logger().warn("Forced to accept it...");
 		}
 	}
 
@@ -221,7 +221,7 @@ public class SkdParser implements ISkdParser {
 		} catch (final IllegalDatabaseSyntaxException ex) {
 			throw ex;
 		} catch (final Exception ex) {
-			SkdApi.get().logger().stacktrace(ex);
+			SkdApi.get().api().logger().stacktrace(ex);
 		}
 
 		if (!this.mainTags.isEmpty()) {
@@ -234,7 +234,7 @@ public class SkdParser implements ISkdParser {
 			throw new IllegalDatabaseSyntaxException();
 		}
 
-		return SkdApi.get().database(this.docType, this.version, this.struct);
+		return SkdApi.get().api().database(this.docType, this.version, this.struct);
 	}
 
 	private boolean parse(final String line) {
@@ -335,6 +335,10 @@ public class SkdParser implements ISkdParser {
 			throw new IllegalDatabaseSyntaxException(); // Tag closed without being open
 		}
 
+		this.lastTagOnLevel.put(indentation,
+				SkdApi.get().api().tagCallback(
+						this.lastTagOnLevel.get(indentation)));
+
 		this.lastTagOnLevel.put(indentation, null);
 
 		if (this.lastTagOnLevel.get(indentation + 1) != null) {
@@ -394,9 +398,8 @@ public class SkdParser implements ISkdParser {
 			}
 		}
 
-		System.out.println(parts);
-
-		final ISkdTag tag = SkdApi.get().tag(parts.get(0));
+		final List<ISkdProperty> properties = Lists.newArrayList();
+		//final ISkdTag tag = SkdApi.get().api().tag(parts.get(0));
 
 		for (final String part : parts) {
 
@@ -429,10 +432,12 @@ public class SkdParser implements ISkdParser {
 
 			pair[1] = pair[1].substring(1, pair[1].length() - 1); // Remove quotes
 
-			final ISkdProperty prop = SkdApi.get().property(pair[0], pair[1]);
-
-			tag.addProperty(prop);
+			properties.add(SkdApi.get().api().propertyCallback(
+					SkdApi.get().api().property(pair[0], pair[1])));
 		}
+
+		final ISkdTag tag = SkdApi.get().api().tag(parts.get(0));
+		properties.stream().forEach(tag::addProperty);
 
 		if (currentIndentation == 0) {
 
@@ -525,19 +530,19 @@ public class SkdParser implements ISkdParser {
 		if (line.startsWith(DEF_OBJ.get(IDocTypeDeclaration.class).getDeclarationName())) {
 
 			final String split = line.split(" ")[2];
-			final IDocTypeDeclaration docType = SkdApi.get().docType(split);
+			final IDocTypeDeclaration docType = SkdApi.get().api().doctype(split);
 
 			if (!docType.validate()) {
 
-				SkdApi.get().logger().warn("Invalid doctype declaration.");
-				SkdApi.get().logger().warn("Accepting it anyway.");
-				SkdApi.get().logger().warn("Warning! This may change in "
+				SkdApi.get().api().logger().warn("Invalid doctype declaration.");
+				SkdApi.get().api().logger().warn("Accepting it anyway.");
+				SkdApi.get().api().logger().warn("Warning! This may change in "
 						      + "the future. Please fix the declaration!");
 			}
 
 			if (this.docType != null) {
 
-				SkdApi.get().logger().severe("DocType already defined");
+				SkdApi.get().api().logger().severe("DocType already defined");
 				throw new IllegalDatabaseSyntaxException(); // ?
 			}
 
@@ -550,13 +555,13 @@ public class SkdParser implements ISkdParser {
 				      .getDeclarationName())) {
 
 			final String split = line.split(" ")[2];
-			final IDatabaseVersionDeclaration version = SkdApi.get().version(
+			final IDatabaseVersionDeclaration version = SkdApi.get().api().version(
 					       CURRENT_VERSION.equals(split) ? null : split
 			);
 
 			if (this.version != null) {
 
-				SkdApi.get().logger().severe("Version already defined");
+				SkdApi.get().api().logger().severe("Version already defined");
 				throw new IllegalDatabaseSyntaxException(); // ?
 			}
 
@@ -619,8 +624,8 @@ public class SkdParser implements ISkdParser {
 				      "/assets/skd_interpreter/examples/DatabaseExample.skd"
 			).getFile()
 		);
-		final IDatabaseHolder db = SkdApi.get().databaseHolder(exampleFile);
-		final ISkdParser parser = SkdApi.get().parser(db);
+		final IDatabaseHolder db = SkdApi.get().api().databaseHolder(exampleFile);
+		final ISkdParser parser = SkdApi.get().api().parser(db);
 
 		parser.init(false);
 
@@ -641,7 +646,8 @@ public class SkdParser implements ISkdParser {
 			ex.printStackTrace();
 		}
 
-		System.out.println(parser.write(database, SkdApi.get().databaseHolder(outputFile)));
+		System.out.println(parser.write(database, SkdApi.get().api()
+				.databaseHolder(outputFile)));
 
 		try (final BufferedReader reader = new BufferedReader(new FileReader(outputFile))) {
 
@@ -653,7 +659,7 @@ public class SkdParser implements ISkdParser {
 			}
 		} catch (final IOException ex) {
 
-			SkdApi.get().logger().stacktrace(ex);
+			SkdApi.get().api().logger().stacktrace(ex);
 		}
 	}
 }

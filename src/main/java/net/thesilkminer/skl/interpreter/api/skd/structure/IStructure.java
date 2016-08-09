@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @since 0.2
  */
-public interface IStructure {
+public interface IStructure extends IAcceptable<IStructure> {
 
 	/**
 	 * Gets the current main tags of a database.
