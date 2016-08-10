@@ -6,10 +6,13 @@ import com.google.common.collect.Lists;
 import net.thesilkminer.skl.interpreter.api.skd.structure.ISkdProperty;
 import net.thesilkminer.skl.interpreter.api.skd.structure.ISkdTag;
 
+import org.jetbrains.annotations.Contract;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * This class represents a tag in skd, which is e.g. {@code <tag></tag>}
@@ -27,8 +30,7 @@ public class SkdTag implements ISkdTag {
 	private final List<ISkdProperty> properties;
 	private boolean closed;
 
-	private SkdTag(final String name) {
-
+	private SkdTag(@Nonnull final String name) {
 		Preconditions.checkNotNull(name, "Tag name must not be null");
 		this.name = name;
 		this.content = null;
@@ -44,43 +46,43 @@ public class SkdTag implements ISkdTag {
 	 * @return
 	 * 		A new tag instance
 	 */
+	@Contract(value = "null -> fail; !null -> !null", pure = true)
+	@Nonnull
 	public static SkdTag of(@Nonnull final String name) {
-
 		return new SkdTag(Preconditions.checkNotNull(name));
 	}
 
+	@Nonnull
 	@Override
 	public String getName() {
-
 		return this.name;
 	}
 
+	@Nonnull
 	@Override
 	public Optional<String> getContent() {
-
 		return Optional.ofNullable(this.content);
 	}
 
 	@Override
 	public boolean isVoidElement() {
-
 		return this.voidElement;
 	}
 
+	@Nonnull
 	@Override
 	public List<ISkdTag> getChildren() {
-
 		return this.children;
 	}
 
+	@Nonnull
 	@Override
 	public List<ISkdProperty> getProperties() {
-
 		return this.properties;
 	}
 
 	@Override
-	public void addChildTag(final ISkdTag tag) {
+	public void addChildTag(@Nonnull final ISkdTag tag) {
 		Preconditions.checkState(!this.closed(), "Tag closed");
 		Preconditions.checkState(!this.voidElement,
 				      "The tag is void");
@@ -88,13 +90,12 @@ public class SkdTag implements ISkdTag {
 	}
 
 	@Override
-	public void setAsChild(final ISkdTag parent) {
-
+	public void setAsChild(@Nonnull final ISkdTag parent) {
 		parent.getChildren().add(this);
 	}
 
 	@Override
-	public void removeChildTag(final ISkdTag tag) {
+	public void removeChildTag(@Nonnull final ISkdTag tag) {
 		Preconditions.checkState(!this.closed(), "Tag closed");
 		this.children.remove(tag);
 	}
@@ -124,9 +125,7 @@ public class SkdTag implements ISkdTag {
 
 	@Override
 	public boolean addProperty(@Nonnull final ISkdProperty property) {
-
 		if (this.hasProperty(property)) {
-
 			return false;
 		}
 
@@ -135,10 +134,8 @@ public class SkdTag implements ISkdTag {
 	}
 
 	@Override
-	public boolean removeProperty(@Nonnull ISkdProperty property) {
-
+	public boolean removeProperty(@Nonnull final ISkdProperty property) {
 		if (!this.hasProperty(property)) {
-
 			return false;
 		}
 
@@ -147,8 +144,7 @@ public class SkdTag implements ISkdTag {
 	}
 
 	@Override
-	public boolean hasProperty(@Nonnull ISkdProperty property) {
-
+	public boolean hasProperty(@Nonnull final ISkdProperty property) {
 		return this.properties.contains(property);
 	}
 
@@ -163,14 +159,12 @@ public class SkdTag implements ISkdTag {
 	}
 
 	@Override
-	public boolean equals(final Object obj) {
-
+	public boolean equals(@Nullable final Object obj) {
 		if (this == obj) {
-
 			return true;
 		}
-		if (obj == null || this.getClass() != obj.getClass()) {
 
+		if (obj == null || this.getClass() != obj.getClass()) {
 			return false;
 		}
 
@@ -184,7 +178,6 @@ public class SkdTag implements ISkdTag {
 
 	@Override
 	public int hashCode() {
-
 		return Objects.hash(
 				this.getName(),
 				this.getContent(),
@@ -194,9 +187,9 @@ public class SkdTag implements ISkdTag {
 		);
 	}
 
+	@Nonnull
 	@Override
 	public String toString() {
-
 		String builder = "";
 
 		builder += "<";
@@ -266,7 +259,7 @@ public class SkdTag implements ISkdTag {
 	 * @param args
 	 * 		args
 	 */
-	public static void main(String... args) {
+	public static void main(@Nonnull final String... args) {
 
 		final SkdProperty propertyOne = SkdProperty.getProperty("test", "example");
 		final SkdProperty propertyTwo = SkdProperty.getProperty("name", Optional.of("me"));

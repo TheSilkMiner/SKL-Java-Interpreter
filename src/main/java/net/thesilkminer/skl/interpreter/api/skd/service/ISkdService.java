@@ -98,6 +98,7 @@ public interface ISkdService {
 	 *
 	 * @since 0.2.1
 	 */
+	@Nonnull
 	ISkdLogger logger();
 
 	/**
@@ -113,6 +114,7 @@ public interface ISkdService {
 	 *
 	 * @since 0.2.1
 	 */
+	@Nonnull
 	ISkdParser parser(@Nonnull final IDatabaseHolder databaseHolder);
 
 	/**
@@ -128,6 +130,7 @@ public interface ISkdService {
 	 *
 	 * @since 0.2.1
 	 */
+	@Nonnull
 	IDatabaseHolder databaseHolder(@Nonnull final Object object); //TODO Generify
 
 	/**
@@ -145,6 +148,7 @@ public interface ISkdService {
 	 *
 	 * @since 0.2.1
 	 */
+	@Nonnull
 	IDatabase database(@Nonnull final IDocTypeDeclaration type,
 	                   @Nonnull final IDatabaseVersionDeclaration version,
 	                   @Nonnull final IStructure structure);
@@ -160,6 +164,7 @@ public interface ISkdService {
 	 *
 	 * @since 0.2.1
 	 */
+	@Nonnull
 	default IDatabase databaseCallback(@Nonnull final IDatabase database) {
 		return database;
 	}
@@ -175,6 +180,7 @@ public interface ISkdService {
 	 *
 	 * @since 0.2.1
 	 */
+	@Nonnull
 	IDocTypeDeclaration doctype(@Nonnull final String type);
 
 	/**
@@ -188,6 +194,7 @@ public interface ISkdService {
 	 *
 	 * @since 0.2.1
 	 */
+	@Nonnull
 	IDatabaseVersionDeclaration version(@Nullable final String version);
 
 	/**
@@ -201,6 +208,7 @@ public interface ISkdService {
 	 *
 	 * @since 0.2.1
 	 */
+	@Nonnull
 	IStructure structure(@Nonnull final List<ISkdTag> main);
 
 	/**
@@ -213,6 +221,7 @@ public interface ISkdService {
 	 *
 	 * @since 0.2.1
 	 */
+	@Nonnull
 	ISkdTag tag(@Nonnull final String name);
 
 	/**
@@ -230,6 +239,7 @@ public interface ISkdService {
 	 *
 	 * @since 0.2.1
 	 */
+	@Nonnull
 	default ISkdTag tagCallback(@Nonnull final ISkdTag tag) {
 		return tag;
 	}
@@ -250,6 +260,7 @@ public interface ISkdService {
 	 *
 	 * @since 0.2.1
 	 */
+	@Nonnull
 	ISkdProperty property(@Nonnull final String name, @Nonnull final Object value);
 
 	/**
@@ -264,6 +275,7 @@ public interface ISkdService {
 	 *
 	 * @since 0.2.1
 	 */
+	@Nonnull
 	default ISkdProperty propertyCallback(@Nonnull final ISkdProperty property) {
 		return property;
 	}
@@ -290,6 +302,7 @@ public interface ISkdService {
 	 *
 	 * @since 0.2.1
 	 */
+	@Nonnull
 	default Multimap<Class<?>, Class<?>> additionalTypes() {
 		return ImmutableListMultimap.of();
 	}

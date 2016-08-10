@@ -5,6 +5,7 @@ import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.doctype.I
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import javax.annotation.Nonnull;
 
 /**
  * Represents the default provider for an SKD doctype.
@@ -13,43 +14,31 @@ import java.net.URL;
  *
  * @since 0.2
  */
-@SuppressWarnings("unused")
 public class DefaultProvider implements IDocTypeProvider {
 
-	/*
-	public DefaultProvider() {
-
-		DocTypes.get().addProvider(this);
-	}
-	*/
-
+	@Nonnull
 	@Override
 	public String name() {
-
 		return "default";
 	}
 
 	@Override
 	public boolean canUse() {
-
 		return true;
 	}
 
+	@Nonnull
 	@Override
 	public URL docTypeUrl() {
-
 		try {
-
 			return new URL("http://thesilkminer.net/sks/skd/default.skd");
 		} catch (final MalformedURLException ex) {
-
 			throw new RuntimeException("This should never happen", ex);
 		}
 	}
 
 	@Override
-	public boolean isStructureValidForProvider(final IStructure structure) {
-
+	public boolean isStructureValidForProvider(@Nonnull final IStructure structure) {
 		return true; //TODO
 	}
 }

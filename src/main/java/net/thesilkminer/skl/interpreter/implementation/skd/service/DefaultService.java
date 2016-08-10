@@ -52,11 +52,13 @@ public class DefaultService implements ISkdService {
 
 	}
 
+	@Nonnull
 	@Override
 	public ISkdLogger logger() {
 		return this.logger;
 	}
 
+	@Nonnull
 	@Override
 	public ISkdParser parser(@Nonnull final IDatabaseHolder databaseHolder) {
 		return SkdParser.of(databaseHolder);
@@ -76,6 +78,7 @@ public class DefaultService implements ISkdService {
 	 *
 	 * @since 0.2.1
 	 */
+	@Nonnull
 	@Override
 	public IDatabaseHolder databaseHolder(@Nonnull final Object object) {
 		Preconditions.checkArgument(object instanceof File,
@@ -83,6 +86,7 @@ public class DefaultService implements ISkdService {
 		return DatabaseFile.of((File) object);
 	}
 
+	@Nonnull
 	@Override
 	public IDatabase database(@Nonnull final IDocTypeDeclaration type,
 	                          @Nonnull final IDatabaseVersionDeclaration version,
@@ -90,26 +94,31 @@ public class DefaultService implements ISkdService {
 		return Database.newDatabase(type, version, structure);
 	}
 
+	@Nonnull
 	@Override
 	public IDocTypeDeclaration doctype(@Nonnull final String type) {
 		return DocType.of(type);
 	}
 
+	@Nonnull
 	@Override
 	public IDatabaseVersionDeclaration version(@Nullable final String version) {
 		return version == null ? DatabaseVersion.get() : DatabaseVersion.get(version);
 	}
 
+	@Nonnull
 	@Override
 	public IStructure structure(@Nonnull final List<ISkdTag> main) {
 		return Structure.newInstance(Optional.ofNullable(main.isEmpty() ? null : main));
 	}
 
+	@Nonnull
 	@Override
 	public ISkdTag tag(@Nonnull final String name) {
 		return SkdTag.of(name);
 	}
 
+	@Nonnull
 	@Override
 	public ISkdProperty property(@Nonnull final String name, @Nonnull final Object value) {
 		return SkdProperty.getProperty(name, Optional.of(value.toString()));

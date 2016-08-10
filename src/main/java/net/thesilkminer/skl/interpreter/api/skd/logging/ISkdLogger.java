@@ -1,5 +1,7 @@
 package net.thesilkminer.skl.interpreter.api.skd.logging;
 
+import org.jetbrains.annotations.NonNls;
+
 import javax.annotation.Nonnull;
 
 /**
@@ -17,7 +19,7 @@ public interface ISkdLogger {
 	 *
 	 * @since 0.2.1
 	 */
-	String DEBUG_PROPERTY = "net.thesilkminer.skl.interpreter.logging.debug";
+	@NonNls	String DEBUG_PROPERTY = "net.thesilkminer.skl.interpreter.logging.debug";
 
 	/**
 	 * The value assumed by {@link #DEBUG_PROPERTY} when
@@ -25,7 +27,7 @@ public interface ISkdLogger {
 	 *
 	 * @since 0.2.1
 	 */
-	String DEBUG_ON = "true";
+	@NonNls String DEBUG_ON = "true";
 
 	/**
 	 * Logs an info message.
@@ -35,7 +37,7 @@ public interface ISkdLogger {
 	 *
 	 * @since 0.2
 	 */
-	void info(final String msg);
+	void info(@Nonnull final String msg);
 
 	/**
 	 * Logs a warning message.
@@ -45,7 +47,7 @@ public interface ISkdLogger {
 	 *
 	 * @since 0.2
 	 */
-	void warn(final String msg);
+	void warn(@Nonnull final String msg);
 
 	/**
 	 * Logs an error message.
@@ -55,7 +57,7 @@ public interface ISkdLogger {
 	 *
 	 * @since 0.2
 	 */
-	void error(final String msg);
+	void error(@Nonnull final String msg);
 
 	/**
 	 * Logs an error message.
@@ -65,8 +67,7 @@ public interface ISkdLogger {
 	 *
 	 * @since 0.2
 	 */
-	default void severe(final String msg) {
-
+	default void severe(@Nonnull final String msg) {
 		this.error(msg);
 	}
 
@@ -78,7 +79,7 @@ public interface ISkdLogger {
 	 *
 	 * @since 0.2
 	 */
-	void fine(final String msg);
+	void fine(@Nonnull final String msg);
 
 	/**
 	 * Prints a stacktrace, along with a message.
@@ -90,7 +91,7 @@ public interface ISkdLogger {
 	 *
 	 * @since 0.2
 	 */
-	void stacktrace(@Nonnull final String msg, final Throwable throwable);
+	void stacktrace(@Nonnull final String msg, @Nonnull final Throwable throwable);
 
 	/**
 	 * Prints a stacktrace.
@@ -100,7 +101,7 @@ public interface ISkdLogger {
 	 *
 	 * @since 0.2
 	 */
-	void stacktrace(final Throwable throwable);
+	void stacktrace(@Nonnull final Throwable throwable);
 
 	/**
 	 * Prints a debug message, if the option is turned on.
@@ -110,14 +111,14 @@ public interface ISkdLogger {
 	 *
 	 * @implNote
 	 *      The default implementation is
-	 *      <blockquote><pre>
-	 *          if (DEBUG_ON.equals(System.getProperty(DEBUG_PROPERTY))) this.info(msg);
+	 *      <pre>
+	 *          if (DEBUG_ON.equals(System.getProperty(DEBUG_PROPERTY))) this.info(msg);<br />
 	 *          else this.fine(msg);
-	 *      </pre></blockquote>
+	 *      </pre>
 	 *
 	 * @since 0.2.1
 	 */
-	default void debug(final String msg) {
+	default void debug(@Nonnull final String msg) {
 		if (DEBUG_ON.equals(System.getProperty(DEBUG_PROPERTY))) {
 			this.info(msg);
 		} else {

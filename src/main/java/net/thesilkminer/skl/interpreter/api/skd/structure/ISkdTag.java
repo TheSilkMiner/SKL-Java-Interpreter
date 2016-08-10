@@ -18,7 +18,10 @@ public interface ISkdTag extends IAcceptable<ISkdTag> {
 	 *
 	 * @return
 	 * 		The tag's name.
+	 *
+	 * @since 0.2
 	 */
+	@Nonnull
 	String getName();
 
 	/**
@@ -26,7 +29,10 @@ public interface ISkdTag extends IAcceptable<ISkdTag> {
 	 *
 	 * @return
 	 * 		The tag's content. It may be {@link Optional#empty()}.
+	 *
+	 * @since 0.2
 	 */
+	@Nonnull
 	Optional<String> getContent();
 
 	/**
@@ -34,6 +40,8 @@ public interface ISkdTag extends IAcceptable<ISkdTag> {
 	 *
 	 * @return
 	 * 		If the tag is a void tag.
+	 *
+	 * @since 0.2
 	 */
 	boolean isVoidElement();
 
@@ -42,7 +50,10 @@ public interface ISkdTag extends IAcceptable<ISkdTag> {
 	 *
 	 * @return
 	 * 		The list of children tags.
+	 *
+	 * @since 0.2
 	 */
+	@Nonnull
 	List<ISkdTag> getChildren();
 
 	/**
@@ -50,7 +61,10 @@ public interface ISkdTag extends IAcceptable<ISkdTag> {
 	 *
 	 * @return
 	 * 		The tag's properties.
+	 *
+	 * @since 0.2
 	 */
+	@Nonnull
 	List<ISkdProperty> getProperties();
 
 	/**
@@ -60,8 +74,10 @@ public interface ISkdTag extends IAcceptable<ISkdTag> {
 	 *
 	 * @param tag
 	 * 		The tag to add.
+	 *
+	 * @since 0.2
 	 */
-	void addChildTag(final ISkdTag tag);
+	void addChildTag(@Nonnull final ISkdTag tag);
 
 	/**
 	 * Sets the tag as a child of another tag.
@@ -72,19 +88,25 @@ public interface ISkdTag extends IAcceptable<ISkdTag> {
 	 *
 	 * @param parent
 	 * 		The parent of this tag
+	 *
+	 * @since 0.2
 	 */
-	void setAsChild(final ISkdTag parent);
+	void setAsChild(@Nonnull final ISkdTag parent);
 
 	/**
 	 * Removes a child tag.
 	 *
 	 * @param tag
-	 * 		The tag to remove
+	 * 		The tag to remove.
+	 *
+	 * @since 0.2
 	 */
-	void removeChildTag(final ISkdTag tag);
+	void removeChildTag(@Nonnull final ISkdTag tag);
 
 	/**
 	 * Sets the tag as a void element.
+	 *
+	 * @since 0.2
 	 */
 	void setVoidElement();
 
@@ -97,6 +119,8 @@ public interface ISkdTag extends IAcceptable<ISkdTag> {
 	 * @deprecated
 	 *      Use {@link #setContent(String)} or
 	 *      {@link #removeContent()} instead.
+	 *
+	 * @since 0.2
 	 */
 	@Deprecated
 	@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -135,6 +159,8 @@ public interface ISkdTag extends IAcceptable<ISkdTag> {
 	 * 		The property to add.
 	 * @return
 	 * 		True if the property was added successfully, false if not.
+	 *
+	 * @since 0.2
 	 */
 	boolean addProperty(@Nonnull final ISkdProperty property);
 
@@ -145,6 +171,8 @@ public interface ISkdTag extends IAcceptable<ISkdTag> {
 	 * 		The property to remove.
 	 * @return
 	 * 		True if the property was removed successfully, false if not.
+	 *
+	 * @since 0.2
 	 */
 	boolean removeProperty(@Nonnull final ISkdProperty property);
 
@@ -155,6 +183,8 @@ public interface ISkdTag extends IAcceptable<ISkdTag> {
 	 * 		The property to look for.
 	 * @return
 	 * 		True if found, false otherwise.
+	 *
+	 * @since 0.2
 	 */
 	boolean hasProperty(@Nonnull final ISkdProperty property);
 

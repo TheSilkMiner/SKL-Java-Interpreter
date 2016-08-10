@@ -20,8 +20,11 @@ import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.version.I
 import net.thesilkminer.skl.interpreter.implementation.skd.structure.declarations.DatabaseVersion;
 import net.thesilkminer.skl.interpreter.implementation.skd.structure.declarations.DocType;
 
+import org.jetbrains.annotations.Contract;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -59,13 +62,12 @@ public class SkdParser implements ISkdParser {
 	private boolean error;
 	private BufferedReader reader;
 
-	private IStructure struct;
-	private List<ISkdTag> mainTags;
+	private final IStructure struct;
+	private final List<ISkdTag> mainTags;
 	private IDocTypeDeclaration docType;
 	private IDatabaseVersionDeclaration version;
 
-	private SkdParser(final IDatabaseHolder databaseFile) {
-
+	private SkdParser(@Nonnull final IDatabaseHolder databaseFile) {
 		this.databaseFile = databaseFile;
 		this.lastTagOnLevel = Maps.newHashMap();
 
@@ -80,7 +82,6 @@ public class SkdParser implements ISkdParser {
 	}
 
 	static {
-
 		declaration(IDocTypeDeclaration.class, DocType.dummy());
 		declaration(IDatabaseVersionDeclaration.class, DatabaseVersion.dummy());
 	}
@@ -96,7 +97,9 @@ public class SkdParser implements ISkdParser {
 	 * @return
 	 * 		A new SkdParser.
 	 */
-	public static SkdParser of(@Nonnull final IDatabaseHolder file) {
+	@Contract(pure = true)
+	@Nonnull
+	public static ISkdParser of(@Nonnull final IDatabaseHolder file) {
 
 		Preconditions.checkNotNull(file, "IDatabaseHolder must not be null");
 
@@ -130,35 +133,29 @@ public class SkdParser implements ISkdParser {
 
 	@Override
 	public void init(final boolean force) {
-
 		if (this.init()) {
-
 			throw new IllegalStateException("Parser has already been initialized");
 		}
 
 		SkdApi.get().api().logger().info("Initializing database parser");
 
 		if (!(this.databaseFile instanceof DatabaseFile)) {
-
 			SkdApi.get().api().logger().error("Supplied file must be an instance of "
 					      + "DatabaseFile to be parsed");
 			return;
 		}
 
 		try {
-
 			this.checkFile(force);
 
 			this.reader = new BufferedReader(
-					new FileReader((DatabaseFile) this.databaseFile));
+					new FileReader((File) this.databaseFile));
 		} catch (final Throwable thr) {
-
 			SkdApi.get().api().logger().stacktrace(thr);
 			this.error = true;
 		}
 
 		if (this.errored()) {
-
 			return;
 		}
 
@@ -167,14 +164,11 @@ public class SkdParser implements ISkdParser {
 
 	@Override
 	public boolean init() {
-
 		return this.init;
 	}
 
 	private void checkFile(final boolean force) {
-
 		if (this.databaseFile == null) {
-
 			throw new IllegalStateException("File was null");
 		}
 
@@ -182,9 +176,7 @@ public class SkdParser implements ISkdParser {
 
 		if (!((DatabaseFile) this.databaseFile).getFileExtension()
 				      .equalsIgnoreCase("skd")) {
-
 			if (!force) {
-
 				SkdApi.get().api().logger()
 						.error("File specified does not end with .skd");
 				SkdApi.get().api().logger().error("Aborting process");
@@ -200,15 +192,13 @@ public class SkdParser implements ISkdParser {
 
 	@Override
 	public boolean errored() {
-
 		return this.error;
 	}
 
+	@Nonnull
 	@Override
 	public IDatabase read() {
-
 		if (!this.init() || this.errored()) {
-
 			throw new IllegalStateException();
 		}
 
@@ -225,12 +215,10 @@ public class SkdParser implements ISkdParser {
 		}
 
 		if (!this.mainTags.isEmpty()) {
-
 			this.struct.mainTags(mainTags);
 		}
 
 		if (this.docType == null || this.version == null) {
-
 			throw new IllegalDatabaseSyntaxException();
 		}
 
@@ -238,36 +226,30 @@ public class SkdParser implements ISkdParser {
 	}
 
 	private boolean parse(final String line) {
-
 		final int indentationLevel = this.countIndentationLevel(line);
 
 		if (indentationLevel != 0 && line.charAt(indentationLevel) != '<') {
-
 			final ISkdTag tag = this.lastTagOnLevel.get(indentationLevel - 1);
 			final Optional<String> content = tag.getContent();
 			String newContent;
 
 			if (content.isPresent()) {
-
 				newContent = content.get()
 						+ "\n"
 						+ line.substring(indentationLevel);
 			} else {
-
 				newContent = line.substring(indentationLevel);
 			}
 
 			while (newContent.startsWith("\t")) {
-
 				newContent = newContent.substring(1);
 			}
 
 			if (newContent.isEmpty()) {
-
 				return true;
 			}
 
-			tag.setContent(Optional.of(newContent));
+			tag.setContent(newContent);
 
 			return true;
 		}
@@ -283,20 +265,17 @@ public class SkdParser implements ISkdParser {
 		boolean closingTag = ln.startsWith("</");
 
 		if (!closingTag && this.lastTagOnLevel.get(indentationLevel) != null) {
-
 			// Tag not closed before declaration
 			throw new IllegalDatabaseSyntaxException();
 		}
 
 		if (closingTag) {
-
 			return this.handleClosingTag(ln, indentationLevel);
 		}
 
 		if (!ln.startsWith("<")
 				      && indentationLevel != 0
 				      && this.lastTagOnLevel.get(indentationLevel - 1) == null) {
-
 			throw new IllegalDatabaseSyntaxException(); // Incorrect content indentation
 		}
 
@@ -304,13 +283,10 @@ public class SkdParser implements ISkdParser {
 	}
 
 	private int countIndentationLevel(final String line) {
-
 		int ind = 0;
 
 		for (final char c : line.toCharArray()) {
-
 			if (c == '\t') {
-
 				++ind;
 				continue;
 			}
@@ -322,16 +298,13 @@ public class SkdParser implements ISkdParser {
 	}
 
 	private boolean handleClosingTag(final String strippedLine, final int indentation) {
-
 		final String tagName = strippedLine.substring(2, strippedLine.length() - 1);
 
 		if (tagName.contains(" ")) {
-
 			throw new IllegalDatabaseSyntaxException(); // Ending tags cannot have props
 		}
 
 		if (this.lastTagOnLevel.get(indentation) == null) {
-
 			throw new IllegalDatabaseSyntaxException(); // Tag closed without being open
 		}
 
@@ -342,7 +315,6 @@ public class SkdParser implements ISkdParser {
 		this.lastTagOnLevel.put(indentation, null);
 
 		if (this.lastTagOnLevel.get(indentation + 1) != null) {
-
 			// Parent tag closed before children
 			throw new IllegalDatabaseSyntaxException();
 		}
@@ -351,9 +323,7 @@ public class SkdParser implements ISkdParser {
 	}
 
 	private boolean handleTag(final String strippedLine, final int currentIndentation) {
-
 		if (!strippedLine.startsWith("<") && strippedLine.endsWith(">")) {
-
 			throw new IllegalDatabaseSyntaxException(); // Wrong line
 		}
 
@@ -362,7 +332,6 @@ public class SkdParser implements ISkdParser {
 				      strippedLine.length() - (emptyTag ? 2 : 1));
 
 		if (this.checkForDeclarations(line, currentIndentation)) {
-
 			return true;
 		}
 
@@ -402,9 +371,7 @@ public class SkdParser implements ISkdParser {
 		//final ISkdTag tag = SkdApi.get().api().tag(parts.get(0));
 
 		for (final String part : parts) {
-
 			if (part.equals(parts.get(0))) {
-
 				// Tag name
 				continue;
 			}
@@ -412,20 +379,16 @@ public class SkdParser implements ISkdParser {
 			final String[] pair = part.split("=");
 
 			if (pair[0].endsWith("=")) {
-
 				pair[0] = pair[0].substring(0, pair[0].length() - 1);
 			}
 
 			if (pair[1].startsWith("=")) {
-
 				pair[1] = pair[1].substring(1);
 			}
 
 			// Check for 2 because if it is less than 2 it would have already failed
 			if (pair.length != 2) {
-
 				for (int i = 2; i < pair.length; ++i) {
-
 					pair[1] += pair[i];
 				}
 			}
@@ -440,20 +403,16 @@ public class SkdParser implements ISkdParser {
 		properties.stream().forEach(tag::addProperty);
 
 		if (currentIndentation == 0) {
-
 			this.mainTags.add(tag);
 		}
 
 		if (currentIndentation > 0) {
-
 			this.lastTagOnLevel.get(currentIndentation - 1).addChildTag(tag);
 		}
 
 		if (!emptyTag) {
-
 			this.lastTagOnLevel.put(currentIndentation, tag);
 		} else {
-
 			tag.setVoidElement();
 		}
 
@@ -464,21 +423,17 @@ public class SkdParser implements ISkdParser {
 							         final int currentIndentation) {
 
 		if (currentIndentation != 0) {
-
 			return false; // Declaration must be at level 0
 		}
 
 		for (Class<? extends IDeclaration> declaration : DECLARATIONS) {
-
 			final IDeclaration mapObject = DEF_OBJ.get(declaration);
 
 			if (mapObject == null) {
-
 				throw new RuntimeException("Illegal declaration registration");
 			}
 
 			if (!strippedLine.startsWith(mapObject.getDeclarationName())) {
-
 				continue;
 			}
 
@@ -490,20 +445,16 @@ public class SkdParser implements ISkdParser {
 			final String[] line = new String[wordsSyntax.length];
 
 			if (wordsLine.length != wordsSyntax.length) {
-
 				continue;
 			}
 
 			for (int i = 0; i < wordsSyntax.length; ++i) {
-
 				if (wordsSyntax[i].equals("%s")) {
-
 					line[i] = wordsLine[i];
 					continue;
 				}
 
 				if (!wordsSyntax[i].equals(wordsLine[i])) {
-
 					break; // or throw?
 				}
 
@@ -526,14 +477,11 @@ public class SkdParser implements ISkdParser {
 	}
 
 	private void handleDeclaration(final String line) {
-
 		if (line.startsWith(DEF_OBJ.get(IDocTypeDeclaration.class).getDeclarationName())) {
-
 			final String split = line.split(" ")[2];
 			final IDocTypeDeclaration docType = SkdApi.get().api().doctype(split);
 
 			if (!docType.validate()) {
-
 				SkdApi.get().api().logger().warn("Invalid doctype declaration.");
 				SkdApi.get().api().logger().warn("Accepting it anyway.");
 				SkdApi.get().api().logger().warn("Warning! This may change in "
@@ -541,7 +489,6 @@ public class SkdParser implements ISkdParser {
 			}
 
 			if (this.docType != null) {
-
 				SkdApi.get().api().logger().severe("DocType already defined");
 				throw new IllegalDatabaseSyntaxException(); // ?
 			}
@@ -553,14 +500,12 @@ public class SkdParser implements ISkdParser {
 
 		if (line.startsWith(DEF_OBJ.get(IDatabaseVersionDeclaration.class)
 				      .getDeclarationName())) {
-
 			final String split = line.split(" ")[2];
 			final IDatabaseVersionDeclaration version = SkdApi.get().api().version(
 					       CURRENT_VERSION.equals(split) ? null : split
 			);
 
 			if (this.version != null) {
-
 				SkdApi.get().api().logger().severe("Version already defined");
 				throw new IllegalDatabaseSyntaxException(); // ?
 			}
@@ -570,8 +515,8 @@ public class SkdParser implements ISkdParser {
 	}
 
 	@Override
-	public boolean write(final IDatabase database, final IDatabaseHolder holder) {
-
+	public boolean write(@Nonnull final IDatabase database,
+	                     @Nonnull final IDatabaseHolder holder) {
 		Preconditions.checkArgument(holder.writable(), "IDatabaseHolder must be writable");
 		Preconditions.checkArgument(holder instanceof DatabaseFile,
 				"Only DatabaseFile is supported");
@@ -579,17 +524,14 @@ public class SkdParser implements ISkdParser {
 		final DatabaseFile file = (DatabaseFile) holder;
 
 		try {
-
 			this.write(database, file);
 			return true;
 		} catch (final IOException ex) {
-
 			return false;
 		}
 	}
 
 	private void write(final IDatabase database, final DatabaseFile file) throws IOException {
-
 		// Yeah, well.
 		// Just a toString() call.
 		// LOL
@@ -598,15 +540,15 @@ public class SkdParser implements ISkdParser {
 		out.close();
 	}
 
+	@Nonnull
 	@Override
 	public Optional<String> getDatabaseName() {
-
 		return this.databaseHolder().name();
 	}
 
+	@Nonnull
 	@Override
 	public IDatabaseHolder databaseHolder() {
-
 		return this.databaseFile;
 	}
 
@@ -618,9 +560,8 @@ public class SkdParser implements ISkdParser {
 	 *
 	 * @since 0.2
 	 */
-	public static void main(final String... args) {
-
-		final java.io.File exampleFile = new java.io.File(SkdParser.class.getResource(
+	public static void main(@Nonnull final String... args) {
+		final File exampleFile = new File(SkdParser.class.getResource(
 				      "/assets/skd_interpreter/examples/DatabaseExample.skd"
 			).getFile()
 		);
@@ -633,16 +574,13 @@ public class SkdParser implements ISkdParser {
 
 		System.out.println(database.toString());
 
-		final java.io.File outputFile = new java.io.File(System.getProperty("user.dir"),
+		final File outputFile = new File(System.getProperty("user.dir"),
 						"temp.skd");
 		try {
-
 			if (!outputFile.createNewFile()) {
-
-				throw new java.io.IOException();
+				throw new IOException();
 			}
-		} catch (final java.io.IOException ex) {
-
+		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
 
@@ -650,15 +588,12 @@ public class SkdParser implements ISkdParser {
 				.databaseHolder(outputFile)));
 
 		try (final BufferedReader reader = new BufferedReader(new FileReader(outputFile))) {
-
 			reader.lines().forEach(System.out::println);
 
 			if (!outputFile.delete()) {
-
 				outputFile.deleteOnExit();
 			}
 		} catch (final IOException ex) {
-
 			SkdApi.get().api().logger().stacktrace(ex);
 		}
 	}

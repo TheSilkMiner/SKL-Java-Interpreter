@@ -3,6 +3,7 @@ package net.thesilkminer.skl.interpreter.implementation.skd.structure;
 import com.google.common.base.Preconditions;
 
 import net.thesilkminer.skl.interpreter.api.skd.structure.ISkdProperty;
+import org.jetbrains.annotations.Contract;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -24,7 +25,6 @@ public class SkdProperty implements ISkdProperty {
 	private Optional<String> value;
 
 	private SkdProperty(@Nonnull final String name, @Nonnull final Optional<String> value) {
-
 		this.name = name;
 		this.value = value;
 	}
@@ -39,12 +39,13 @@ public class SkdProperty implements ISkdProperty {
 	 * @return
 	 * 		A new SkdProperty instance.
 	 */
+	@Contract(value = "!null, !null -> !null; _, _ -> fail", pure = true)
+	@Nonnull
 	public static SkdProperty getProperty(@Nonnull final String name,
 										  @Nonnull
 										  final
 										  Optional<String>
 											value) {
-
 		Preconditions.checkNotNull(name, "Name must not be null");
 		Preconditions.checkNotNull(value, "Value must not be null. "
 				      + "Use Optional.empty() instead");
@@ -61,72 +62,67 @@ public class SkdProperty implements ISkdProperty {
 	 * @return
 	 * 		A new SkdProperty instance.
 	 */
+	@Contract(value = "!null, !null -> !null; !null, null -> !null; null, _ -> fail",
+			  pure = true)
+	@Nonnull
 	public static SkdProperty getProperty(@Nonnull final String name,
 										  @Nullable
 										  final String
 											value) {
-
 		Optional<String> opt = Optional.empty();
 
 		if (value != null) {
-
 			opt = Optional.of(value);
 		}
 
 		return SkdProperty.getProperty(name, opt);
 	}
 
+	@Nonnull
 	@Override
 	public String getName() {
-
 		return this.name;
 	}
 
+	@Nonnull
 	@Override
 	public Optional<String> getValue() {
-
 		return this.value;
 	}
 
 	@Override
-	public void setValue(final String value) {
-
+	public void setValue(@Nonnull final String value) {
 		this.value = Optional.of(value);
 	}
 
 	@Override
 	public void removeValue() {
-
 		this.value = Optional.empty();
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-
+	public boolean equals(@Nullable Object obj) {
 		if (this == obj) {
-
 			return true;
 		}
+
 		if (obj == null || this.getClass() != obj.getClass()) {
-
 			return false;
-
 		}
-		SkdProperty that = (SkdProperty) obj;
+
+		ISkdProperty that = (ISkdProperty) obj;
 		return Objects.equals(this.getName(), that.getName())
 				&& Objects.equals(this.getValue(), that.getValue());
 	}
 
 	@Override
 	public int hashCode() {
-
 		return Objects.hash(this.getName(), this.getValue());
 	}
 
+	@Nonnull
 	@Override
-	@SuppressWarnings("OptionalGetWithoutIsPresent") // Don't you see the check???
 	public String toString() {
-
 		String str = "";
 
 		str += this.getName();

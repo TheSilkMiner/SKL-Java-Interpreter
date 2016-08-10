@@ -7,6 +7,10 @@ import net.thesilkminer.skl.interpreter.api.skd.structure.IStructure;
 import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.doctype.IDocTypeDeclaration;
 import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.version.IDatabaseVersionDeclaration;
 
+import org.jetbrains.annotations.Contract;
+
+import javax.annotation.Nonnull;
+
 /**
  * Represents the full structure of an SKD database.
  *
@@ -20,10 +24,9 @@ public class Database implements IDatabase {
 	private IDatabaseVersionDeclaration version;
 	private IStructure struct;
 
-	private Database(final IDocTypeDeclaration docType,
-				     final IDatabaseVersionDeclaration version,
-				     final IStructure struct) {
-
+	private Database(@Nonnull final IDocTypeDeclaration docType,
+	                 @Nonnull final IDatabaseVersionDeclaration version,
+	                 @Nonnull final IStructure struct) {
 		// Structure must be loaded before otherwise a NPE is thrown.
 		this.structure(struct);
 
@@ -45,85 +48,77 @@ public class Database implements IDatabase {
 	 *
 	 * @since 0.2
 	 */
-	public static IDatabase newDatabase(final IDocTypeDeclaration docType,
-						      final IDatabaseVersionDeclaration version,
-						      final IStructure struct) {
-
+	@Contract(value = "!null, !null, !null -> !null; _, _, _ -> fail", pure = true)
+	@Nonnull
+	public static IDatabase newDatabase(@Nonnull final IDocTypeDeclaration docType,
+	                                    @Nonnull final IDatabaseVersionDeclaration version,
+	                                    @Nonnull final IStructure struct) {
 		return new Database(docType, version, struct);
 	}
 
+	@Nonnull
 	@Override
 	public IDocTypeDeclaration docType() {
-
 		return this.docType;
 	}
 
 	@Override
-	public boolean docType(final IDocTypeDeclaration declaration) {
-
+	public boolean docType(@Nonnull final IDocTypeDeclaration declaration) {
 		Preconditions.checkNotNull(declaration,
 				      "You cannot create a database without a doctype declaration");
 
 		if (!declaration.validate()) {
-
 			return false;
 		}
 
 		if (!this.canApplyDocType(declaration)) {
-
 			return false;
 		}
 
 		try {
-
 			this.apply(declaration);
 			this.docType = declaration;
 			return true;
 		} catch (final RuntimeException ex) {
-
 			return false;
 		}
 	}
 
 	@Override
-	public boolean canApplyDocType(final IDocTypeDeclaration declaration) {
-
+	public boolean canApplyDocType(@Nonnull final IDocTypeDeclaration declaration) {
 		return this.structure().canApply(declaration);
 	}
 
 	@Override
-	public void apply(final IDocTypeDeclaration declaration) {
-
+	public void apply(@Nonnull final IDocTypeDeclaration declaration) {
 		this.structure().apply(declaration);
 	}
 
+	@Nonnull
 	@Override
 	public IDatabaseVersionDeclaration version() {
-
 		return this.version;
 	}
 
 	@Override
-	public void version(final IDatabaseVersionDeclaration declaration) {
-
+	public void version(@Nonnull final IDatabaseVersionDeclaration declaration) {
 		this.version = declaration;
 	}
 
+	@Nonnull
 	@Override
 	public IStructure structure() {
-
 		return this.struct;
 	}
 
 	@Override
-	public void structure(final IStructure structure) {
-
+	public void structure(@Nonnull final IStructure structure) {
 		this.struct = structure;
 	}
 
+	@Nonnull
 	@Override
 	public String toString() {
-
 		return this.docType().toString()
 				+ "\n"
 				+ this.version().toString()

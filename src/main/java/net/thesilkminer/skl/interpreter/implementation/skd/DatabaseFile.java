@@ -5,7 +5,15 @@ import com.google.common.base.Throwables;
 
 import net.thesilkminer.skl.interpreter.api.skd.holder.IDatabaseHolder;
 
-import java.io.*;
+import org.jetbrains.annotations.Contract;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Optional;
 import javax.annotation.Nonnull;
 
@@ -84,8 +92,9 @@ public class DatabaseFile extends File implements IDatabaseHolder {
 	 * @return
 	 * 		A new instance of <code>ScriptFile</code>
 	 */
-	public static DatabaseFile of(@Nonnull File file) {
-
+	@Contract(pure = true)
+	@Nonnull
+	public static IDatabaseHolder of(@Nonnull final File file) {
 		return new DatabaseFile(file.getParent(), file.getName());
 	}
 
@@ -103,8 +112,8 @@ public class DatabaseFile extends File implements IDatabaseHolder {
 	 * @return
 	 * 		The file's name
 	 */
+	@Nonnull
 	public String getFileName() {
-
 		return fileName;
 	}
 
@@ -122,21 +131,19 @@ public class DatabaseFile extends File implements IDatabaseHolder {
 	 * @return
 	 * 		The file's extension
 	 */
+	@Nonnull
 	public String getFileExtension() {
-
 		return fileExtension;
 	}
 
 	@Override
 	public boolean writable() {
-
 		return true;
 	}
 
 	@Nonnull
 	@Override
 	public Optional<String> name() {
-
 		return Optional.of(this.getFileName());
 	}
 

@@ -3,6 +3,7 @@ package net.thesilkminer.skl.interpreter.api.skd.structure.declarations.doctype;
 import net.thesilkminer.skl.interpreter.api.skd.structure.IStructure;
 
 import java.net.URL;
+import javax.annotation.Nonnull;
 
 /**
  * Marks a provider of a valid doctype.
@@ -11,7 +12,6 @@ import java.net.URL;
  *
  * @since 0.2
  */
-@SuppressWarnings({"SameReturnValue", "unused"})
 public interface IDocTypeProvider {
 
 	/**
@@ -22,6 +22,7 @@ public interface IDocTypeProvider {
 	 *
 	 * @since 0.2
 	 */
+	@Nonnull
 	String name();
 
 	/**
@@ -50,6 +51,7 @@ public interface IDocTypeProvider {
 	 *
 	 * @since 0.2
 	 */
+	@Nonnull
 	URL docTypeUrl();
 
 	/**
@@ -61,6 +63,5 @@ public interface IDocTypeProvider {
 	 * @return
 	 * 		If the specified structure is valid for the provider.
 	 */
-	@SuppressWarnings("UnusedParameters")
-	boolean isStructureValidForProvider(final IStructure structure);
+	boolean isStructureValidForProvider(@Nonnull final IStructure structure);
 }

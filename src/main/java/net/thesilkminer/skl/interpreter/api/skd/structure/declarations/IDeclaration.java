@@ -1,5 +1,7 @@
 package net.thesilkminer.skl.interpreter.api.skd.structure.declarations;
 
+import javax.annotation.Nonnull;
+
 /**
  * Represents a generic declaration.
  *
@@ -9,7 +11,6 @@ package net.thesilkminer.skl.interpreter.api.skd.structure.declarations;
  *
  * @since 0.2
  */
-@SuppressWarnings("unused")
 public interface IDeclaration {
 
 	/**
@@ -20,7 +21,7 @@ public interface IDeclaration {
 	 *
 	 * @since 0.2
 	 */
-	@SuppressWarnings("SameReturnValue")
+	@Nonnull
 	String getDeclarationName();
 
 	/**
@@ -31,5 +32,6 @@ public interface IDeclaration {
 	 *
 	 * @since 0.2
 	 */
+	@Nonnull
 	String getDeclarationSyntax();
 }

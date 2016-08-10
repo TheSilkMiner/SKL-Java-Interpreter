@@ -3,6 +3,7 @@ package net.thesilkminer.skl.interpreter.api.skd.structure;
 import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.doctype.IDocTypeDeclaration;
 
 import java.util.List;
+import javax.annotation.Nonnull;
 
 /**
  * Represents a general structure for an SKD database.
@@ -26,6 +27,7 @@ public interface IStructure extends IAcceptable<IStructure> {
 	 *
 	 * @since 0.2
 	 */
+	@Nonnull
 	List<ISkdTag> mainTags();
 
 	/**
@@ -39,7 +41,7 @@ public interface IStructure extends IAcceptable<IStructure> {
 	 *
 	 * @since 0.2
 	 */
-	void mainTags(final List<ISkdTag> tags);
+	void mainTags(@Nonnull final List<ISkdTag> tags);
 
 	/**
 	 * Gets if the specified declaration can be applied to the
@@ -52,7 +54,7 @@ public interface IStructure extends IAcceptable<IStructure> {
 	 *
 	 * @since 0.2
 	 */
-	boolean canApply(final IDocTypeDeclaration declaration);
+	boolean canApply(@Nonnull final IDocTypeDeclaration declaration);
 
 	/**
 	 * Applies the specified declaration.
@@ -62,5 +64,5 @@ public interface IStructure extends IAcceptable<IStructure> {
 	 *
 	 * @since 0.2
 	 */
-	void apply(final IDocTypeDeclaration declaration);
+	void apply(@Nonnull final IDocTypeDeclaration declaration);
 }

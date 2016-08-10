@@ -6,6 +6,7 @@ import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.IDeclarat
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import javax.annotation.Nonnull;
 
 /**
  * Represents the DocType declaration of an SKD database.
@@ -14,7 +15,6 @@ import java.util.List;
  *
  * @since 0.2
  */
-@SuppressWarnings("unused")
 public interface IDocTypeDeclaration extends IDeclaration {
 
 	/**
@@ -25,6 +25,7 @@ public interface IDocTypeDeclaration extends IDeclaration {
 	 *
 	 * @since 0.2
 	 */
+	@Nonnull
 	String getDocType();
 
 	/**
@@ -40,7 +41,7 @@ public interface IDocTypeDeclaration extends IDeclaration {
 	 *
 	 * @since 0.2
 	 */
-	boolean setDocType(final String type);
+	boolean setDocType(@Nonnull final String type);
 
 	/**
 	 * Validates this document type.
@@ -62,8 +63,8 @@ public interface IDocTypeDeclaration extends IDeclaration {
 	 *
 	 * @since 0.2
 	 */
+	@Nonnull
 	default URL getStyleSheet() throws MalformedURLException {
-
 		return new URL(this.getDocType());
 	}
 
@@ -76,8 +77,7 @@ public interface IDocTypeDeclaration extends IDeclaration {
 	 *
 	 * @since 0.2
 	 */
-	default void apply(final List<ISkdTag> tags) {
-
+	default void apply(@Nonnull final List<ISkdTag> tags) {
 		//TODO Implement for 0.3
 	}
 }

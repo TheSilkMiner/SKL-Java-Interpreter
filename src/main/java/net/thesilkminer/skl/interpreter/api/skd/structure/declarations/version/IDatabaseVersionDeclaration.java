@@ -2,6 +2,8 @@ package net.thesilkminer.skl.interpreter.api.skd.structure.declarations.version;
 
 import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.IDeclaration;
 
+import javax.annotation.Nonnull;
+
 /**
  * Represents the Version declaration of a database.
  *
@@ -19,6 +21,7 @@ public interface IDatabaseVersionDeclaration extends IDeclaration {
 	 *
 	 * @since 0.2
 	 */
+	@Nonnull
 	String version();
 
 	/**
@@ -40,5 +43,5 @@ public interface IDatabaseVersionDeclaration extends IDeclaration {
 	 *
 	 * @since 0.2
 	 */
-	void version(final String version);
+	void version(@Nonnull final String version);
 }

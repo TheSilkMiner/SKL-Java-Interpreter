@@ -2,6 +2,8 @@ package net.thesilkminer.skl.interpreter.implementation.skd;
 
 import net.thesilkminer.skl.interpreter.api.skd.logging.ISkdLogger;
 
+import org.jetbrains.annotations.Contract;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -32,7 +34,6 @@ public class SkdLogger implements ISkdLogger {
 
 			@Override
 			public String format(final LogRecord record) {
-
 				final StringBuilder builder = new StringBuilder();
 
 				builder.append(dateFormat.format(new Date(record.getMillis())));
@@ -55,14 +56,11 @@ public class SkdLogger implements ISkdLogger {
 
 		@Override
 		public void publish(final LogRecord record) {
-
 			if (this.getFormatter() == null) {
-
 				this.setFormatter(new LogFormatter());
 			}
 
 			try {
-
 				final String message = this.getFormatter().format(record);
 
 				if (record.getLevel().intValue() >= Level.WARNING.intValue()) {
@@ -84,12 +82,11 @@ public class SkdLogger implements ISkdLogger {
 		public void flush() {}
 	}
 
-	private static final SkdLogger SINGLETON = new SkdLogger();
+	private static final ISkdLogger SINGLETON = new SkdLogger();
 
 	private final Logger logger = Logger.getLogger("SKD Parser");
 
 	private SkdLogger() {
-
 		this.logger.setUseParentHandlers(false);
 		this.logger.addHandler(new LogOutputHandler());
 	}
@@ -102,38 +99,34 @@ public class SkdLogger implements ISkdLogger {
 	 *
 	 * @since 0.2
 	 */
-	public static SkdLogger get() {
-
+	@Contract(pure = true)
+	@Nonnull
+	public static ISkdLogger get() {
 		return SINGLETON;
 	}
 
 	@Override
-	public void info(final String msg) {
-
+	public void info(@Nonnull final String msg) {
 		this.logger.log(Level.INFO, msg);
 	}
 
 	@Override
-	public void warn(final String msg) {
-
+	public void warn(@Nonnull final String msg) {
 		this.logger.log(Level.WARNING, msg);
 	}
 
 	@Override
-	public void error(final String msg) {
-
+	public void error(@Nonnull final String msg) {
 		this.logger.log(Level.SEVERE, msg);
 	}
 
 	@Override
-	public void fine(final String msg) {
-
+	public void fine(@Nonnull final String msg) {
 		this.logger.log(Level.FINE, msg);
 	}
 
 	@Override
-	public void stacktrace(@Nonnull final String msg, final Throwable throwable) {
-
+	public void stacktrace(@Nonnull final String msg, @Nonnull final Throwable throwable) {
 		this.error(msg);
 		final StackTraceElement[] elements = throwable.getStackTrace();
 		for (final StackTraceElement element : elements) {
@@ -143,8 +136,7 @@ public class SkdLogger implements ISkdLogger {
 	}
 
 	@Override
-	public void stacktrace(final Throwable throwable) {
-
+	public void stacktrace(@Nonnull final Throwable throwable) {
 		this.error(throwable.getClass().getName());
 		this.stacktrace(throwable.getLocalizedMessage(), throwable);
 	}

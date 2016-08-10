@@ -5,7 +5,10 @@ import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.doctype.D
 import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.doctype.IDocTypeDeclaration;
 import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.doctype.IDocTypeProvider;
 
+import org.jetbrains.annotations.Contract;
+
 import java.util.Optional;
+import javax.annotation.Nonnull;
 
 /**
  * Represents the doctype declaration of an SKD database.
@@ -27,13 +30,11 @@ import java.util.Optional;
  *
  * @since 0.2
  */
-@SuppressWarnings("unused")
 public class DocType implements IDocTypeDeclaration {
 
 	private String docType;
 
-	private DocType(final String docType) {
-
+	private DocType(@Nonnull final String docType) {
 		this.setDocType(docType);
 	}
 
@@ -47,8 +48,9 @@ public class DocType implements IDocTypeDeclaration {
 	 *
 	 * @since 0.2
 	 */
-	public static IDocTypeDeclaration of(final String docType) {
-
+	@Contract(value = "null -> fail; !null -> !null", pure = true)
+	@Nonnull
+	public static IDocTypeDeclaration of(@Nonnull final String docType) {
 		return new DocType(docType);
 	}
 
@@ -60,25 +62,24 @@ public class DocType implements IDocTypeDeclaration {
 	 *
 	 * @since 0.2
 	 */
+	@Contract(value = "-> !null", pure = true)
+	@Nonnull
 	public static IDeclaration dummy() {
-
 		return new DocType("http://abc.def.net");
 	}
 
+	@Nonnull
 	@Override
 	public String getDocType() {
-
 		return this.docType;
 	}
 
 	@Override
-	public boolean setDocType(final String type) {
-
+	public boolean setDocType(@Nonnull final String type) {
 		final String backup = this.docType;
 		this.docType = type;
 
 		if (!this.validate()) {
-
 			this.docType = backup;
 			return false;
 		}
@@ -88,27 +89,25 @@ public class DocType implements IDocTypeDeclaration {
 
 	@Override
 	public boolean validate() {
-
 		final Optional<IDocTypeProvider> provider = DocTypes.get().getProviderFor(this);
-
 		return provider.isPresent() && DocTypes.get().isProviderValid(provider.get());
 	}
 
+	@Nonnull
 	@Override
 	public String getDeclarationName() {
-
 		return "!DOCTYPE";
 	}
 
+	@Nonnull
 	@Override
 	public String getDeclarationSyntax() {
-
 		return String.format("%s skd <stylesheet>", this.getDeclarationName());
 	}
 
+	@Nonnull
 	@Override
 	public String toString() {
-
 		return "<"
  				+ this.getDeclarationSyntax().replace("<stylesheet>",
 						this.getDocType())

@@ -1,6 +1,7 @@
 package net.thesilkminer.skl.interpreter.api.skd.structure;
 
 import java.util.Optional;
+import javax.annotation.Nonnull;
 
 /**
  * Represents a property in the SKD language specifications.
@@ -15,18 +16,22 @@ public interface ISkdProperty extends IAcceptable<ISkdProperty> {
 	 * Gets the name of the property.
 	 *
 	 * @return
-	 * 		The property's name
+	 * 		The property's name.
+	 *
+	 * @since 0.2
 	 */
-	@SuppressWarnings("unused")
+	@Nonnull
 	String getName();
 
 	/**
 	 * Gets the property value. It may be {@link Optional#empty()}
 	 *
 	 * @return
-	 * 		The property's value
+	 * 		The property's value.
+	 *
+	 * @since 0.2
 	 */
-	@SuppressWarnings("unused")
+	@Nonnull
 	Optional<String> getValue();
 
 	/**
@@ -34,13 +39,15 @@ public interface ISkdProperty extends IAcceptable<ISkdProperty> {
 	 *
 	 * @param value
 	 * 		The new value
+	 *
+	 * @since 0.2
 	 */
-	@SuppressWarnings("unused")
-	void setValue(final String value);
+	void setValue(@Nonnull final String value);
 
 	/**
 	 * Clears the value of the property.
+	 *
+	 * @since 0.2
 	 */
-	@SuppressWarnings("unused")
 	void removeValue();
 }

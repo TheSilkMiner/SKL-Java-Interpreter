@@ -3,6 +3,8 @@ package net.thesilkminer.skl.interpreter.api.skd.structure;
 import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.doctype.IDocTypeDeclaration;
 import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.version.IDatabaseVersionDeclaration;
 
+import javax.annotation.Nonnull;
+
 /**
  * Represents the general structure of an SKD database.
  *
@@ -20,6 +22,7 @@ public interface IDatabase extends IAcceptable<IDatabase> {
 	 *
 	 * @since 0.2
 	 */
+	@Nonnull
 	IDocTypeDeclaration docType();
 
 	/**
@@ -51,7 +54,7 @@ public interface IDatabase extends IAcceptable<IDatabase> {
 	 *
 	 * @since 0.2
 	 */
-	boolean docType(final IDocTypeDeclaration declaration);
+	boolean docType(@Nonnull final IDocTypeDeclaration declaration);
 
 	/**
 	 * Gets if the specified doctype declaration can be applied.
@@ -63,7 +66,7 @@ public interface IDatabase extends IAcceptable<IDatabase> {
 	 *
 	 * @since 0.2
 	 */
-	boolean canApplyDocType(final IDocTypeDeclaration declaration);
+	boolean canApplyDocType(@Nonnull final IDocTypeDeclaration declaration);
 
 	/**
 	 * Applies the declaration.
@@ -73,7 +76,7 @@ public interface IDatabase extends IAcceptable<IDatabase> {
 	 *
 	 * @since 0.2
 	 */
-	void apply(final IDocTypeDeclaration declaration);
+	void apply(@Nonnull final IDocTypeDeclaration declaration);
 
 	/**
 	 * Gets the declaration of this database's version.
@@ -83,6 +86,7 @@ public interface IDatabase extends IAcceptable<IDatabase> {
 	 *
 	 * @since 0.2
 	 */
+	@Nonnull
 	IDatabaseVersionDeclaration version();
 
 	/**
@@ -93,7 +97,7 @@ public interface IDatabase extends IAcceptable<IDatabase> {
 	 *
 	 * @since 0.2
 	 */
-	void version(final IDatabaseVersionDeclaration declaration);
+	void version(@Nonnull final IDatabaseVersionDeclaration declaration);
 
 	/**
 	 * Gets the tags' and properties' structure of this database.
@@ -103,6 +107,7 @@ public interface IDatabase extends IAcceptable<IDatabase> {
 	 *
 	 * @since 0.2
 	 */
+	@Nonnull
 	IStructure structure();
 
 	/**
@@ -113,5 +118,5 @@ public interface IDatabase extends IAcceptable<IDatabase> {
 	 *
 	 * @since 0.2
 	 */
-	void structure(final IStructure structure);
+	void structure(@Nonnull final IStructure structure);
 }

@@ -3,6 +3,8 @@ package net.thesilkminer.skl.interpreter.api.skd.service;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
+import org.jetbrains.annotations.Contract;
+
 import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nonnull;
@@ -19,7 +21,7 @@ public final class ServiceManager {
 
 	private static final ServiceManager INSTANCE = new ServiceManager();
 
-	private Map<Class<?>, ISkdService> services;
+	private final Map<Class<?>, ISkdService> services;
 
 	private ServiceManager() {
 		this.services = Maps.newHashMap();
@@ -33,6 +35,8 @@ public final class ServiceManager {
 	 *
 	 * @since 0.2.1
 	 */
+	@Contract(value = "-> !null", pure = true)
+	@Nonnull
 	public static ServiceManager get() {
 		return INSTANCE;
 	}
@@ -48,6 +52,8 @@ public final class ServiceManager {
 	 *
 	 * @since 0.2.1
 	 */
+	@Contract(value = "null -> fail; !null -> !null", pure = true)
+	@Nonnull
 	public Optional<ISkdService> get(@Nonnull final Class<?> service) {
 		return Optional.ofNullable(this.services.get(service));
 	}

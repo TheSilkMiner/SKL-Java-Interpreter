@@ -3,7 +3,11 @@ package net.thesilkminer.skl.interpreter.api.skd.parser;
 import net.thesilkminer.skl.interpreter.api.skd.holder.IDatabaseHolder;
 import net.thesilkminer.skl.interpreter.api.skd.structure.IDatabase;
 
+import org.jetbrains.annotations.NonNls;
+
 import java.util.Optional;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Represents the API entry for an SKD parser.
@@ -20,7 +24,7 @@ public interface ISkdParser {
 	 *
 	 * @since 0.2
 	 */
-	String CURRENT_VERSION = "0.2";
+	@NonNls String CURRENT_VERSION = "0.2";
 
 	/**
 	 * Initializes the parser previously created.
@@ -64,6 +68,7 @@ public interface ISkdParser {
 	 *
 	 * @since 0.2
 	 */
+	@Nonnull
 	IDatabase read();
 
 	/**
@@ -84,8 +89,7 @@ public interface ISkdParser {
 	 *
 	 * @since 0.2
 	 */
-	default boolean write(final IDatabase database) {
-
+	default boolean write(@Nonnull final IDatabase database) {
 		return this.write(database, this.databaseHolder());
 	}
 
@@ -101,7 +105,7 @@ public interface ISkdParser {
 	 *
 	 * @since 0.2
 	 */
-	boolean write(final IDatabase database, final IDatabaseHolder holder);
+	boolean write(@Nonnull final IDatabase database, @Nonnull final IDatabaseHolder holder);
 
 	/**
 	 * Gets the name of the database.
@@ -115,10 +119,9 @@ public interface ISkdParser {
 	 * @since 0.2
 	 */
 	@Deprecated
-	@SuppressWarnings("OptionalGetWithoutIsPresent")
+	@Nullable
 	default String databaseName() {
-
-		return this.getDatabaseName().isPresent() ? this.getDatabaseName().get() : null;
+		return this.getDatabaseName().orElse(null);
 	}
 
 	/**
@@ -134,6 +137,7 @@ public interface ISkdParser {
 	 *
 	 * @since 0.2
 	 */
+	@Nonnull
 	Optional<String> getDatabaseName();
 
 	/**
@@ -144,5 +148,6 @@ public interface ISkdParser {
 	 *
 	 * @since 0.2
 	 */
+	@Nonnull
 	IDatabaseHolder databaseHolder();
 }

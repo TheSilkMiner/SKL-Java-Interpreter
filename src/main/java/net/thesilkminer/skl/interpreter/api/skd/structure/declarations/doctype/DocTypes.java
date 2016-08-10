@@ -4,6 +4,10 @@ import com.google.common.collect.Lists;
 
 import net.thesilkminer.skl.interpreter.api.skd.SkdApi;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Optional;
@@ -21,17 +25,14 @@ public final class DocTypes {
 	private static DocTypes singleton;
 
 	private DocTypes() {
-
 		this.providers = Lists.newArrayList();
 
 		try {
-
 			Class<?> clazz = Class.forName("net.thesilkminer.skl.interpreter."
 					      + "implementation.skd.structure.providers.doctype."
 					      + "DefaultProvider");
 			this.providers.add((IDocTypeProvider) clazz.getConstructor().newInstance());
 		} catch (final ReflectiveOperationException ex) {
-
 			SkdApi.get().api().logger().severe("Implementation unavailable");
 			ex.printStackTrace();
 		}
@@ -45,10 +46,10 @@ public final class DocTypes {
 	 *
 	 * @since 0.2
 	 */
+	@Contract(value = "-> !null", pure = true)
+	@NotNull
 	public static DocTypes get() {
-
 		if (singleton == null) {
-
 			singleton = new DocTypes();
 		}
 
@@ -66,15 +67,14 @@ public final class DocTypes {
 	 * @return
 	 * 		If the provider has been added successfully.
 	 */
-	@SuppressWarnings("UnusedReturnValue") //API method
-	public boolean addProvider(final IDocTypeProvider provider) {
-
+	public boolean addProvider(@Nullable final IDocTypeProvider provider) {
 		return this.validate(provider) && this.providers.add(provider);
 	}
 
-	private boolean validate(final IDocTypeProvider provider) {
-
-		return provider.name() != null
+	@Contract(value = "null -> false; !null -> _", pure = true)
+	private boolean validate(@Nullable final IDocTypeProvider provider) {
+		return provider != null
+				&& provider.name() != null
 				&& !provider.name().isEmpty()
 				&& provider.canUse()
 				&& provider.docTypeUrl() != null;
@@ -91,8 +91,7 @@ public final class DocTypes {
 	 *
 	 * @since 0.2
 	 */
-	public boolean isProviderValid(final IDocTypeProvider provider) {
-
+	public boolean isProviderValid(@NotNull final IDocTypeProvider provider) {
 		return this.providers.contains(provider);
 	}
 
@@ -106,19 +105,16 @@ public final class DocTypes {
 	 * 		{@link Optional#empty()} if none is
 	 *    	available.
 	 */
-	public Optional<IDocTypeProvider> getProviderFor(final IDocTypeDeclaration declaration) {
-
+	@NotNull
+	public Optional<IDocTypeProvider> getProviderFor(@NotNull final
+	                                                     IDocTypeDeclaration declaration) {
 		for (final IDocTypeProvider provider : this.providers) {
-
 			try {
-
 				if (provider.docTypeUrl().equals(declaration.getStyleSheet())
 						      && this.isProviderValid(provider)) {
-
 					return Optional.of(provider);
 				}
 			} catch (final MalformedURLException ex) {
-
 				ex.printStackTrace();
 			}
 		}

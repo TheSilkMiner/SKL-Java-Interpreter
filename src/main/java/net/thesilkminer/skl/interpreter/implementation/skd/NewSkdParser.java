@@ -17,6 +17,7 @@ import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.doctype.I
 import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.version.IDatabaseVersionDeclaration;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.Contract;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -98,6 +99,8 @@ public class NewSkdParser implements ISkdParser {
 	 *
 	 * @since 0.2.1
 	 */
+	@Contract(pure = true)
+	@Nonnull
 	public static ISkdParser get(@Nonnull final IDatabaseHolder databaseHolder) {
 		return get(databaseHolder, false);
 	}
@@ -116,6 +119,8 @@ public class NewSkdParser implements ISkdParser {
 	 *
 	 * @since 0.2.1
 	 */
+	@Contract(pure = true)
+	@Nonnull
 	public static ISkdParser get(@Nonnull final IDatabaseHolder databaseHolder,
 	                             final boolean cached) {
 		if (cached && CACHE.containsKey(databaseHolder)) {
@@ -151,6 +156,7 @@ public class NewSkdParser implements ISkdParser {
 
 		this.in = this.databaseHolder().readerStream();
 		this.structure = SkdApi.get().api().structure(Lists.newArrayList());
+		this.init = true;
 	}
 
 	@Override
@@ -163,6 +169,7 @@ public class NewSkdParser implements ISkdParser {
 		return false;
 	}
 
+	@Nonnull
 	@Override
 	public IDatabase read() {
 		if (!this.init()) {
@@ -190,7 +197,6 @@ public class NewSkdParser implements ISkdParser {
 					= new IllegalDatabaseSyntaxException();
 			toThrow.initCause(exception);
 			try {
-				@SuppressWarnings("all")
 				final Class<?> clazzIdse = toThrow.getClass();
 				Class<?> clazzT;
 				do {
@@ -210,13 +216,12 @@ public class NewSkdParser implements ISkdParser {
 	}
 
 	@Nonnull
-	private <T> Optional<T> tryAccept(final Class<T> clazz, T toAccept) {
+	private <T> Optional<T> tryAccept(@Nonnull final Class<T> clazz, @Nonnull T toAccept) {
 		final Collection<Class<?>> types = this.types.get(clazz);
 
 		if (types != null && !types.isEmpty()) {
 			for (final Class<?> typeClass : types) {
 				try {
-					@SuppressWarnings("unchecked")
 					final T type = (T) typeClass.newInstance();
 					final boolean canAccept = (boolean) type.getClass()
 							.getMethod("canAccept", Object.class)
@@ -507,7 +512,7 @@ public class NewSkdParser implements ISkdParser {
 		this.lastTagOnLevel.put(indent, parent);
 	}
 
-	private List<ISkdProperty> parseProperties(final String propLine) {
+	private Collection<ISkdProperty> parseProperties(final String propLine) {
 		final List<String> strings = this.getAsList(propLine);
 
 		if (strings.isEmpty()) {
@@ -582,6 +587,7 @@ public class NewSkdParser implements ISkdParser {
 		return properties;
 	}
 
+	@Contract(value = "null -> false; !null -> _")
 	private boolean isValidPair(final Pair<String, String> pair) {
 		return pair != null
 				&& pair.getLeft() != null
@@ -614,7 +620,8 @@ public class NewSkdParser implements ISkdParser {
 	}
 
 	@Override
-	public boolean write(final IDatabase database, final IDatabaseHolder holder) {
+	public boolean write(@Nonnull final IDatabase database,
+	                     @Nonnull final IDatabaseHolder holder) {
 		if (!holder.writable()) {
 			return false;
 		}
@@ -641,11 +648,13 @@ public class NewSkdParser implements ISkdParser {
 		return true;
 	}
 
+	@Nonnull
 	@Override
 	public Optional<String> getDatabaseName() {
 		return this.databaseHolder().name();
 	}
 
+	@Nonnull
 	@Override
 	public IDatabaseHolder databaseHolder() {
 		return this.currentDatabaseHolder;
@@ -659,6 +668,7 @@ public class NewSkdParser implements ISkdParser {
 	 *
 	 * @since 0.2.1
 	 */
+	@SuppressWarnings("MagicNumber")
 	public static void main(final String... args) { //Move to JUnit
 		final java.io.File exampleFile = new java.io.File(SkdParser.class.getResource(
 				"/assets/skd_interpreter/examples/DatabaseExample.skd"
