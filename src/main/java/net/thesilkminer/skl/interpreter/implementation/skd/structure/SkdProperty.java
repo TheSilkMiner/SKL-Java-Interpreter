@@ -18,13 +18,12 @@ import javax.annotation.Nullable;
  *
  * @since 0.1
  */
-@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "WeakerAccess"})
 public class SkdProperty implements ISkdProperty {
 
 	private final String name;
-	private Optional<String> value;
+	private String value;
 
-	private SkdProperty(@Nonnull final String name, @Nonnull final Optional<String> value) {
+	private SkdProperty(@Nonnull final String name, @Nullable final String value) {
 		this.name = name;
 		this.value = value;
 	}
@@ -38,18 +37,18 @@ public class SkdProperty implements ISkdProperty {
 	 * 		The value. May be empty.
 	 * @return
 	 * 		A new SkdProperty instance.
+	 *
+	 * @deprecated Use {@link #getProperty(String, String)} instead.
+	 *
+	 * @since 0.2
 	 */
 	@Contract(value = "!null, !null -> !null; _, _ -> fail", pure = true)
+	@Deprecated
 	@Nonnull
+	@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 	public static SkdProperty getProperty(@Nonnull final String name,
-										  @Nonnull
-										  final
-										  Optional<String>
-											value) {
-		Preconditions.checkNotNull(name, "Name must not be null");
-		Preconditions.checkNotNull(value, "Value must not be null. "
-				      + "Use Optional.empty() instead");
-		return new SkdProperty(name, value);
+	                                      @Nonnull final Optional<String> value) {
+		return getProperty(name, value.orElse(null));
 	}
 
 	/**
@@ -61,21 +60,18 @@ public class SkdProperty implements ISkdProperty {
 	 * 		The value. May be null.
 	 * @return
 	 * 		A new SkdProperty instance.
+	 *
+	 * @since 0.2
 	 */
 	@Contract(value = "!null, !null -> !null; !null, null -> !null; null, _ -> fail",
 			  pure = true)
 	@Nonnull
 	public static SkdProperty getProperty(@Nonnull final String name,
-										  @Nullable
-										  final String
-											value) {
-		Optional<String> opt = Optional.empty();
-
-		if (value != null) {
-			opt = Optional.of(value);
-		}
-
-		return SkdProperty.getProperty(name, opt);
+	                                      @Nullable final String value) {
+		return new SkdProperty(
+				Preconditions.checkNotNull(name, "Property name must not be null"),
+				value
+		);
 	}
 
 	@Nonnull
@@ -87,17 +83,21 @@ public class SkdProperty implements ISkdProperty {
 	@Nonnull
 	@Override
 	public Optional<String> getValue() {
-		return this.value;
+		return Optional.ofNullable(this.value);
 	}
 
 	@Override
 	public void setValue(@Nonnull final String value) {
-		this.value = Optional.of(value);
+		Preconditions.checkNotNull(value,
+				"Value must not be null. Use #removeValue() instead");
+		Preconditions.checkArgument(!value.isEmpty(),
+				"Use #removeValue() instead of setting the content to empty");
+		this.value = value;
 	}
 
 	@Override
 	public void removeValue() {
-		this.value = Optional.empty();
+		this.value = null;
 	}
 
 	@Override
@@ -127,7 +127,7 @@ public class SkdProperty implements ISkdProperty {
 
 		str += this.getName();
 		str += "=\"";
-		str += this.getValue().isPresent() ? this.getValue().get() : "";
+		str += this.getValue().orElse("");
 		str += "\"";
 
 		return str;
