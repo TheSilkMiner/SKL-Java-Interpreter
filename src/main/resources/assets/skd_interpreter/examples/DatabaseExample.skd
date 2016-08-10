@@ -17,7 +17,7 @@
 		</child>
 	</child>
 	<other>
-		<properties test1="yes" test2="bella" test3="no spaces!!!">
+		<properties test1="yes" test2="bella" test3="spaces supported!!!">
 			<aVoidTag />
 			<aVoidTagWithProps prop="prop" />
 		</properties>

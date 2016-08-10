@@ -109,7 +109,7 @@ public class DefaultService implements ISkdService {
 	@Nonnull
 	@Override
 	public IStructure structure(@Nonnull final List<ISkdTag> main) {
-		return Structure.newInstance(Optional.ofNullable(main.isEmpty() ? null : main));
+		return Structure.newInstance(main);
 	}
 
 	@Nonnull
@@ -121,6 +121,6 @@ public class DefaultService implements ISkdService {
 	@Nonnull
 	@Override
 	public ISkdProperty property(@Nonnull final String name, @Nonnull final Object value) {
-		return SkdProperty.getProperty(name, Optional.of(value.toString()));
+		return SkdProperty.getProperty(name, value.toString());
 	}
 }

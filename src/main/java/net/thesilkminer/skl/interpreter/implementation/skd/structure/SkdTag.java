@@ -259,8 +259,8 @@ public class SkdTag implements ISkdTag {
 	 * @param args
 	 * 		args
 	 */
+	@SuppressWarnings("deprecation")
 	public static void main(@Nonnull final String... args) {
-
 		final SkdProperty propertyOne = SkdProperty.getProperty("test", "example");
 		final SkdProperty propertyTwo = SkdProperty.getProperty("name", Optional.of("me"));
 		final SkdProperty propertyThree = SkdProperty.getProperty("author", "BELLA");
@@ -281,65 +281,124 @@ public class SkdTag implements ISkdTag {
 		childThree.setAsChild(main);
 		main.addChildTag(childOne);
 
-		//main.setContent(Optional.of("Test content"));
 		main.setContent("Test content");
 
 		childThree.setVoidElement();
 
 		System.out.println(main.toString());
 
+		try {
+			Thread.sleep(1000);
+			System.out.println("\n");
+		} catch (final InterruptedException exception) {
+			//We don't care
+		}
+
 		main.removeChildTag(childThree);
 
 		System.out.println(main.toString());
+
+		try {
+			Thread.sleep(1000);
+			System.out.println("\n");
+		} catch (final InterruptedException exception) {
+			//We don't care
+		}
 
 		System.out.println(childOne.removeProperty(propertyTwo));
 		System.out.println(childOne.removeProperty(propertyOne));
 
 		System.out.println(main.toString());
 
-		//main.setContent(Optional.empty());
+		try {
+			Thread.sleep(1000);
+			System.out.println("\n");
+		} catch (final InterruptedException exception) {
+			//We don't care
+		}
+
+		childTwo.getProperties().get(0).removeValue();
+
 		main.removeContent();
 
 		System.out.println(main.toString());
 
+		try {
+			Thread.sleep(1000);
+			System.out.println("\n");
+		} catch (final InterruptedException exception) {
+			//We don't care
+		}
+
 		System.out.println("============= DATABASE CONSTRUCTION ATTEMPT =============");
 
-		final SkdTag dbMain = SkdTag.of("main");
+		final ISkdTag db$main = SkdTag.of("main");
 
-		final SkdTag dbChild = SkdTag.of("child");
-		dbChild.setAsChild(dbMain);
+		final ISkdTag db$main$child = SkdTag.of("child");
+		db$main.addChildTag(db$main$child);
 
-		final SkdTag dbTag1 = SkdTag.of("tag");
-		//dbTag1.setContent(Optional.of("Content test"));
-		dbTag1.setContent("Content test");
-		dbTag1.setAsChild(dbChild);
+		final ISkdTag db$main$child$tag£1 = SkdTag.of("tag");
+		db$main$child$tag£1.setContent("Content test");
+		db$main$child.addChildTag(db$main$child$tag£1);
 
-		final SkdTag dbTag2 = SkdTag.of("tag");
-		//dbTag2.setContent(Optional.of("Content test\n#2"));
-		dbTag2.setContent("Content test\n#2");
-		dbTag2.setAsChild(dbChild);
+		final ISkdTag db$main$child$tag£2 = SkdTag.of("tag");
+		db$main$child$tag£2.setContent("Content test\n#2");
+		db$main$child.addChildTag(db$main$child$tag£2);
 
-		final SkdTag dbOther = SkdTag.of("other");
-		dbOther.setAsChild(dbMain);
+		final ISkdTag db$main$child$child = SkdTag.of("child");
+		db$main$child.addChildTag(db$main$child$child);
 
-		final SkdTag dbProperties = SkdTag.of("properties");
-		dbProperties.addProperty(SkdProperty.getProperty("test1", "yes"));
-		dbProperties.addProperty(SkdProperty.getProperty("test2", Optional.of("bella")));
-		dbProperties.setAsChild(dbOther);
+		final ISkdTag db$main$child$child$evenMoreNested = SkdTag.of("evenMoreNested");
+		db$main$child$child.addChildTag(db$main$child$child$evenMoreNested);
 
-		final SkdTag dbAVoidTag1 = SkdTag.of("aVoidTag");
-		dbAVoidTag1.setVoidElement();
-		dbAVoidTag1.setAsChild(dbProperties);
+		final ISkdTag db$main$child$child$evenMoreNested$nestedAsHell =
+				SkdTag.of("nestedAsHell");
+		db$main$child$child$evenMoreNested$nestedAsHell.setVoidElement();
+		db$main$child$child$evenMoreNested
+				.addChildTag(db$main$child$child$evenMoreNested$nestedAsHell);
 
-		final SkdTag dbAVoidTagWithProps = SkdTag.of("aVoidTagWithProps");
-		dbAVoidTagWithProps.setVoidElement();
-		dbAVoidTagWithProps.addProperty(SkdProperty.getProperty("prop", "prop"));
-		dbAVoidTagWithProps.setAsChild(dbProperties);
+		final ISkdTag db$main$other = SkdTag.of("other");
+		db$main$other.setAsChild(db$main);
 
-		final SkdTag dbAVoidTag2 = SkdTag.of("aVoidTag");
-		dbAVoidTag2.setVoidElement();
-		dbAVoidTag2.setAsChild(dbOther);
+		final ISkdTag db$main$other$properties = SkdTag.of("properties");
+		db$main$other$properties.setAsChild(db$main$other);
 
-		System.out.println(dbMain);
+		final ISkdProperty db$main$other$properties_test1 =
+				SkdProperty.getProperty("test1", "yes");
+		db$main$other$properties.addProperty(db$main$other$properties_test1);
+
+		final ISkdProperty db$main$other$properties_test2 =
+				SkdProperty.getProperty("test2", "bella");
+		db$main$other$properties.addProperty(db$main$other$properties_test2);
+
+		final ISkdProperty db$main$other$properties_test3 =
+				SkdProperty.getProperty("test3", "spaces supported!!!");
+		db$main$other$properties.addProperty(db$main$other$properties_test3);
+
+		final ISkdTag db$main$other$properties$aVoidTag = SkdTag.of("aVoidTag");
+		db$main$other$properties$aVoidTag.setVoidElement();
+		db$main$other$properties$aVoidTag.setAsChild(db$main$other$properties);
+
+		final ISkdTag db$main$other$properties$aVoidTagWithProps =
+				SkdTag.of("aVoidTagWithProps");
+		db$main$other$properties$aVoidTagWithProps.setVoidElement();
+		db$main$other$properties$aVoidTagWithProps.addProperty(
+				SkdProperty.getProperty("prop", "prop")
+		);
+		db$main$other$properties$aVoidTagWithProps.setAsChild(db$main$other$properties);
+
+		final ISkdTag db$main$other$aVoidTag = SkdTag.of("aVoidTag");
+		db$main$other$aVoidTag.setVoidElement();
+		db$main$other$aVoidTag.setAsChild(db$main$other);
+
+		final ISkdTag db$voidMain = SkdTag.of("voidMain");
+		db$voidMain.setVoidElement();
+
+		final net.thesilkminer.skl.interpreter.api.skd.structure.IStructure struct =
+				Structure.newInstance(
+						java.util.Arrays.asList(db$main, db$voidMain)
+				);
+
+		System.out.println(struct);
 	}
 }
