@@ -183,6 +183,21 @@ public final class ExtensionManager {
 		this.registered = Maps.newHashMap();
 	}
 
+	static {
+		// Register ParserEx extension automatically, if available
+		try {
+			//noinspection SpellCheckingInspection
+			IT.register(
+				Class.forName(
+					"net.thesilkminer.skl.interpreterx.skdx.thesilkminer."
+						+ "parserex.ParserEx"
+				)
+			);
+		} catch (final ReflectiveOperationException expected) {
+			// Do nothing. We don't really care
+		}
+	}
+
 	/**
 	 * Gets the singleton instance of the extension manager.
 	 *
