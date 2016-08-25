@@ -3,6 +3,7 @@ package net.thesilkminer.skl.interpreter.api.skd.structure;
 import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.doctype.IDocTypeDeclaration;
 
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 
 /**
@@ -65,4 +66,43 @@ public interface IStructure extends IAcceptable<IStructure> {
 	 * @since 0.2
 	 */
 	void apply(@Nonnull final IDocTypeDeclaration declaration);
+
+	/**
+	 * Gets the non-null tag at the specified index.
+	 *
+	 * <p>In other words, gets the tag at the specified {@code index},
+	 * not counting eventually {@code null} tags.</p>
+	 *
+	 * @implNote
+	 *      By default, it is the same as calling
+	 *      {@code this.mainTags().get(index)}
+	 *
+	 * @param index
+	 *      The tag's index.
+	 * @return
+	 *      An {@link Optional} containing the {@code index}-th
+	 *      non-{@code null} tag, if present.
+	 *
+	 * @since 0.2.1
+	 */
+	@Nonnull
+	default Optional<ISkdTag> getIndexTagNonNull(final int index) {
+		return Optional.ofNullable(this.mainTags().get(index));
+	}
+
+	/**
+	 * Gets the amount of non-null main tags contained in this structure.
+	 *
+	 * @implNote
+	 *      By default, it is the same as calling
+	 *      {@code this.mainTags().size()}.
+	 *
+	 * @return
+	 *      The amount of non-{@code null} main tags.
+	 *
+	 * @since 0.2.1
+	 */
+	default int nonNullSize() {
+		return this.mainTags().size();
+	}
 }

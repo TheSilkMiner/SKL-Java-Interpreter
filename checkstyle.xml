@@ -25,11 +25,11 @@
     <!-- See http://checkstyle.sf.net/config_whitespace.html -->
 	<!--
 		Nah: We use tabs
-		
+
         <module name="FileTabCharacter">
             <property name="eachLine" value="true"/>
         </module>
-		
+
 		Signed-off by TheSilkMiner
 	-->
 
@@ -94,7 +94,15 @@
             <property name="option" value="EOL"/>
         </module>
         <module name="PackageName">
-            <property name="format" value="^[a-z]+(\.[a-z][a-z0-9]*)*$"/>
+            <!--
+                Allow underscores to permit extensions versioning.
+                See net/thesilkminer/skl/interpreterx/package-info.java for more information
+
+                <property name="format" value="^[a-z]+(\.[a-z][a-z0-9]*)*$"/>
+
+                Signed-off by TheSilkMiner
+            -->
+            <property name="format" value="^[a-z]+(\.[a-z][a-z0-9_]*)*$"/>
             <message key="name.invalidPattern"
              value="Package name ''{0}'' must match pattern ''{1}''."/>
         </module>
@@ -153,9 +161,9 @@
         <module name="Indentation">
 			<!--
 				Use custom indentation rules.
-				
+
 				Signed-off by TheSilkMiner
-				
+
             <property name="basicOffset" value="2"/>
             <property name="braceAdjustment" value="0"/>
             <property name="caseIndent" value="2"/>

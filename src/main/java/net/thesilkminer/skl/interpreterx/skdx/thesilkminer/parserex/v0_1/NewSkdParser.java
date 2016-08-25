@@ -1,4 +1,4 @@
-package net.thesilkminer.skl.interpreter.implementation.skd;
+package net.thesilkminer.skl.interpreterx.skdx.thesilkminer.parserex.v0_1;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -15,6 +15,8 @@ import net.thesilkminer.skl.interpreter.api.skd.structure.IStructure;
 import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.IDeclaration;
 import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.doctype.IDocTypeDeclaration;
 import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.version.IDatabaseVersionDeclaration;
+import net.thesilkminer.skl.interpreterx.skdx.thesilkminer.parserex.ParserEx;
+import net.thesilkminer.skl.interpreterx.skdx.thesilkminer.parserex.v0_1.service.AcceptanceService;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Contract;
@@ -23,7 +25,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -33,7 +34,8 @@ import java.util.Optional;
 import javax.annotation.Nonnull;
 
 /**
- * An improved version of the {@link SkdParser original version}.
+ * An improved version of the
+ * {@link net.thesilkminer.skl.interpreter.implementation.skd.SkdParser original version}.
  *
  * <p>This parser can work with multiple
  * {@link net.thesilkminer.skl.interpreter.api.skd.holder.IDatabaseHolder database holders}
@@ -46,9 +48,35 @@ import javax.annotation.Nonnull;
  *
  * @author TheSilkMiner
  *
- * @since 0.2.1
+ * @since 0.1
  */
-public class NewSkdParser implements ISkdParser {
+public class NewSkdParser implements ISkdParser { //TODO Better exceptions
+
+	/**
+	 * Whether we should use more detailed error messages for our exceptions.
+	 *
+	 * @since 0.1
+	 */
+	private static final boolean DEBUG_EXCEPTIONS = true;
+
+	/**
+	 * Represents the amount of hours spent trying to write this parser.
+	 *
+	 * @since 0.1
+	 */
+	@SuppressWarnings("unused")
+	private static final int HOURS_SPENT_ON_THIS = 24;
+
+	/**
+	 * Represents the amount of hours of the amount specified in
+	 * {@link #HOURS_SPENT_ON_THIS} that have been spent in trying
+	 * to make the acceptance service usable and also test all
+	 * corner cases.
+	 *
+	 * @since 0.1
+	 */
+	@SuppressWarnings("unused")
+	private static final int HOURS_SPENT_ON_ACCEPTANCE = 19;
 
 	private static final Map<IDatabaseHolder, ISkdParser> CACHE = Maps.newHashMap();
 	private static final String TAG_START = "<";
@@ -62,6 +90,7 @@ public class NewSkdParser implements ISkdParser {
 
 	private final Map<Integer, ISkdTag> lastTagOnLevel;
 	private final IDatabaseHolder currentDatabaseHolder;
+	@SuppressWarnings({"unused", "FieldCanBeLocal"})
 	private final Multimap<Class<?>, Class<?>> types;
 	private final Map<String, IDeclaration> declarations;
 	private boolean init;
@@ -146,17 +175,32 @@ public class NewSkdParser implements ISkdParser {
 			throw new RuntimeException("Invalid database holder type");
 		}
 
-		SkdApi.get().api().logger().info("Initializing parser for database holder: "
-				+ this.databaseHolder().toString());
+		SkdApi.get().api().logger().info(String.format(
+				"Initializing parser %s version %s for database holder %s (%s)",
+				this.getClass().getSimpleName(),
+				ParserEx.currentVersion(),
+				this.databaseHolder().toString(),
+				this.databaseHolder().getClass().getSimpleName()
+		));
 
 		if (force && !this.databaseHolder().canBeAcceptedByDefault()) {
 			SkdApi.get().api().logger().warn("This initialization has been forced");
 			SkdApi.get().api().logger().warn("This may not go well...");
 		}
 
+		final long start = System.currentTimeMillis();
+
 		this.in = this.databaseHolder().readerStream();
 		this.structure = SkdApi.get().api().structure(Lists.newArrayList());
 		this.init = true;
+
+		final long stop = System.currentTimeMillis();
+
+		SkdApi.get().api().logger().info("Initialization completed");
+		SkdApi.get().api().logger().info(String.format(
+				"It took %d milliseconds to complete",
+				stop - start
+		));
 	}
 
 	@Override
@@ -165,7 +209,7 @@ public class NewSkdParser implements ISkdParser {
 	}
 
 	@Override
-	public boolean errored() {
+	public boolean hasThrownError() {
 		return false;
 	}
 
@@ -177,6 +221,10 @@ public class NewSkdParser implements ISkdParser {
 		}
 
 		try {
+			final long start = System.currentTimeMillis();
+
+			SkdApi.get().api().logger().info("Reading database");
+
 			this.in.lines().forEach(this::parse);
 
 			this.docType = (IDocTypeDeclaration) this.declarations.get("DOCTYPE");
@@ -189,7 +237,13 @@ public class NewSkdParser implements ISkdParser {
 
 			this.db = this.tryAccept(IDatabase.class, this.db).orElse(this.db);
 
+			final long stop = System.currentTimeMillis();
+
 			SkdApi.get().api().logger().info("Parse completed");
+			SkdApi.get().api().logger().info(String.format(
+					"It took %d milliseconds to complete",
+					stop - start
+			));
 
 			return this.db;
 		} catch (final RuntimeException exception) {
@@ -197,51 +251,77 @@ public class NewSkdParser implements ISkdParser {
 					= new IllegalDatabaseSyntaxException();
 			toThrow.initCause(exception);
 			try {
-				final Class<?> clazzIdse = toThrow.getClass();
-				Class<?> clazzT;
-				do {
-					clazzT = clazzIdse.getSuperclass();
+				Class<?> clazzEx = toThrow.getClass();
+				while (!clazzEx.equals(Throwable.class)) {
+					clazzEx = clazzEx.getSuperclass();
 				}
-				while (clazzT.equals(Throwable.class));
-				final Field detailMessage = clazzT.getField("detailMessage");
+				final Field detailMessage = clazzEx.getDeclaredField(
+						"detailMessage"
+				);
 				detailMessage.setAccessible(true);
 				detailMessage.set(toThrow,
-						"Unable to parse the database: syntax error");
+						"Unable to parse database: syntax error"
+				);
 				detailMessage.setAccessible(false);
 			} catch (final ReflectiveOperationException ignored) {
-				//Ignore
+				// Ignore
 			}
 			throw toThrow;
 		}
 	}
 
 	@Nonnull
-	private <T> Optional<T> tryAccept(@Nonnull final Class<T> clazz, @Nonnull T toAccept) {
-		final Collection<Class<?>> types = this.types.get(clazz);
+	@SuppressWarnings("unchecked")
+	private <T> Optional<T> tryAccept(@Nonnull final Class<T> clazz,
+	                                  @Nonnull final T toAccept) {
+		SkdApi.get().api().logger().debug("Attempting to accept last parsed token");
+		final AcceptanceService<T> service = (AcceptanceService<T>)
+				SkdApi.get().serviceManager().get(clazz)
+						.orElseThrow(() -> this.throwExForService(clazz));
+		if (service.canAccept(toAccept)) {
+			SkdApi.get().api().logger().debug("Accepted token "
+					+ toAccept.toString().replace("\n", "").replace("\t", ""));
+			SkdApi.get().api().logger().debug("Token original class: "
+					+ toAccept.getClass().getName());
+			final T of = service.accept(toAccept);
+			SkdApi.get().api().logger().debug("New token class: "
+					+ of.getClass().getName());
+			return Optional.of(of);
+		}
+		SkdApi.get().api().logger().debug("Keeping original token class ("
+				+ toAccept.getClass().getName() + ")");
+		return Optional.empty();
+	}
 
-		if (types != null && !types.isEmpty()) {
-			for (final Class<?> typeClass : types) {
-				try {
-					final T type = (T) typeClass.newInstance();
-					final boolean canAccept = (boolean) type.getClass()
-							.getMethod("canAccept", Object.class)
-							.invoke(type, toAccept);
-					if (!canAccept) {
-						continue;
-					}
-					type.getClass().getMethod("accept", Object.class)
-							.invoke(type, toAccept);
-					return Optional.of(type);
-				} catch (final InstantiationException
-						| IllegalAccessException
-						| NoSuchMethodException
-						| InvocationTargetException ex) {
-					// Ignored
+	@Nonnull
+	private RuntimeException throwExForService(final Class<?> clazz) {
+		final RuntimeException it = new RuntimeException();
+		if (DEBUG_EXCEPTIONS) {
+			try {
+				Class<?> clazzEx = it.getClass();
+				while (!clazzEx.equals(Throwable.class)) {
+					clazzEx = clazzEx.getSuperclass();
 				}
+				final Field detailMessage = clazzEx.getDeclaredField(
+						"detailMessage"
+				);
+				detailMessage.setAccessible(true);
+				detailMessage.set(it,
+					String.format(
+						"Unable to find service for specified class %s",
+					clazz)
+				);
+				detailMessage.setAccessible(false);
+			} catch (final ReflectiveOperationException ignored) {
+				Throwable cause = ignored;
+				while (cause.getCause() != null) {
+					cause = cause.getCause();
+				}
+				cause.initCause(it);
+				throw new RuntimeException(ignored);
 			}
 		}
-
-		return Optional.empty();
+		return it;
 	}
 
 	private void parse(final String line) {
@@ -263,7 +343,9 @@ public class NewSkdParser implements ISkdParser {
 
 		if (realLine.startsWith("<SKD")) {
 			// Legacy support
-			// TODO Remove in 0.3
+			// FIXME Remove in 0.3
+			SkdApi.get().api().logger().fine("Found version " + realLine);
+			SkdApi.get().api().logger().fine("Redirecting to declaration");
 			SkdApi.get().api().logger().debug("Found declaration " + realLine);
 			this.parseVersionBridge(realLine);
 			return;
@@ -276,6 +358,7 @@ public class NewSkdParser implements ISkdParser {
 		}
 
 		if (realLine.isEmpty()) {
+			this.structure.mainTags().add(null);
 			return;
 		}
 
@@ -383,7 +466,6 @@ public class NewSkdParser implements ISkdParser {
 
 		tag.setContent(newCont);
 		SkdApi.get().api().tagCallback(tag);
-		this.tryAccept(ISkdTag.class, tag).orElse(tag);
 	}
 
 	private void parseVoidTag(final String line) {
@@ -433,7 +515,6 @@ public class NewSkdParser implements ISkdParser {
 		parent.addChildTag(tag);
 
 		SkdApi.get().api().tagCallback(parent);
-		parent = this.tryAccept(ISkdTag.class, parent).orElse(parent);
 
 		this.lastTagOnLevel.put(indent, parent);
 	}
@@ -485,7 +566,6 @@ public class NewSkdParser implements ISkdParser {
 		this.parseProperties(propLine).stream().forEach(tag::addProperty);
 
 		SkdApi.get().api().tagCallback(tag);
-		tag = this.tryAccept(ISkdTag.class, tag).orElse(tag);
 
 		this.lastTagOnLevel.put(this.indentCount, tag);
 
@@ -507,7 +587,6 @@ public class NewSkdParser implements ISkdParser {
 		parent.addChildTag(tag);
 
 		SkdApi.get().api().tagCallback(parent);
-		parent = this.tryAccept(ISkdTag.class, parent).orElse(parent);
 
 		this.lastTagOnLevel.put(indent, parent);
 	}
@@ -611,12 +690,15 @@ public class NewSkdParser implements ISkdParser {
 			throw new RuntimeException("Impossible to set property with empty key");
 		}
 
-		ISkdProperty prop = SkdApi.get().api().property(key, value);
+		final ISkdProperty prop = SkdApi.get().api().property(key, value);
+
+		if (value.isEmpty()) {
+			prop.removeValue();
+		}
+
 		SkdApi.get().api().propertyCallback(prop);
 
-		prop = this.tryAccept(ISkdProperty.class, prop).orElse(prop);
-
-		return prop;
+		return this.tryAccept(ISkdProperty.class, prop).orElse(prop);
 	}
 
 	@Override
@@ -626,7 +708,15 @@ public class NewSkdParser implements ISkdParser {
 			return false;
 		}
 
-		SkdApi.get().api().logger().info("Writing database to database holder");
+		SkdApi.get().api().logger().info(String.format(
+				"Writing database %s (%s) to database holder %s (%s)",
+				this.getDatabaseName().orElse("ERROR: ~NullPointerException~"),
+				database.getClass().getSimpleName(),
+				holder.toString(),
+				holder.getClass().getSimpleName()
+		));
+
+		final long start = System.currentTimeMillis();
 
 		final Optional<BufferedWriter> optionallyOut = holder.writerStream();
 
@@ -638,12 +728,18 @@ public class NewSkdParser implements ISkdParser {
 		final BufferedWriter unwrappedOut = optionallyOut.get();
 		// Let's wrap it into a PrintWriter for ease of use
 		final PrintWriter out = new PrintWriter(unwrappedOut);
-		//out.println(database.toString()); //TODO Which one?
-		out.print(database.toString()); //TODO Which one?
+		//TODO Not "toString" dependent version?
+		out.print(database.toString()); //Maybe "println"?
 		out.flush();
 		out.close();
 
+		final long stop = System.currentTimeMillis();
+
 		SkdApi.get().api().logger().info("Write completed");
+		SkdApi.get().api().logger().info(String.format(
+				"It took %d milliseconds to complete",
+				stop - start
+		));
 
 		return true;
 	}
@@ -670,12 +766,16 @@ public class NewSkdParser implements ISkdParser {
 	 */
 	@SuppressWarnings("MagicNumber")
 	public static void main(final String... args) { //Move to JUnit
-		final java.io.File exampleFile = new java.io.File(SkdParser.class.getResource(
-				"/assets/skd_interpreter/examples/DatabaseExample.skd"
+		new ParserExV01().init();
+
+		@SuppressWarnings("SpellCheckingInspection")
+		final java.io.File exampleFile = new java.io.File(NewSkdParser.class.getResource(
+				"/assets/interpreterx/skdx/thesilkminer/parserex/v0_1/databases/"
+						+ "Test.skd"
 		).getFile());
 		final IDatabaseHolder db = SkdApi.get().api().databaseHolder(exampleFile);
-		//final ISkdParser parser = SkdApi.get().api().parser(db);
-		final ISkdParser parser = NewSkdParser.get(db);
+		final ISkdParser parser = SkdApi.get().api().parser(db);
+		//final ISkdParser parser = NewSkdParser.get(db);
 		final IDatabase database = parser.read();
 
 		System.out.println(database.toString());
@@ -684,6 +784,15 @@ public class NewSkdParser implements ISkdParser {
 			Thread.sleep(200);
 		} catch (final Exception exc) {
 			//NO-OP
+		}
+
+		try {
+			database.structure().getIndexTagNonNull(2)
+					.orElseThrow(RuntimeException::new)
+					.getChildren().get(0).getProperties();
+			System.out.println("Exception not thrown: this isn't good!");
+		} catch (final UnsupportedOperationException ex) {
+			System.out.println("Thrown exception: this is good!");
 		}
 
 		final java.io.File outputFile = new java.io.File(System.getProperty("user.dir"),

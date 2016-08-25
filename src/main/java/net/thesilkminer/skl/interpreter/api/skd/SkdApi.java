@@ -1,25 +1,12 @@
 package net.thesilkminer.skl.interpreter.api.skd;
 
-/*import net.thesilkminer.skl.interpreter.api.skd.holder.IDatabaseHolder;
-import net.thesilkminer.skl.interpreter.api.skd.logging.ISkdLogger;
-import net.thesilkminer.skl.interpreter.api.skd.parser.ISkdParser;*/
 import net.thesilkminer.skl.interpreter.api.skd.service.ISkdService;
 import net.thesilkminer.skl.interpreter.api.skd.service.ServiceManager;
-import org.jetbrains.annotations.Contract;
-/*import net.thesilkminer.skl.interpreter.api.skd.structure.IDatabase;
-import net.thesilkminer.skl.interpreter.api.skd.structure.ISkdProperty;
-import net.thesilkminer.skl.interpreter.api.skd.structure.ISkdTag;
-import net.thesilkminer.skl.interpreter.api.skd.structure.IStructure;
-import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.doctype.IDocTypeDeclaration;
-import net.thesilkminer.skl.interpreter.api.skd.structure.declarations.version.IDatabaseVersionDeclaration;*/
 
-/*import java.io.File;
-import java.lang.reflect.Method;
-import java.util.List;*/
+import org.jetbrains.annotations.Contract;
 
 import java.util.Optional;
 import javax.annotation.Nonnull;
-/*import javax.annotation.Nullable;*/
 
 /**
  * Represents the access point of the SKD Api.

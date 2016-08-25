@@ -289,14 +289,6 @@ public interface ISkdService {
 	 * value, by default, a {@link List}, containing as a single entry
 	 * {@code ListTag.class}.</p>
 	 *
-	 * <p>All the values for the specific type are asked by the parser if
-	 * they
-	 * {@link net.thesilkminer.skl.interpreter.api.skd.structure.IAcceptable#canAccept(Object)
-	 * can accept the type} and
-	 * then, if they allow the specific type to be applied, they
-	 * {@link net.thesilkminer.skl.interpreter.api.skd.structure.IAcceptable#accept(Object)
-	 * accept the tag}.</p>
-	 *
 	 * @return
 	 *      A Multimap containing the various mapping types.
 	 *

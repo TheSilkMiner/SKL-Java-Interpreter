@@ -29,10 +29,10 @@ public interface ISksParser {
 	boolean init();
 
 	/**
-	 * Gets if the parser has errored.
+	 * Gets if the parser has hasThrownError.
 	 *
 	 * @return
-	 * 		If the parser has errored.
+	 * 		If the parser has hasThrownError.
 	 */
 	boolean errored();
 

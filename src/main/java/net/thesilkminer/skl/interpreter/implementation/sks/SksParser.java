@@ -328,7 +328,7 @@ public final class SksParser implements ISksParser {
 			}
 
 			SksLogger.logger().warn("File specified does not end with .sks");
-			SksLogger.logger().warn("Forced to accept it...");
+			SksLogger.logger().warn("Forced to acceptNoImplement it...");
 
 			//return true;
 		}

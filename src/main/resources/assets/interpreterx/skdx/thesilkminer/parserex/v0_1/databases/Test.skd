@@ -1,0 +1,41 @@
+<!DOCTYPE skd http://thesilkminer.net/sks/skd/default.skd>
+<SKD version 0.2>
+
+<main>
+	<child>
+		<tag>
+			Content test
+		</tag>
+		<tag>
+			Content test
+			#2
+		</tag>
+		<child>
+			<evenMoreNested>
+				<nestedAsHell />
+			</evenMoreNested>
+		</child>
+	</child>
+	<other>
+		<properties test1="yes" test2="bella" test3="spaces supported!!!">
+			<aVoidTag />
+			<aVoidTagWithProps prop="prop" />
+		</properties>
+		<aVoidTag />
+	</other>
+</main>
+<voidMain />
+
+<specialTags>
+	<listTest>
+		<listElement id="0" />
+		<listElement id="1" />
+		<listElement id="2" />
+		<listElement id="3" />
+		<listElement id="4" />
+	</listTest>
+	<pairTest left="left" right="right" />
+	<valueTest value="value" />
+</specialTags>
+
+<specialProps marker="" />

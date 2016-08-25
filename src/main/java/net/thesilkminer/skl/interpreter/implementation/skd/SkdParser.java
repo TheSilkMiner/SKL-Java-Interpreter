@@ -155,7 +155,7 @@ public class SkdParser implements ISkdParser {
 			this.error = true;
 		}
 
-		if (this.errored()) {
+		if (this.hasThrownError()) {
 			return;
 		}
 
@@ -186,19 +186,19 @@ public class SkdParser implements ISkdParser {
 			}
 
 			SkdApi.get().api().logger().warn("File specified does not end with .skd");
-			SkdApi.get().api().logger().warn("Forced to accept it...");
+			SkdApi.get().api().logger().warn("Forced to acceptNoImplement it...");
 		}
 	}
 
 	@Override
-	public boolean errored() {
+	public boolean hasThrownError() {
 		return this.error;
 	}
 
 	@Nonnull
 	@Override
 	public IDatabase read() {
-		if (!this.init() || this.errored()) {
+		if (!this.init() || this.hasThrownError()) {
 			throw new IllegalStateException();
 		}
 

@@ -37,7 +37,7 @@ public interface ISkdProperty extends IAcceptable<ISkdProperty> {
 	/**
 	 * Sets the value of the property.
 	 *
-	 * <p>To remove the property value, do not pass {@link null}
+	 * <p>To remove the property value, do not pass {@code null}
 	 * to this method. Use {@link #removeValue()} instead.</p>
 	 *
 	 * @param value

@@ -50,14 +50,17 @@ public interface ISkdParser {
 	boolean init();
 
 	/**
-	 * Gets if the parser has errored.
+	 * Gets if the parser has thrown an error.
 	 *
 	 * @return
-	 * 		If the parser has errored.
+	 * 		If the parser has thrown an error.
 	 *
-	 * @since 0.2
+	 * @since 0.2.1
 	 */
-	boolean errored();
+	// Previous version removed directly because, well...
+	// big typo and also... we remove binary compatibility
+	// with those parser at the moment.
+	boolean hasThrownError();
 
 	/**
 	 * Reads the file and creates an in-memory representation

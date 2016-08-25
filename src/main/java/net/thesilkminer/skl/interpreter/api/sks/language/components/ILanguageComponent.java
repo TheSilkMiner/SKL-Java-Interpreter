@@ -198,7 +198,7 @@ public interface ILanguageComponent {
 		 * Constructs a new instance.
 		 *
 		 * @param component
-		 * 		The component which errored. Can be {@code this}.
+		 * 		The component which hasThrownError. Can be {@code this}.
 		 *
 		 * @since 0.2
 		 */
