@@ -2,35 +2,116 @@ buildscript {
 	repositories {
 		mavenCentral()
 		jcenter()
+        google()
+        maven {
+            name 'OpenMods Third Party'
+            url 'https://repo.openmods.info/artifactory/simple/thirdparty'
+        }
 	}
 	dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
+        classpath group: 'com.github.jengelman.gradle.plugins', name: 'shadow', version: '1.2.3'
+        classpath group: 'net.thesilkminer.gradle.translationchecker', name: 'TranslationChecker', version: '1.1'
+        classpath group: 'com.autoscout24.gradle', name: 'gradle-todo-plugin', version: '1.0'
+        classpath group: 'org.jetbrains.kotlin', name: 'kotlin-gradle-plugin', version: "${kotlin_version}"
     }
 }
 
 plugins {
 	id 'java'
-	id 'eclipse'
 	id 'idea'
+    id 'eclipse'
+	id 'visual-studio'
 	id 'checkstyle'
 	id 'maven'
-	//id 'com.github.johnrengelman.shadow' version '1.2.3'
+    id 'com.github.ben-manes.versions' version '0.15.0'
+    id 'com.github.hierynomus.license' version '0.14.0'
 }
 
+apply plugin: 'findbugs'
+apply plugin: 'kotlin'
 apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'com.autoscout24.gradle.todo'
 
-//noinspection GroovyUnusedAssignment
+idea {
+    module {
+        inheritOutputDirs = true
+    }
+}
+
+//noinspection GrUnresolvedAccess
+license {
+    //noinspection GrUnresolvedAccess
+    header file('COPYING')
+    //noinspection GrUnresolvedAccess
+    include '**/*.java'
+    include '**/*.kt'
+    ext.year = Calendar.getInstance().get(Calendar.YEAR)
+    ext.name = 'TheSilkMiner'
+    ext.email = 'thesilkminer <at> outlook <dot> com'
+    ext.app = 'SKL Interpreter for Java'
+    
+    //noinspection GrUnresolvedAccess
+    strictCheck true
+    //noinspection GrUnresolvedAccess
+    ignoreFailures false
+    
+    //noinspection GrUnresolvedAccess
+    mapping {
+        java = 'SLASHSTAR_STYLE'
+        kt = 'SLASHSTAR_STYLE'
+    }
+}
+
+//noinspection GrUnresolvedAccess
+todo {
+    todoPattern = '\\/(\\/|\\*)(( )|())[\\\\t\\\\s]*(TODO|FIXME)(.*)'
+}
+
+findbugs {
+    ignoreFailures = true
+}
+
+checkstyle {
+    toolVersion = '8.2'
+    configFile = new File(new File(rootDir, 'etc'), 'checkstyle.xml')
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = '1.8'
+}
+
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled = false
+        
+        html.enabled = true
+        html.stylesheet project.resources.text.fromFile('etc/findbugs.xsl')
+        html.destination rootProject.file('build/reports/findbugs.html')
+    }
+}
+
+tasks.withType(Checkstyle) {
+    reports {
+        xml.enabled = true
+        xml.destination rootProject.file('build/reports/checkstyle.xml')
+        
+        html.enabled = true
+        html.stylesheet project.resources.text.fromFile('etc/checkstyle.xsl')
+        html.destination rootProject.file('build/reports/checkstyle.html')
+    }
+}
+
 sourceCompatibility = 1.8
-//noinspection GroovyUnusedAssignment
 targetCompatibility = 1.8
 
-version = sklVersion
-group = "net.thesilkminer.skl"
-//noinspection GroovyUnusedAssignment
-archivesBaseName = "JavaInterpreter"
+group "net.thesilkminer.skl.interpreter"
+version app_version
+archivesBaseName = "SKL-Java-Interpreter"
 
 repositories {
 	mavenCentral()
+	jcenter()
+    google()
 }
 
 configurations {
@@ -39,67 +120,130 @@ configurations {
 }
 
 dependencies {
-	// Guava
-	compile group: 'com.google.guava', name: 'guava', version: '12.0'
-	shade group: 'com.google.guava', name: 'guava', version: '12.0'
-	
 	// Apache Commons-Lang 3
-	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
 	shade group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
-	
-	// Jetbrains Annotations
-	compile group: 'org.jetbrains', name: 'annotations', version: '15.0'
+    
+    // Apache Commons IO
+    shade group: 'commons-io', name: 'commons-io', version: '2.6'
+
+	// Guava: Google Core Libraries For Java
+	shade group: 'com.google.guava', name: 'guava', version: '12.0'
+    
+    // FindBugs Annotations
+    shade group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
+    
+    // FindBugs JSR305
+    shade group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
+    
+    // Jetbrains Annotations
 	shade group: 'org.jetbrains', name: 'annotations', version: '15.0'
+    
+    // jOOλ
+    shade group: 'org.jooq', name: 'jool-java-8', version: '0.9.13'
+    
+    // jOOR
+    shade group: 'org.jooq', name: 'joor-java-8', version: '0.9.7'
+    
+    // jOOU
+    shade group: 'org.jooq', name: 'joou-java-6', version: '0.9.3'
+    
+    // Kotlin Standard Lib
+    compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: "${kotlin_version}"
+    
+    // SilkCommons Core
+    /* TO ADD LATER, WHEN IT IS AVAILABLE */
+    
+    // SLF4J Api Module
+    shade group: 'org.slf4j', name: 'slf4j-api', version: '1.8.0-alpha2'
 	
+    // ======== RUNTIME ONLY DEPENDENCIES ======== //
+    
+    // Apache Log4j
+    runtime group: 'log4j', name: 'log4j', version: '1.2.17'
+    
+    // SLF4J Log4j 12 Binding
+    runtime group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.8.0-alpha2'
+    
+    // ======== TEST ONLY DEPENDENCIES ======== //
+    
 	// JUnit
 	testCompile group: 'junit', name: 'junit', version: '4.12'
+    
+    // Kotlin JUnit
+    testCompile group: 'org.jetbrains.kotlin', name: 'kotlin-test-junit', version: "${kotlin_version}"
 }
 
-//noinspection GroovyAssignabilityCheck
-sourceSets {
-	main {
-		java {
-			srcDir "src/main/java"
-		}
-		resources {
-			srcDir "src/main/resources"
-		}
-	}
-	test {
-		java {
-			srcDir "src/test/java"
-		}
-		resources {
-			srcDir "src/test/resources"
-		}
-	}
+ext.jarManifest = manifest {
+    attributes("Archive-Type": "jar")
 }
 
-//noinspection GroovyAssignabilityCheck
+ext.zipManifest = manifest {
+    attributes("Archive-Type": "zip")
+}
+
+ext.authorsManifest = manifest {
+    attributes("Author": "TheSilkMiner")
+}
+
+ext.runnableManifest = manifest {
+    attributes("Main-Class": "java.lang.RuntimeException")
+}
+
+ext.fatJarManifest = manifest {
+    attributes("Is-Fat": "true")
+}
+
+ext.thinJarManifest = manifest {
+    attributes("Is-Fat": "false")
+}
+
+ext.genericJarManifest = manifest {
+    from ext.jarManifest, ext.authorsManifest, ext.runnableManifest
+}
+
 jar {
-	manifest {
-		attributes (
-			// Use SilkCore syntax when uploaded
-			"Main-Class":"net.thesilkminer.skl.interpreter.JavaInterpreter"
-		)
-	}
+    manifest {
+        from project.genericJarManifest, project.thinJarManifest
+    }
+    exclude '**/log4j.xml'
+    exclude 'org/apache/log4j/custom/**'
 }
 
+//noinspection GrUnresolvedAccess
 shadowJar {
     configurations = [ project.configurations.shade ]
-    exclude '**/*.html'
+    manifest {
+        from project.genericJarManifest, project.fatJarManifest
+    }
+    exclude '**/log4j.xml'
+    exclude 'org/apache/log4j/custom/**'
 }
 
-//noinspection GroovyAssignabilityCheck
+//noinspection GrUnresolvedAccess,GroovyAssignabilityCheck
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    //noinspection GrUnresolvedAccess
+    from sourceSets.main.allSource
+    manifest {
+        from project.thinJarManifest, project.authorsManifest, project.jarManifest
+    }
+}
+
+//noinspection GrUnresolvedAccess,GroovyAssignabilityCheck
 build.dependsOn shadowJar
+//noinspection GrUnresolvedAccess,GroovyAssignabilityCheck
+compileJava.dependsOn licenseMain
+//noinspection GrUnresolvedAccess,GroovyAssignabilityCheck
+licenseMain.dependsOn licenseFormatMain
+//noinspection GrUnresolvedAccess,GroovyAssignabilityCheck
+compileJava.dependsOn checkTodo
+build.dependsOn check
+
+artifacts {
+    archives sourcesJar
+    archives shadowJar
+}
 
 task wrapper (type: Wrapper) {
-	gradleVersion = "2.7-rc-2"
+	gradleVersion = "${gradle_version}"
 }
-
-checkstyle {
-	toolVersion = "6.17"
-	//noinspection GroovyAssignabilityCheck
-	configFile = new File(projectDir, "checkstyle.xml")
-}
-

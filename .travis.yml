@@ -1,48 +1,36 @@
 language: java
 jdk:
+  - oraclejdk9
+  - openjdk9
   - oraclejdk8
   - openjdk8
 sudo: required
 dist: trusty
 before_install:
   - echo Setting up workspace...
-  - echo Before install...
   - chmod +x gradlew
   - ls -a -l -h --color
   - echo Downloading Gradle
   - ./gradlew
-  - echo Gradle 2.7 rc2 running on Linux environment.
   - ./gradlew -version
 install:
-  - echo Install...
   - ./gradlew assemble
 before_script:
-  - echo Starting building process...
-  - echo Before script...
-  - echo Printing dependencies...
+  - echo Starting building process
   - ./gradlew dependencies
 script:
-  - echo Script...
   - ./gradlew check --info
 after_success:
-  - echo Build successfull
-  - echo Now building the artifacts
+  - echo Build successful
   - ./gradlew build --info
-  - echo Deploying artifact
-  - echo == Insert here artifact deploy ==
 after_failure:
   - echo Build failed
-  - echo See the log for errors
-  - echo Deploying build log...
-  - echo == Insert here log deploy ==
 after_script:
-  - echo After script...
-  - echo == Insert cleanup if needed ==
   - echo Build terminated.
 notifications:
   email:
     recipients:
-      - sir.karati@outlook.com
+      - thesilkminer@outlook.com
     on_success: change
     on_failure: always
   slack:

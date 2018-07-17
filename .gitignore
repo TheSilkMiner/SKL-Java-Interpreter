@@ -2,6 +2,7 @@
 *.jar
 
 # Gradle
+!gradle/wrapper/gradle-wrapper.jar
 .gradle/
 build/
 classes/
