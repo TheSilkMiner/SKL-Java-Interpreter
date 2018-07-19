@@ -25,6 +25,7 @@ plugins {
 	id 'maven'
     id 'com.github.ben-manes.versions' version '0.15.0'
     id 'com.github.hierynomus.license' version '0.14.0'
+    id 'org.jetbrains.dokka' version '0.9.17'
 }
 
 apply plugin: 'findbugs'
@@ -74,6 +75,13 @@ findbugs {
 checkstyle {
     toolVersion = '8.2'
     configFile = new File(new File(rootDir, 'etc'), 'checkstyle.xml')
+}
+
+dokka {
+    outputFormat = 'gfm'
+    outputDirectory = "$buildDir/kdoc/md"
+    jdkVersion = 8
+    skipEmptyPackages = false
 }
 
 compileKotlin {
@@ -229,6 +237,14 @@ task sourcesJar(type: Jar, dependsOn: classes) {
     }
 }
 
+task dokkaJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask) {
+    outputFormat = 'javadoc'
+    outputDirectory = "$buildDir/kdoc/javadoc"
+    jdkVersion = 8
+    reportUndocumented = false
+    skipEmptyPackages = false
+}
+
 //noinspection GrUnresolvedAccess,GroovyAssignabilityCheck
 build.dependsOn shadowJar
 //noinspection GrUnresolvedAccess,GroovyAssignabilityCheck
@@ -238,6 +254,8 @@ licenseMain.dependsOn licenseFormatMain
 //noinspection GrUnresolvedAccess,GroovyAssignabilityCheck
 compileJava.dependsOn checkTodo
 build.dependsOn check
+build.dependsOn dokka
+dokka.dependsOn dokkaJavadoc
 
 artifacts {
     archives sourcesJar
