@@ -9,7 +9,6 @@ buildscript {
         }
 	}
 	dependencies {
-        classpath group: 'com.github.jengelman.gradle.plugins', name: 'shadow', version: '1.2.3'
         classpath group: 'net.thesilkminer.gradle.translationchecker', name: 'TranslationChecker', version: '1.1'
         classpath group: 'com.autoscout24.gradle', name: 'gradle-todo-plugin', version: '1.0'
         classpath group: 'org.jetbrains.kotlin', name: 'kotlin-gradle-plugin', version: "${kotlin_version}"
@@ -23,6 +22,7 @@ plugins {
 	id 'visual-studio'
 	id 'checkstyle'
 	id 'maven'
+    id 'com.github.johnrengelman.shadow' version '2.0.4'
     id 'com.github.ben-manes.versions' version '0.15.0'
     id 'com.github.hierynomus.license' version '0.14.0'
     id 'org.jetbrains.dokka' version '0.9.17'
@@ -30,7 +30,6 @@ plugins {
 
 apply plugin: 'findbugs'
 apply plugin: 'kotlin'
-apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'com.autoscout24.gradle.todo'
 
 idea {
@@ -274,6 +273,7 @@ artifacts {
     archives apiSrcJar
 }
 
-task wrapper (type: Wrapper) {
+wrapper {
 	gradleVersion = "${gradle_version}"
+    distributionType = Wrapper.DistributionType.ALL
 }
