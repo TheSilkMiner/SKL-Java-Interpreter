@@ -39,31 +39,24 @@ idea {
     }
 }
 
-//noinspection GrUnresolvedAccess
 license {
-    //noinspection GrUnresolvedAccess
     header file('COPYING')
-    //noinspection GrUnresolvedAccess
     include '**/*.java'
     include '**/*.kt'
     ext.year = Calendar.getInstance().get(Calendar.YEAR)
     ext.name = 'TheSilkMiner'
     ext.email = 'thesilkminer <at> outlook <dot> com'
     ext.app = 'SKL Interpreter for Java'
-    
-    //noinspection GrUnresolvedAccess
+
     strictCheck true
-    //noinspection GrUnresolvedAccess
     ignoreFailures false
-    
-    //noinspection GrUnresolvedAccess
+
     mapping {
         java = 'SLASHSTAR_STYLE'
         kt = 'SLASHSTAR_STYLE'
     }
 }
 
-//noinspection GrUnresolvedAccess
 todo {
     todoPattern = '\\/(\\/|\\*)(( )|())[\\\\t\\\\s]*(TODO|FIXME)(.*)'
 }
@@ -114,7 +107,7 @@ targetCompatibility = 1.8
 
 group "net.thesilkminer.skl.interpreter"
 version app_version
-archivesBaseName = "SKL-Java-Interpreter"
+archivesBaseName = "${archives_name}"
 
 repositories {
 	mavenCentral()
@@ -159,6 +152,9 @@ dependencies {
     compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: "${kotlin_version}"
     
     // SilkCommons Core
+    /* TO ADD LATER, WHEN IT IS AVAILABLE */
+
+    // SilkCommons IO
     /* TO ADD LATER, WHEN IT IS AVAILABLE */
     
     // SLF4J Api Module
@@ -217,7 +213,6 @@ jar {
     exclude 'org/apache/log4j/custom/**'
 }
 
-//noinspection GrUnresolvedAccess
 shadowJar {
     configurations = [ project.configurations.shade ]
     manifest {
@@ -227,10 +222,30 @@ shadowJar {
     exclude 'org/apache/log4j/custom/**'
 }
 
-//noinspection GrUnresolvedAccess,GroovyAssignabilityCheck
+task apiJar(type: Jar) {
+    baseName "${archives_name}-API"
+    version "${api_version}"
+
+    from sourceSets.main.output
+
+    include 'net/thesilkminer/skl/interpreter/skd/api/**'
+
+    classifier = 'api'
+}
+
+task apiSrcJar(type: Jar) {
+    baseName "${archives_name}-API"
+    version "${api_version}"
+
+    from sourceSets.main.allSource
+
+    include 'net/thesilkminer/skl/interpreter/skd/api/**'
+
+    classifier = 'sources'
+}
+
 task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
-    //noinspection GrUnresolvedAccess
     from sourceSets.main.allSource
     manifest {
         from project.thinJarManifest, project.authorsManifest, project.jarManifest
@@ -245,14 +260,9 @@ task dokkaJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask) {
     skipEmptyPackages = false
 }
 
-//noinspection GrUnresolvedAccess,GroovyAssignabilityCheck
 build.dependsOn shadowJar
-//noinspection GrUnresolvedAccess,GroovyAssignabilityCheck
-compileJava.dependsOn licenseMain
-//noinspection GrUnresolvedAccess,GroovyAssignabilityCheck
-licenseMain.dependsOn licenseFormatMain
-//noinspection GrUnresolvedAccess,GroovyAssignabilityCheck
-compileJava.dependsOn checkTodo
+check.dependsOn licenseMain
+check.dependsOn checkTodo
 build.dependsOn check
 build.dependsOn dokka
 dokka.dependsOn dokkaJavadoc
@@ -260,6 +270,8 @@ dokka.dependsOn dokkaJavadoc
 artifacts {
     archives sourcesJar
     archives shadowJar
+    archives apiJar
+    archives apiSrcJar
 }
 
 task wrapper (type: Wrapper) {
