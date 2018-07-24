@@ -92,7 +92,7 @@ import java.util.Optional
  *
  * @since 0.3
  */
-interface ArrayEntity : Entity, Iterable<ArrayEntity> {
+interface ArrayEntity : Entity, Iterable<Entity> {
 
     /**
      * Gets this array-like entity as instance of a "normal"
@@ -234,6 +234,32 @@ interface ArrayEntity : Entity, Iterable<ArrayEntity> {
      * @since 0.3
      */
     fun clear()
+
+    /**
+     * Validates this array-like entity, checking that every child
+     * entity respect this array-like entity contract.
+     *
+     * The presence of this method is required due to the possibility
+     * of altering the structure of the array-like entity by adding
+     * an entity which respects the contract, but then using the
+     * instance to alter it.
+     *
+     * This method should be called by parsers and consumers alike,
+     * before finalizing an entity.
+     *
+     * @param[autoFix] Whether contract-violating entities should be
+     * automatically fixed, either by modifying their children or by
+     * removing them completely. The method used to fix an entity is
+     * left to the implementation. By default, the value of this
+     * parameter is `false`.
+     * @exception IllegalStateException If this method identifies
+     * contract-violating entities in this array-like entity and is
+     * unable to fix them, either because `autoFix` is `false` or
+     * because the array-like entity is corrupted beyond repair.
+     *
+     * @since 0.3
+     */
+    fun validate(autoFix: Boolean = false)
 
     /**
      * Adds an entity as a child of this entity.
@@ -414,7 +440,9 @@ interface ArrayEntity : Entity, Iterable<ArrayEntity> {
      *
      * @since 0.3
      */
-    override fun addChildInfoPair(infoPair: InfoPair<*>)
+    override fun addChildInfoPair(infoPair: InfoPair<*>) {
+        throw UnsupportedOperationException("Information pairs are not supported in array-like entities")
+    }
 
     /**
      * Gets a collection of all information pairs that are
@@ -429,7 +457,9 @@ interface ArrayEntity : Entity, Iterable<ArrayEntity> {
      *
      * @since 0.3
      */
-    override fun getChildInfoPairs(): Collection<InfoPair<*>>
+    override fun getChildInfoPairs(): Collection<InfoPair<*>> {
+        throw UnsupportedOperationException("Information pairs are not supported in array-like entities")
+    }
 
     /**
      * Removes the given information pair from the information
@@ -443,7 +473,9 @@ interface ArrayEntity : Entity, Iterable<ArrayEntity> {
      *
      * @since 0.3
      */
-    override fun removeChildInfoPair(infoPair: InfoPair<*>)
+    override fun removeChildInfoPair(infoPair: InfoPair<*>) {
+        throw UnsupportedOperationException("Information pairs are not supported in array-like entities")
+    }
 
     /**
      * Removes the child information pair identified by the given
@@ -457,7 +489,9 @@ interface ArrayEntity : Entity, Iterable<ArrayEntity> {
      *
      * @since 0.3
      */
-    override fun removeChildInfoPair(id: String)
+    override fun removeChildInfoPair(id: String) {
+        throw UnsupportedOperationException("Information pairs are not supported in array-like entities")
+    }
 
     /**
      * Removes the child information pair with the given key from
@@ -471,7 +505,9 @@ interface ArrayEntity : Entity, Iterable<ArrayEntity> {
      *
      * @since 0.3
      */
-    override fun removeChildInfoPairByKey(key: String)
+    override fun removeChildInfoPairByKey(key: String) {
+        throw UnsupportedOperationException("Information pairs are not supported in array-like entities")
+    }
 
     /**
      * Removes all children information pairs with the given key
@@ -485,7 +521,9 @@ interface ArrayEntity : Entity, Iterable<ArrayEntity> {
      *
      * @since 0.3
      */
-    override fun removeAllChildrenInfoPairByKey(key: String)
+    override fun removeAllChildrenInfoPairByKey(key: String) {
+        throw UnsupportedOperationException("Information pairs are not supported in array-like entities")
+    }
 
     /**
      * Finds all the children information pairs of this entity with
@@ -501,7 +539,9 @@ interface ArrayEntity : Entity, Iterable<ArrayEntity> {
      *
      * @since 0.3
      */
-    override fun findChildInfoPairsByKey(key: String): Collection<InfoPair<*>>
+    override fun findChildInfoPairsByKey(key: String): Collection<InfoPair<*>> {
+        throw UnsupportedOperationException("Information pairs are not supported in array-like entities")
+    }
 
     /**
      * Finds the child information pair of this entity with the
@@ -517,5 +557,7 @@ interface ArrayEntity : Entity, Iterable<ArrayEntity> {
      *
      * @since 0.3
      */
-    override fun findChildInfoPair(id: String): Optional<InfoPair<*>>
+    override fun findChildInfoPair(id: String): Optional<InfoPair<*>> {
+        throw UnsupportedOperationException("Information pairs are not supported in array-like entities")
+    }
 }
