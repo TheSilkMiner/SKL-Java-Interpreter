@@ -259,11 +259,23 @@ task dokkaJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask) {
     skipEmptyPackages = false
 }
 
+task copyDokkaDocs(type: Copy) {
+    delete "${project.projectDir}/docs"
+
+    mkdir "${project.projectDir}/docs"
+
+    from("$buildDir/kdoc/md") {
+        include "**"
+    }
+    into "${project.projectDir}/docs"
+}
+
 build.dependsOn shadowJar
 check.dependsOn licenseMain
 check.dependsOn checkTodo
 build.dependsOn check
-build.dependsOn dokka
+build.dependsOn copyDokkaDocs
+copyDokkaDocs.dependsOn dokka
 dokka.dependsOn dokkaJavadoc
 
 artifacts {
