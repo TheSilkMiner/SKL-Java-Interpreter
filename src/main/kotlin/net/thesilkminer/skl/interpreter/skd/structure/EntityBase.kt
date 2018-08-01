@@ -39,6 +39,7 @@ class EntityBase(name: String) : Entity, ArrayEntity {
     private var referenceEntity: Entity? = null
 
     init {
+        Preconditions.checkArgument(name.isNotBlank(), "Provided name is not valid: cannot be blank")
         Preconditions.checkArgument(name.chars().allMatch {
             val c = it.toChar()
             Character.isLetterOrDigit(c) ||

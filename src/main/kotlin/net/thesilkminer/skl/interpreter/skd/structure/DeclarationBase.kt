@@ -11,6 +11,7 @@ class DeclarationBase(key: String, value: String) : Declaration {
     private var value: String
 
     init {
+        Preconditions.checkArgument(key.isNotBlank(), "Key cannot be blank")
         Preconditions.checkArgument(key.chars().allMatch {
             Character.isUpperCase(it.toChar()) || it.toChar() == '_'
         }, "Key $key does not respect constraints: it must be all uppercase and cannot contain symbols but _")
