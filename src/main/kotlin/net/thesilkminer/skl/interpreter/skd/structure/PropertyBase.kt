@@ -2,6 +2,7 @@ package net.thesilkminer.skl.interpreter.skd.structure
 
 import com.google.common.base.Preconditions
 import com.google.common.collect.ImmutableList
+import net.thesilkminer.skl.interpreter.skd.SupportedStringConverterTypes
 import net.thesilkminer.skl.interpreter.skd.api.structure.Property
 import net.thesilkminer.skl.interpreter.skd.convertFromSkdPropertyRepresentation
 import net.thesilkminer.skl.interpreter.skd.convertToSkdPropertyRepresentation
@@ -43,7 +44,8 @@ class PropertyBase<T>(name: String, value: T) : Property<T> {
 
     override fun setValueFromString(stringValue: String) {
         val type = getTypeFromAny(this.value)
-        val optional = convertFromSkdPropertyRepresentation<T>(stringValue, type)
+        val nullProbably = convertFromSkdPropertyRepresentation<T>(stringValue, SupportedStringConverterTypes.NULL_TYPE)
+        val optional = if (nullProbably?.isPresent == false) convertFromSkdPropertyRepresentation(stringValue, type) else nullProbably
         // Nullable boolean check, I'm sorry, I know it is ugly
         if (optional?.isPresent == true) {
             // Value found and parsing was successful. Set the value

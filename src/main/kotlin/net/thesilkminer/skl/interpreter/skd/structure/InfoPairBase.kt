@@ -1,6 +1,7 @@
 package net.thesilkminer.skl.interpreter.skd.structure
 
 import com.google.common.base.Preconditions
+import net.thesilkminer.skl.interpreter.skd.SupportedStringConverterTypes
 import net.thesilkminer.skl.interpreter.skd.api.structure.InfoPair
 import net.thesilkminer.skl.interpreter.skd.convertFromSkdPropertyRepresentation
 import net.thesilkminer.skl.interpreter.skd.convertToSkdPropertyRepresentation
@@ -32,7 +33,8 @@ class InfoPairBase<T>(key: String, value: T) : InfoPair<T> {
 
     override fun setValueFromString(value: String) {
         val type = getTypeFromAny(this.value)
-        val optional = convertFromSkdPropertyRepresentation<T>(value, type)
+        val nullProbably = convertFromSkdPropertyRepresentation<T>(value, SupportedStringConverterTypes.NULL_TYPE)
+        val optional = if (nullProbably?.isPresent == false) convertFromSkdPropertyRepresentation(value, type) else nullProbably
         // Nullable boolean check, I'm sorry, I know it is ugly
         if (optional?.isPresent == true) {
             // Value found and parsing was successful. Set the value

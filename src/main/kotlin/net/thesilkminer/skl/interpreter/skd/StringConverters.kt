@@ -99,7 +99,7 @@ fun <T> convertFromSkdPropertyRepresentation(s: String, t: SupportedStringConver
         }
         SupportedStringConverterTypes.FLOAT -> s.removeSuffix("F").toFloatOrNull()
         SupportedStringConverterTypes.DOUBLE -> s.removeSuffix("D").toDoubleOrNull()
-        else -> null
+        else -> if (s == "kotlin.Unit" && t == SupportedStringConverterTypes.ANY) Unit else null
     }
 
     return try {

@@ -428,7 +428,7 @@ class EntityBase(name: String) : Entity, ArrayEntity {
     private fun checkPropertyNameConstraints(name: String, alreadyPresent: Boolean = false) : Boolean {
         if (name == "id") return false
         if (PropertyBase.INTERNAL_PROPERTIES_NAMES.contains(name)) return false
-        if (alreadyPresent && this.properties.filter { return it.getName() == name }.count() > 0) {
+        if (alreadyPresent && this.properties.filter { it.getName() == name }.count() > 0) {
             return false
         }
         return true

@@ -96,7 +96,7 @@ interface Declaration {
                         "Given key $key is invalid")
 
                 val values = DeclarationType.values()
-                for (i in 0..values.size) {
+                for (i in 0 until values.size) {
                     if (values[i].key == CATCH_ALL_KEY) continue
                     if (values[i].key == key) return values[i]
                 }

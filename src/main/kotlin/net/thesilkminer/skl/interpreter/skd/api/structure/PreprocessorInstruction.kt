@@ -34,7 +34,7 @@ interface PreprocessorInstruction {
 
     @Retention(AnnotationRetention.SOURCE)
     @Target(AnnotationTarget.FIELD)
-    private annotation class InternalPreprocessorInstruction
+    private annotation class InternalOnly
 
     /**
      * Identifies a type of preprocessor instruction.
@@ -60,15 +60,15 @@ interface PreprocessorInstruction {
         DEFINE_ENVIRONMENT_VARIABLE("var"),
         DEFINE_MACRO("mac"),
         SYNTAX("syntax"),
-        @InternalPreprocessorInstruction DELETED_LINE("dln"),
+        @InternalOnly DELETED_LINE("dln"),
         THROW_ERROR("throw"),
         IF_VARIABLE_OR_PROPERTY_DEFINED("ifdef"),
         IF_VARIABLE_OR_PROPERTY_NOT_DEFINED("ifndef"),
         ELSE("else"),
         END_IF_STATEMENT("endif"),
         INCLUDE_FILE("include"),
-        @InternalPreprocessorInstruction INCLUDE_FILE_BEGIN_MARK("ibg"),
-        @InternalPreprocessorInstruction INCLUDE_FILE_END_MARK("ied"),
+        @InternalOnly INCLUDE_FILE_BEGIN_MARK("ibg"),
+        @InternalOnly INCLUDE_FILE_END_MARK("ied"),
         SUB_ENTITY_NAME_ASSIGNATION("nameassign");
 
         companion object {
@@ -86,7 +86,7 @@ interface PreprocessorInstruction {
              */
             fun fromKeyword(keyword: String) : InstructionType {
                 val values = InstructionType.values()
-                for (i in 0..values.size) {
+                for (i in 0 until values.size) {
                     if (values[i].keyword == keyword) return values[i]
                 }
                 throw IllegalArgumentException("Invalid keyword specified")

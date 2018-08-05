@@ -19,7 +19,7 @@ class DatabaseBase(entity: Entity) : Database {
     override fun getDeclarations(): Collection<Declaration> = ImmutableList.copyOf(this.declarations)
 
     override fun addDeclaration(declaration: Declaration) {
-        Preconditions.checkArgument(this.declarations.any { it.getKey() == declaration.getKey() },
+        Preconditions.checkArgument(!this.declarations.any { it.getKey() == declaration.getKey() },
                 "There is already a declaration in the database with the same key")
         this.declarations.add(declaration)
     }
