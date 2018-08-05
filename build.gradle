@@ -24,9 +24,9 @@ plugins {
 	id 'maven'
     id 'com.github.johnrengelman.shadow' version '2.0.4'
     id 'com.github.ben-manes.versions' version '0.15.0'
-    id 'com.github.hierynomus.license' version '0.14.0'
     id 'org.jlleitschuh.gradle.ktlint' version '4.1.0'
     id 'org.jetbrains.dokka' version '0.9.17'
+    id 'net.minecrell.licenser' version '0.4.1'
 }
 
 apply plugin: 'findbugs'
@@ -40,20 +40,23 @@ idea {
 }
 
 license {
-    header file('COPYING')
+    header = project.file('COPYING')
+
     include '**/*.java'
     include '**/*.kt'
-    ext.year = Calendar.getInstance().get(Calendar.YEAR)
-    ext.name = 'TheSilkMiner'
-    ext.email = 'thesilkminer <at> outlook <dot> com'
-    ext.app = 'SKL Interpreter for Java'
 
-    strictCheck true
+    ext {
+        year = Calendar.getInstance().get(Calendar.YEAR)
+        name = 'TheSilkMiner'
+        email = 'thesilkminer <at> outlook <dot> com'
+        app = 'SKL Interpreter for Java'
+    }
+
     ignoreFailures false
 
-    mapping {
-        java = 'SLASHSTAR_STYLE'
-        kt = 'SLASHSTAR_STYLE'
+    style {
+        java = 'BLOCK_COMMENT'
+        kt = 'BLOCK_COMMENT'
     }
 }
 
@@ -284,7 +287,7 @@ task copyDokkaDocs(type: Copy) {
 }
 
 build.dependsOn shadowJar
-check.dependsOn licenseMain
+check.dependsOn licenseCheck
 check.dependsOn checkTodo
 build.dependsOn check
 build.dependsOn copyDokkaDocs

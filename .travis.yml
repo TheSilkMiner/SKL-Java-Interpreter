@@ -33,6 +33,3 @@ notifications:
       - thesilkminer@outlook.com
     on_success: change
     on_failure: always
-  slack:
-    on_success: always
-    on_failure: always
