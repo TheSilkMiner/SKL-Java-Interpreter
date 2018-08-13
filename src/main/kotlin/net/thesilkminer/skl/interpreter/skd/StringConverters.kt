@@ -1,4 +1,4 @@
-@file:JvmName("SkdUtilitiesKt")
+@file:JvmName("UtilitiesKt")
 @file:JvmMultifileClass
 
 package net.thesilkminer.skl.interpreter.skd
