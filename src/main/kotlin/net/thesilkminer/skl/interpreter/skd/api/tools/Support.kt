@@ -78,6 +78,13 @@ interface Support {
      * If no line is available, then the implementation must
      * return `null`.
      *
+     * If the underlying implementation uses an input stream
+     * of some sort to read the contents of this support,
+     * then the used input stream must be closed once the end
+     * of it is reached. In other words, if this method
+     * returns a `null` value, then the underlying input stream
+     * must be closed.
+     *
      * @return The next line of input or `null` if it is not
      * available.
      *
@@ -106,7 +113,16 @@ interface Support {
      * error occurs, implementations should throw an instance
      * of [WritingException].
      *
+     * If an implementation chooses to use a writing stream
+     * to write to the physical and/or "ethereal" support
+     * the given data, then the implementation must not close
+     * the stream at the end of the writing process, to
+     * allow for more data to be appended. To close the stream
+     * the callee must manually call [terminateWriting].
+     *
      * @param[str] The string to write on the support.
+     * @exception WritingException If writing fails for some
+     * reason or writing is not supported on this support.
      *
      * @since 0.3
      */
@@ -121,10 +137,39 @@ interface Support {
      * error occurs, implementations should throw an instance
      * of [WritingException].
      *
+     * Closing both the input stream and the writing stream is
+     * left to the caller of this method. Refer to [write] and
+     * [terminateWriting] for more information.
+     *
      * @param[str] The stream containing the data to write on
-     * the support.
+     * the support. The stream is not automatically closed at
+     * the end of the call.
+     * @exception WritingException If this support is not
+     * writable or another exception occurs while writing the
+     * contents of the stream on the support.
      *
      * @since 0.3
      */
     fun write(str: InputStream)
+
+    /**
+     * Terminates the writing process by closing the stream
+     * used by this support, if available, else it does
+     * nothing.
+     *
+     * Implementations that do not rely on streams must
+     * simply leave this method implementation as a NO-OP,
+     * while supports that do not support writing are
+     * allowed to throw an exception.
+     *
+     * If closing happens to throw an exception, then it
+     * must be wrapped into an instance of [WritingException].
+     *
+     * @exception WritingException If this support is not
+     * writable or any other reason occurs while closing this
+     * input stream.
+     *
+     * @since 0.3
+     */
+    fun terminateWriting()
 }
