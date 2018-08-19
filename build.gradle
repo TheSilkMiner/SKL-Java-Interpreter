@@ -9,6 +9,7 @@ buildscript {
         }
 	}
 	dependencies {
+        classpath group: 'commons-io', name: 'commons-io', version: '2.0.1' // Workaround for Scout24/gradle-todo-plugin#2
         classpath group: 'net.thesilkminer.gradle.translationchecker', name: 'TranslationChecker', version: '1.1'
         classpath group: 'com.autoscout24.gradle', name: 'gradle-todo-plugin', version: '1.0'
         classpath group: 'org.jetbrains.kotlin', name: 'kotlin-gradle-plugin', version: "${kotlin_version}"
@@ -51,8 +52,6 @@ license {
         email = 'thesilkminer <at> outlook <dot> com'
         app = 'SKL Interpreter for Java'
     }
-
-    ignoreFailures = false
 
     style {
         java = 'BLOCK_COMMENT'
