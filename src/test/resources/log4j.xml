@@ -8,7 +8,7 @@
             <param name="ConversionPattern" value="[%d{hh:mm:ss aaa}] [%t/%p] [%c{1}]: %m%n" />
         </layout>
     </appender>
-    <appender name="FileAppender" class="org.apache.log4j.FileAppender">
+    <appender name="FileAppender" class="org.apache.log4j.custom.MultipleFilesAppender">
         <param name="File" value="build/logs/app.log" />
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="[%d{hh:mm:ss aaa}] [%t/%p] [%c{1}]: %m%n" />

@@ -8,6 +8,30 @@ import kotlin.reflect.KClass
 class L(c: KClass<*>) {
     constructor(a: Any): this(a::class)
 
+    companion object {
+        var h = false
+    }
+
+    init {
+        if (System.getProperty("slf4j.detectLoggerNameMismatch") == null) {
+            System.setProperty("slf4j.detectLoggerNameMismatch", "true")
+        }
+
+        try {
+            @Suppress("NO_REFLECTION_IN_CLASS_PATH")
+            if (c.isCompanion) {
+                System.err.println("sL: [WARN] Logger will be initialized on companion object - " +
+                        "in Java this means that \$Companion will be appended to the class name")
+            }
+        } catch (e: Throwable) {
+            if (!h && e is KotlinReflectionNotSupportedError) {
+                System.out.println("sL: Missing Reflection in class path - unable to check preconditions")
+                e.printStackTrace(System.out)
+                h = true
+            }
+        }
+    }
+
     private val logger: org.slf4j.Logger by lazy {
         LoggerFactory.getLogger(c.java)
     }
