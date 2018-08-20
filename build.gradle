@@ -53,10 +53,15 @@ license {
         app = 'SKL Interpreter for Java'
     }
 
+    ignoreFailures = false
+
+    /*
+    // Workaround for Minecrell/licenser#10
     style {
         java = 'BLOCK_COMMENT'
         kt = 'BLOCK_COMMENT'
     }
+    */
 }
 
 todo {

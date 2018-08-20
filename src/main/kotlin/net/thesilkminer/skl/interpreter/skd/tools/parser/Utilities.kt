@@ -9,7 +9,7 @@ class L(c: KClass<*>) {
     constructor(a: Any): this(a::class)
 
     companion object {
-        var h = false
+        private var h = false
     }
 
     init {
