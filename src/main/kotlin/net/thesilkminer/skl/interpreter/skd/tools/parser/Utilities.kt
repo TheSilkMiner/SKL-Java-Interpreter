@@ -1,7 +1,10 @@
 @file:JvmName("PUtK")
+@file:JvmMultifileClass
 
 package net.thesilkminer.skl.interpreter.skd.tools.parser
 
+import net.thesilkminer.skl.interpreter.skd.plusAssign
+import net.thesilkminer.skl.interpreter.skd.invoke
 import org.slf4j.LoggerFactory
 import kotlin.reflect.KClass
 
@@ -17,6 +20,13 @@ class L(c: KClass<*>) {
             System.setProperty("slf4j.detectLoggerNameMismatch", "true")
         }
 
+        if (h) {
+            if (c.java.name.endsWith("\$Companion")) {
+                System.err.println("sL: [WARN] Logger will be initialized on companion object - " +
+                        "in Java this means that \$Companion will be appended to the class name")
+            }
+        }
+
         try {
             @Suppress("NO_REFLECTION_IN_CLASS_PATH")
             if (c.isCompanion) {
@@ -25,9 +35,14 @@ class L(c: KClass<*>) {
             }
         } catch (e: Throwable) {
             if (!h && e is KotlinReflectionNotSupportedError) {
-                System.out.println("sL: Missing Reflection in class path - unable to check preconditions")
+                System.out.println("sL: Missing Reflection in class path - falling back to Java-based preconditions checking")
                 e.printStackTrace(System.out)
                 h = true
+
+                if (c.java.name.endsWith("\$Companion")) {
+                    System.err.println("sL: [WARN] Logger will be initialized on companion object - " +
+                            "in Java this means that \$Companion will be appended to the class name")
+                }
             }
         }
     }
@@ -64,6 +79,7 @@ class LineNumber private constructor(private val lineNumber: Int) {
     }
 
     fun toInt(): Int = this.lineNumber - 1
+    fun toLong(): Long = this.toInt().toLong()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -74,6 +90,14 @@ class LineNumber private constructor(private val lineNumber: Int) {
 
     override fun hashCode(): Int = this.lineNumber
     override fun toString(): String = "${this.lineNumber}"
+}
+
+fun buildMessage(msg: String, line: LineNumber, found: String, errorIndex: Int): String {
+    val builder = StringBuilder()
+    builder += "Error line $line - $msg\n$found\n"
+    for (i in 1 until errorIndex) builder += ERROR_MESSAGE_ERROR_LINE_BEFORE
+    builder += ERROR_MESSAGE_ERROR_MARKER
+    return builder()
 }
 
 fun Int.toLineNumber(): LineNumber = LineNumber(this + 1)

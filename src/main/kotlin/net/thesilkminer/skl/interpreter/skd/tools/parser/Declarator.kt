@@ -1,3 +1,6 @@
+@file:JvmName("PUtK")
+@file:JvmMultifileClass
+
 package net.thesilkminer.skl.interpreter.skd.tools.parser
 
 import com.google.common.collect.Lists
@@ -273,12 +276,4 @@ internal class MisplacedDeclarationException(message: String): Exception(message
 internal class RequiredDeclarationNotFoundException(message: String): Exception(message)
 internal class MultipleDeclarationsWithSameKeyFoundException(message: String): Exception(message)
 
-private fun buildMessage(msg: String, line: LineNumber, found: String, errorIndex: Int): String {
-    val builder = StringBuilder()
-    builder.append("Error line $line - $msg\n$found\n")
-    for (i in 1 until errorIndex) builder.append(ERROR_MESSAGE_ERROR_LINE_BEFORE)
-    builder.append(ERROR_MESSAGE_ERROR_MARKER)
-    return builder.toString()
-}
-
-private fun String.isValidKey(): Boolean = this.isUpperCase() && this.asSequence().filterNot { it.isLetter() }.filter { it == '_' }.none()
+private fun String.isValidKey(): Boolean = this.isUpperCase() && this.asSequence().filterNot { it.isLetter() }.filter { it != '_' }.none()

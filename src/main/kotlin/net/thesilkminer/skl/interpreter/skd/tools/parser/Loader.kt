@@ -1,7 +1,12 @@
+@file:JvmName("PUtK")
+@file:JvmMultifileClass
+
 package net.thesilkminer.skl.interpreter.skd.tools.parser
 
 import com.google.common.collect.Lists
 import net.thesilkminer.skl.interpreter.skd.api.tools.Support
+import net.thesilkminer.skl.interpreter.skd.extractMessage
+import net.thesilkminer.skl.interpreter.skd.rethrowAs
 
 internal class Loader(private val support: Support) {
 
@@ -15,7 +20,7 @@ internal class Loader(private val support: Support) {
             this.loadImplementation()
         } catch (e: Exception) {
             l.e("An exception has been thrown while attempting to load file into memory - parsing cannot continue")
-            throw LoadingException(e)
+            e rethrowAs ::LoadingException
         }
     }
 
@@ -31,4 +36,4 @@ internal class Loader(private val support: Support) {
     }
 }
 
-internal class LoadingException(cause: Throwable?) : Exception(cause?.message, cause)
+internal class LoadingException(cause: Throwable?) : Exception(cause.extractMessage(), cause)
