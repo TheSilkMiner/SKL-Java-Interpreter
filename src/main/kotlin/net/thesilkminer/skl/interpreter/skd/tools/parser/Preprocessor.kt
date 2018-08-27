@@ -32,7 +32,7 @@ class Preprocessor(private val lines: MutableList<String>) {
     private val variables: MutableList<Variable> = Lists.newArrayList()!!
     private val macros: MutableList<Macro> = Lists.newArrayList()!!
 
-    private val specialAccessInstructions: MutableMap<QueryType, Any> = mutableMapOf()
+    private val specialAccessInstructions: MutableMap<QueryType, Any> = SpecialAccessInstructionsMutableMap()
     private val linesWithReplacements: MutableMap<LineNumber, String> = mutableMapOf()
 
     init {
@@ -50,6 +50,8 @@ class Preprocessor(private val lines: MutableList<String>) {
         this.linesWithReplacements.clear()
         l.t("Starting include lines processing")
         this.processIncludes(this.lines)
+        l.t("Checking for runaway if clauses")
+        this.checkRunawayIfClauses()
         l.i("Terminating preprocessor")
         l.i("Successfully found and parsed {} instructions", this.instructions.count())
         l.t("Logging wrappers")
@@ -82,7 +84,7 @@ class Preprocessor(private val lines: MutableList<String>) {
     private fun populateWithDefaultVariables() {
         l.t("Populating with default variables")
         this.variables.add(Variable("__PREPROCESSOR_VERSION", "0.3"))
-        //this.variables.add(Variable("__RECURSIVE_PREPROCESSOR_DEPTH", "0"))
+        //this.variables.add(Variable("__RECURSIVE_PREPROCESSOR_DEPTH", "0")) TODO()
     }
 
     private fun populateWithDefaultMacros() {
@@ -145,7 +147,7 @@ class Preprocessor(private val lines: MutableList<String>) {
             message += "\nPlease make sure that the instruction follows the rules and that it is a valid instruction "
             message += "for the preprocessor.\nCheck the preprocessor documentations and the docs directory on GitHub "
             message += "for more information."
-            throw InvalidPreprocessorInstructionException(buildMessage(message(), i.toLineNumber(), s, 2), e)
+            throw InvalidPreprocessorInstructionException(buildMessage(message(), i.toLineNumber(), "<#$s>", 2), e)
         }
         
         when (pi.getInstructionType()) {
@@ -156,7 +158,7 @@ class Preprocessor(private val lines: MutableList<String>) {
                 throw InternalOnlyPreprocessorInstructionException(buildMessage(
                         "You cannot use an instruction marked @InternalOnly in a database. These instructions " +
                                 "can be used only by the parser and/or the preprocessor itself.",
-                        i.toLineNumber(), s, 3
+                        i.toLineNumber(), "<#$s>", 3
                 ))
             }
             PI.InstructionType.DEFINE_ENVIRONMENT_PROPERTY -> {
@@ -201,10 +203,10 @@ class Preprocessor(private val lines: MutableList<String>) {
                 }
                 if (maybeClass == null) {
                     val errorMessage = pi.stringifyArguments()
-                    throw ThrowException(buildMessage(errorMessage, i.toLineNumber(), s, "<#throw a".count()))
+                    throw ThrowException(buildMessage(errorMessage, i.toLineNumber(), "<#$s>", "<#throw a".count()))
                 }
                 val errorMessage = pi.stringifyArguments().removePrefix(argumentsList[0]).trimStart()
-                val builtMessage = buildMessage(errorMessage, i.toLineNumber(), s, "<#throw a".count())
+                val builtMessage = buildMessage(errorMessage, i.toLineNumber(), "<#$s>", "<#throw a".count())
                 try {
                     l.e("FATAL ERROR! The preprocessor was asked to throw an exception!")
                     l.e("FATAL ERROR! {}", errorMessage)
@@ -217,7 +219,7 @@ class Preprocessor(private val lines: MutableList<String>) {
                         throw throwable
                     }
                 } catch (e: ReflectiveOperationException) {
-                    e.initCause(ThrowException(buildMessage(errorMessage, i.toLineNumber(), s, "<#throw a".count())))
+                    e.initCause(ThrowException(buildMessage(errorMessage, i.toLineNumber(), "<#$s>", "<#throw a".count())))
                     throw e
                 }
             }
@@ -227,29 +229,28 @@ class Preprocessor(private val lines: MutableList<String>) {
             }
             PI.InstructionType.ELSE -> {
                 l.d("Found else conditional instruction")
-                if (this.ifStack.peek() == null) {
+                val oldIf = this.ifStack.peek()
+                l.t("Old if value: disabled? {}", oldIf?.status == IfElement.DISABLED_IF)
+                val newIf = try {
+                    this.ifStack.pushElse()
+                    this.ifStack.peek()
+                } catch (e: Exception) {
                     l.e("FATAL! Found else without a matching if before!")
                     throw IllegalElseLocationException(buildMessage(
-                            "Found else instruction without matching if clause. Make sure the syntax is something like " +
-                                    "<#if xxx>\n...\n<#else>",
-                            i.toLineNumber(), s, 3
-                    ))
-                }
-                l.t("Old if value: disabled? {}", this.ifStack.peek() != null && this.ifStack.peek() == IfStack.DISABLED_IF)
-                when (this.ifStack.pop()) {
-                    IfStack.DISABLED_IF -> this.ifStack.pushEnabled()
-                    IfStack.ENABLED_IF -> this.ifStack.pushDisabled()
-                    else -> throw IllegalStateException("How is that even possible? Boolean was both not true and not false!")
-                }
-                l.t("New if value: disabled? {}", this.ifStack.peek() != null && this.ifStack.peek() == IfStack.DISABLED_IF)
+                            "Found else instruction without matching if clause.\n" +
+                                    "Make sure you did not forget an if instruction before",
+                            i.toLineNumber(), "<#$s>", 3
+                    ), e)
+                } ?: throw IllegalStateException("newIf == null after else push!")
+                l.t("New if value: disabled? {}", newIf.status == IfElement.DISABLED_IF)
             }
             PI.InstructionType.END_IF_STATEMENT -> {
                 l.d("Found termination of conditional statement {}", pi.getInstruction())
                 if (this.ifStack.peek() == null) {
                     l.e("FATAL! Found end if without a matching if before!")
                     throw IllegalEndIfLocationException(buildMessage(
-                            "Found if terminating instruction without a matching if clause. Make sure you are not missing an " +
-                                    "if instruction before.", i.toLineNumber(), s, 3
+                            "Found if terminating instruction without a matching if clause.\nMake sure you are not missing an " +
+                                    "if instruction before.", i.toLineNumber(), "<#$s>", 3
                     ))
                 }
                 l.t("Removing if from stack, was {}", this.ifStack.pop())
@@ -279,8 +280,8 @@ class Preprocessor(private val lines: MutableList<String>) {
             return
         }
 
-        val lineBefore = this.lines[i - 1]
-        val lineAfter = this.lines[i + 1]
+        val lineBefore = this.lines.safeGet(i - 1, "skd\$noPrevLine")
+        val lineAfter = this.lines.safeGet(i + 1, "skd\$noNextLine")
         val wrapper = PIWrapper(pi, lineBefore, lineAfter)
         this.instructions.add(wrapper)
         l.t("Added {} to instructions found", wrapper)
@@ -341,7 +342,9 @@ class Preprocessor(private val lines: MutableList<String>) {
 
         val newInstruction = Skd.provider.buildPreprocessorInstruction(
                 "${PI.InstructionType.DELETED_LINE.keyword} $s", i.toLineNumber().toLong())
-        this.instructions.add(PIWrapper(newInstruction, this.lines[i - 1], this.lines[i + 1]))
+        this.instructions.add(PIWrapper(newInstruction, this.lines.safeGet(i - 1, "skd\$noPrevLine"),
+                this.lines.safeGet(i + 1, "skd\$noNextLine")))
+        this.linesWithReplacements[i.toLineNumber()] = "<#${PI.InstructionType.DELETED_LINE.keyword} $s>"
     }
 
     private fun handleReplacements(i: Int, s: String) {
@@ -356,8 +359,11 @@ class Preprocessor(private val lines: MutableList<String>) {
     private fun handleVariableReplacements(i: Int, s: String): String {
         val builder = StringBuilder()
         val words = s.split(" ")
-        words.forEach { builder += this.handleVariableReplacement(it) }
-        val result = builder()
+        words.forEach {
+            builder += this.handleVariableReplacement(it)
+            builder += " "
+        }
+        val result = builder().trimEnd()
         if (s != result) {
             l.t("Performed variable replacements on line {}: '{}' -> '{}'", i.toLineNumber(), s, result)
         }
@@ -365,8 +371,23 @@ class Preprocessor(private val lines: MutableList<String>) {
     }
 
     private fun handleVariableReplacement(w: String): String {
+        if (w.chars().filter { it.toChar() == '"' }.count() > 1) {
+            return this.handleQuotedReplacement(w) { this.handleVariableReplacement(it) }
+        }
         if (this.variables.map { it.name }.contains(w)) return this.variables.first { it.name == w }.value
         return w
+    }
+
+    private fun handleQuotedReplacement(w: String, f: (String) -> String): String {
+        val builder = StringBuilder()
+        val words = w.split("\"")
+        words.forEach {
+            builder += f(it)
+            builder += "\""
+        }
+        val result = builder().removeSuffix("\"")
+        -builder
+        return result
     }
 
     private fun handleMacroReplacements(i: Int, s: String): String {
@@ -391,8 +412,11 @@ class Preprocessor(private val lines: MutableList<String>) {
         if (builder().isNotBlank()) macroWords.add(builder())
         -builder
         macroWords.removeIf { it.isBlank() }
-        macroWords.forEach { builder += this.handleMacroReplacement(it) }
-        val result = builder()
+        macroWords.forEach {
+            builder += this.handleMacroReplacement(it)
+            builder += " "
+        }
+        val result = builder().trimEnd()
         if (s != result) {
             l.t("Performed macro replacements on line {}: '{}' -> '{}'", i.toLineNumber(), s, result)
         }
@@ -400,8 +424,14 @@ class Preprocessor(private val lines: MutableList<String>) {
     }
 
     private fun handleMacroReplacement(w: String): String {
+        if (w.chars().filter { it.toChar() == '"' }.count() > 1) {
+            return this.handleQuotedReplacement(w) { this.handleMacroReplacement(it) }
+        }
+        if (!w.contains(Regex("[()]"))) return w
         val (name, argString) = w.split(Regex("[()]"), limit = 2)
-        val args = argString.split(",").map { it.trim() }
+        val args = (if (argString.endsWith(")")) argString.removeSuffix(")") else argString)
+                .split(",").map { it.trim() }
+        l.t("Found macro string: '{}' passed into parameters {}", argString, args)
         val macro = this.macros.filter { it.name == name }.firstOrNull { it.parameters.count() == args.count() }
         if (macro == null) {
             l.w("Found macro invocation {}, but no valid macro was found", w)
@@ -413,8 +443,13 @@ class Preprocessor(private val lines: MutableList<String>) {
         for (i in 0 until macroArgs.count()) {
             val id = macroArgs[i]
             val replacement = args[i]
+            l.d("Attempting replacement of macro parameter {} with {}", id, replacement)
             val tmp = mutableListOf<String>()
-            macroFunctions.forEach { tmp.add(it.replace(id, replacement)) }
+            macroFunctions.forEach {
+                val r = it.replaceWholeWord(id, replacement)
+                l.t("Replacement completed: '{}' -> '{}'", it, r)
+                tmp.add(r)
+            }
             macroFunctions.clear()
             tmp.forEach { macroFunctions.add(it) }
         }
@@ -423,11 +458,12 @@ class Preprocessor(private val lines: MutableList<String>) {
             builder += it
             builder += "; "
         }
-        l.t("Replaced macro invocation {} with macro body {}", w, builder())
-        return builder()
+        val result = builder().trimEnd().removeSuffix(";")
+        l.t("Replaced macro invocation {} with macro body {}", w, result)
+        return result
     }
 
-    private fun isInsideDisabledIf() = this.ifStack.seekDisabled()
+    private fun isInsideDisabledIf() = this.ifStack.seek(IfElement.DISABLED_IF)
 
     private fun processIncludes(lines: MutableList<String>) {
         try {
@@ -504,6 +540,24 @@ class Preprocessor(private val lines: MutableList<String>) {
             l.w("CRITICAL! Found preprocessor instruction '{}' on line {}. This line will NOT be parsed", s, i.toLineNumber())
         }
     }
+
+    private fun checkRunawayIfClauses() {
+        if (this.ifStack.peek() != null) {
+            l.w("Detected runaway if clauses! This is a SERIOUS ERROR!")
+            l.w("Runaway if clauses are implicitly closed at the end of file. This operation is non-standard!")
+            l.w("Please consider closing your declaration when needed - in this case adding an <#endif> instruction at the end of file")
+            l.w("This way you ensure standard compliant databases and portability")
+            l.w("This preprocessor will automatically close all runaway clauses NOW")
+            var counter = 0
+            while (this.ifStack.peek() != null) {
+                val a = this.ifStack.pop()
+                l.d("Popping if {} from stack", a)
+                ++counter
+            }
+            l.w("The preprocessor has successfully closed {} runaway if clauses", counter)
+            l.w("")
+        }
+    }
 }
 
 data class PIWrapper(val instruction: PI, val stringBefore: String, val stringAfter: String) {
@@ -521,20 +575,46 @@ private data class Property(val property: String)
 private data class Variable(val name: String, val value: String)
 private data class Macro(val name: String, val parameters: List<String>, val function: List<String>)
 
-private class IfStack {
+private class IfElement(var status: Boolean, var hadElse: Boolean = false) {
     companion object {
         const val DISABLED_IF = false
         const val ENABLED_IF = true
     }
-    private val stack = Stack<Boolean>()
-    private fun push(how: Boolean) = this.stack.push(how)
-    private fun seek(how: Boolean) = this.stack.search(how) != -1
-    fun pushDisabled() = this.push(DISABLED_IF)
-    fun pushEnabled() = this.push(ENABLED_IF)
+
+    operator fun invoke() = this.status
+    override operator fun equals(other: Any?) = this === other || (other is IfElement && other.status == this.status)
+    override fun hashCode() = this.status.hashCode()
+    override fun toString() = "IfElement[${super.toString()}](status=${this.status}, hadElse=${this.hadElse})"
+}
+
+private class IfStack {
+    private val stack = Stack<IfElement>()
+
+    private fun push(how: IfElement) = this.stack.push(how)
+
+    fun pushDisabled() = this.push(IfElement(IfElement.DISABLED_IF))
+    fun pushEnabled() = this.push(IfElement(IfElement.ENABLED_IF))
     fun pop() = this.stack.pop()
-    fun peek() = try { this.stack.peek() } catch (e: EmptyStackException) { null } // If it happens, we are already crashing so... no probs
-    fun seekDisabled() = this.seek(DISABLED_IF)
-    fun seekEnabled() = this.seek(ENABLED_IF)
+    fun peek() = try { this.stack.peek() } catch (e: EmptyStackException) { null } // If it happens, we are already crashing so...
+    fun seek(how: Boolean) = this.stack.search(IfElement(how)) != -1
+
+    fun pushElse() {
+        val element = this.peek() ?: throw UnsupportedOperationException("Unable to call else when no if element is present")
+        if (element.hadElse) {
+            throw IllegalStateException("Unable to call else when else has already been called before on the same statement")
+        }
+        element.hadElse = true
+        element.status = !element.status
+    }
+}
+
+private class SpecialAccessInstructionsMutableMap: LinkedHashMap<QueryType, Any>() {
+    override fun put(key: QueryType, value: Any): Any? {
+        if (this.contains(key)) {
+            throw IllegalStateException("A value with the same query type $key already exists")
+        }
+        return super.put(key, value)
+    }
 }
 
 internal class PreprocessorException(message: String, cause: Throwable?): Exception(message, cause)
@@ -542,7 +622,7 @@ internal class MalformedPreprocessorInstructionException(message: String): Excep
 internal class InvalidPreprocessorInstructionException(message: String, cause: Throwable? = null): Exception(message, cause)
 internal class InternalOnlyPreprocessorInstructionException(message: String): Exception(message)
 internal class ThrowException(message: String): Exception(message)
-internal class IllegalElseLocationException(message: String): Exception(message)
+internal class IllegalElseLocationException(message: String, cause: Throwable? = null): Exception(message, cause)
 internal class IllegalEndIfLocationException(message: String): Exception(message)
 internal class IllegalIncludeFileInstructionException(message: String): Exception(message)
 internal class InclusionException(message: String, cause: Throwable?): Exception(message, cause)
@@ -551,5 +631,9 @@ private fun PI.getKeyword() = this.getWords()[0]
 private fun PI.getArguments() = ImmutableList.copyOf(this.getWords().subList(1, this.getWords().count()))!!
 private fun PI.getWords() = this.getInstruction().split(" ", ignoreCase = true)
 private fun PI.stringifyArguments() = this.getInstruction().removePrefix(this.getKeyword()).trimStart()
+
+private fun <T> List<T>.safeGet(index: Int, default: T) = try { this[index] } catch (i: IndexOutOfBoundsException) { default }
+
+private fun String.replaceWholeWord(word: String, with: String) = this.replace(Regex("\\b$word\\b"), with)
 
 @Suppress("UNCHECKED_CAST") private fun <T> Any?.toT() = if (this == null) null else this as T?

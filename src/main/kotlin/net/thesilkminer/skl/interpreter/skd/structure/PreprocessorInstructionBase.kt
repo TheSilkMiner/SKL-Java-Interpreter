@@ -36,6 +36,7 @@ class PreprocessorInstructionBase(instruction: String, lineNumber: Long) : Prepr
             return IllegalArgumentException("Given type and instruction mismatch: found $foundType, expected $type")
         }
 
+        // TODO("Allow quoting to circumvent spaces (e.g. <#var STRING \"with spaces\">)")
         val parameters = instruction.removePrefix(keyword).trim().split(' ').toMutableList()
         parameters.removeIf { it.isBlank() }
         val parameterCount = parameters.count()

@@ -1,7 +1,6 @@
 package net.thesilkminer.skl.interpreter.skd.tools.parser
 
-import org.hamcrest.CoreMatchers
-import org.hamcrest.Matcher
+import net.thesilkminer.skl.interpreter.skd.expectExceptions
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
@@ -88,14 +87,8 @@ class DeclaratorTest {
             "<!DOCTYPE skd>", "<!SKD 0.3>", "<!INVALID>")
 
     private fun <T: Exception> expectExceptionWhileParsing(exception: KClass<T>, vararg lines: String) {
-        this.expectedException.expectCause(this.isAn(exception))
-        try {
-            Declarator(mutableListOf(*lines)).parse()
-        } catch (e: Exception) {
-            e.printStackTrace(System.err)
-            throw e
+        expectExceptions(this.expectedException, exception, *lines) {
+            Declarator(it).parse()
         }
     }
-
-    private fun <T: Exception> isAn(e: KClass<T>): Matcher<T> = CoreMatchers.isA(e.java)
 }

@@ -35,8 +35,8 @@ class L(c: KClass<*>) {
             }
         } catch (e: Throwable) {
             if (!h && e is KotlinReflectionNotSupportedError) {
-                System.out.println("sL: Missing Reflection in class path - falling back to Java-based preconditions checking")
-                e.printStackTrace(System.out)
+                System.err.println("sL: Missing Reflection in class path - falling back to Java-based preconditions checking")
+                e.printStackTrace(System.err)
                 h = true
 
                 if (c.java.name.endsWith("\$Companion")) {
